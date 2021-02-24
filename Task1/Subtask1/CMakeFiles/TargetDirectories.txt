@@ -1,3 +1,0 @@
-/home/rahul/Documents/COP290Assignments/Task1/Subtask1/CMakeFiles/rebuild_cache.dir
-/home/rahul/Documents/COP290Assignments/Task1/Subtask1/CMakeFiles/edit_cache.dir
-/home/rahul/Documents/COP290Assignments/Task1/Subtask1/CMakeFiles/img.dir
