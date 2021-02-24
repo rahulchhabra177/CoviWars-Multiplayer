@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	resize(imgsrc,resized_img, Size(imgsrc.cols*1.5,imgsrc.rows*1.5));
 	Size img_size=resized_img.size();
 	Size size=imgsrc.size();
-	Size cropped_size(300,400);
+	Size cropped_size(600,800);
 	
 	//Destination images initialized as blank/empty canvas i.e. a black screen	
 	Mat img_dst = Mat::zeros(img_size,CV_32F);
@@ -94,24 +94,11 @@ int main(int argc, char** argv)
 	setMouseCallback("Image",handle_clicks,&userdata);
 	waitKey(0);
 
-
-
-
-
-
-
-
-
 	//Finding warped image
 	Mat h1 = findHomography(userdata.points,pts_dst);
 	Mat h2 = findHomography(userdata.points,pts_dst2);
 	warpPerspective(resized_img,img_dst,h1,img_size);
 	warpPerspective(resized_img,img_dst2,h2,cropped_size);
-
-
-
-
-
 
 	//Displaying image(s)
 	imshow("Warped Image",img_dst);
