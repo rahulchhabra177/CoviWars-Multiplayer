@@ -1,4 +1,4 @@
-# Install script for directory: /home/shrey/Desktop/COP290Assignments/Task1/Subtask1
+# Install script for directory: /home/rahul/Documents/COP290Assignments/Task1/Subtask1
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/shrey/Desktop/COP290Assignments/Task1/Subtask1/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/rahul/Documents/COP290Assignments/Task1/Subtask1/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
