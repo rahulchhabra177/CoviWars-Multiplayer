@@ -24,6 +24,7 @@ void handle_clicks(int event,int x,int y,int flags,void* data){
     	//Detecting left mouse click
    	if (event==EVENT_LBUTTONDOWN){
    	
+   		cout<<x<<" "<<y<<endl;
         	img_points* cur_data=(img_points*) data; 
         	
         	//Circle to be displayed at the selected point
@@ -139,7 +140,7 @@ int main(int argc, char** argv)
 
 	
 
-				//A vector of pre-defined points of img_dst2 for displaying the cropped image
+				//A vector of pre-defined points
 				vector<Point2f> pts_dst2;
 				pts_dst2.push_back(Point2f(0,0));
 				pts_dst2.push_back(Point2f(0,cropped_size.height-1));
