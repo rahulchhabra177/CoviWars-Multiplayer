@@ -69,10 +69,15 @@ int main(int argc,char** argv)
  		
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
+
+            float X,Y;
+            cout<<"Enter space separated values of required resolution: ";
+            cin>>X>>Y;
+
  			Mat initialImg;
  			cap.read(initialImg);
  			Size img_size=initialImg.size();		//Resolution=1920*1080 
- 			resize(initialImg,initialImg,Size(1.5*img_size.width,1.5*img_size.height));
+ 			resize(initialImg,initialImg,Size(X,Y));
 			cvtColor(initialImg,initialImg,COLOR_BGR2GRAY);
  			
  			//Size of the cropped image which we are interested in
@@ -80,10 +85,10 @@ int main(int argc,char** argv)
 
 			//Warping the frame to fit in the cropped frame whose size we defined above
  			vector<Point2f> pts_dst;
- 			pts_dst.push_back(Point2f(1214,309));
-			pts_dst.push_back(Point2f(43,1265));
-			pts_dst.push_back(Point2f(2613,1519));							
-			pts_dst.push_back(Point2f(2017,303));
+ 			pts_dst.push_back(Point2f(1214*X/2880,309*Y/1620));
+			pts_dst.push_back(Point2f(43*X/2880,1265*Y/1620));
+			pts_dst.push_back(Point2f(2613*X/2880,1519*Y/1620));							
+			pts_dst.push_back(Point2f(2017*X/2880,303*Y/1620));
 
 			vector<Point2f> pts_dst2;
 			pts_dst2.push_back(Point2f(0,0));
@@ -107,7 +112,7 @@ int main(int argc,char** argv)
 			float qDensity;
 			float dDensity;
 
- 			while(true){
+            while(true){
  				
  				//Processing the current frame of the video
  				Mat frame;
@@ -122,7 +127,7 @@ int main(int argc,char** argv)
  				
  				//Manipulating the current frame so that it can be operated with the 
  				//reference frame
- 				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+ 				resize(frame,frame,Size(X,Y));
  				cvtColor(frame,frame,COLOR_BGR2GRAY);
  				warpPerspective(frame,frame,h,cropped_size);
 
@@ -167,18 +172,24 @@ int main(int argc,char** argv)
 				     }
 				}
 				
+                imshow("Normal Image",frame);
+                imshow("Queue Density",queueImg);
+                imshow("Dynamic Density",diffImg);
+
 				//Writing the frame number and density values in the command line
-				//fstream myfile("out.txt",std::ios_base::app);
-				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				fstream myfile("out.txt",std::ios_base::app);
+				myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				//cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 				//Iterating through the frames
 				currentImg = frame;
 				frameNo++;
+
+                if(waitKey(10) == 27){
+                    break;
+                }
  			}
- 		
- 		}
-		
+        }		
 	}else{
 		cerr<<"Exactly two arguments are acceptable. The correct input format on the command line should be ./video sample_video.mp4"<<endl;
 	}

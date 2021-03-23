@@ -166,6 +166,10 @@ int main(int argc,char** argv)
 				     	dDensity = d;
 				     }
 				}
+
+				imshow("Normal Image",frame);
+                imshow("Queue Density",queueImg);
+                imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
 				//fstream myfile("out.txt",std::ios_base::app);
@@ -175,8 +179,11 @@ int main(int argc,char** argv)
 				//Iterating through the frames
 				currentImg = frame;
 				frameNo++;
+
+				if(waitKey(10) == 27){
+                    break;
+                }
  			}
- 		
  		}
 		
 	}else{
