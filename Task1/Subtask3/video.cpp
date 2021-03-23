@@ -1,7 +1,7 @@
 //Designed by:
 // 1) Rahul Chhabra (2019CS11016)
 // 2) Shrey Patel (2019CS10400)
-//new branch
+//new branch named rahul
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
