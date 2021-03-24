@@ -182,9 +182,9 @@ int main(int argc,char** argv)
                 // imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
-				fstream myfile("out.txt",std::ios_base::app);
-				myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				//cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				//fstream myfile("out.txt",std::ios_base::app);
+				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 				//Iterating through the frames
 				currentImg = frame;
