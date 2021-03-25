@@ -72,7 +72,7 @@ int main(int argc,char** argv)
  			Mat initialImg;
  			cap.read(initialImg);
  			Size img_size=initialImg.size();		//Resolution=1920*1080 
- 			resize(initialImg,initialImg,Size(1.5*img_size.width,1.5*img_size.height));
+ 			//resize(initialImg,initialImg,Size(1.5*img_size.width,1.5*img_size.height));
 			cvtColor(initialImg,initialImg,COLOR_BGR2GRAY);
  			
  			//Size of the cropped image which we are interested in
@@ -124,7 +124,7 @@ int main(int argc,char** argv)
  				
  				//Manipulating the current frame so that it can be operated with the 
  				//reference frame
- 				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+ 				//resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
  				cvtColor(frame,frame,COLOR_BGR2GRAY);
  				warpPerspective(frame,frame,h,cropped_size);
 
