@@ -107,8 +107,6 @@ int main(int argc,char** argv)
 			float qDensity;
 			float dDensity;
 
-			auto startTime = chrono::high_resolution_clock::now();
-
  			while(true){
  				
  				//Processing the current frame of the video
@@ -168,6 +166,10 @@ int main(int argc,char** argv)
 				     	dDensity = d;
 				     }
 				}
+
+				imshow("Normal Image",frame);
+                imshow("Queue Density",queueImg);
+                imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
 				//fstream myfile("out.txt",std::ios_base::app);
@@ -182,12 +184,7 @@ int main(int argc,char** argv)
                     break;
                 }
  			}
-			
-			auto endTime = chrono::high_resolution_clock::now(); 
-
-            chrono::duration<float> execTime = endTime - startTime;
-            cout<<execTime.count()<<endl;
-  		}
+ 		}
 		
 	}else{
 		cerr<<"Exactly two arguments are acceptable. The correct input format on the command line should be ./video sample_video.mp4"<<endl;

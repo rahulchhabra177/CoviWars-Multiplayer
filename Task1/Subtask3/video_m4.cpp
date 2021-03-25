@@ -15,7 +15,7 @@ vector<double> bArea;
 
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
 //the queue density and the dynamic density 
-void black_area(Mat mat,int x0,int y0,int x1,int y1,int i)
+void black_area(Mat mat,int x0,int x1,int y0,int y1,int i)
 {      
 	double k=0.0;
 
@@ -115,8 +115,8 @@ int main(int argc,char** argv)
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
-			float qDensity;
-			float dDensity;
+			double qDensity;
+			double dDensity;
 
             auto startTime = chrono::high_resolution_clock::now();
 
@@ -159,14 +159,11 @@ int main(int argc,char** argv)
 				threshold(diffImg,diffImg,20,255,0); 
 				GaussianBlur(diffImg,diffImg,Size(45,45),10,10);
 
-				double bArea1,bArea2,bArea3,bArea4,bArea5,bArea6,bArea7,bArea8;
-				bArea1 = bArea2 = bArea3 = bArea4 = bArea5 = bArea6 = bArea7 = bArea8 = 0;
-
 				thread t1(black_area,queueImg,0,img_size.width/2,0,img_size.height/2,0);
 				thread t2(black_area,queueImg,img_size.width/2,img_size.width,0,img_size.height/2,1);
 				thread t3(black_area,queueImg,img_size.width/2,img_size.width,img_size.height/2,img_size.height,2);
 				thread t4(black_area,queueImg,0,img_size.width/2,img_size.height/2,img_size.height,3);
-				thread t5(black_area,diffImg,0,img_size.width/2,0,img_size.height/2,bArea4);
+				thread t5(black_area,diffImg,0,img_size.width/2,0,img_size.height/2,4);
 				thread t6(black_area,diffImg,img_size.width/2,img_size.width,0,img_size.height/2,5);
 				thread t7(black_area,diffImg,img_size.width/2,img_size.width,img_size.height/2,img_size.height,6);
 				thread t8(black_area,diffImg,0,img_size.width/2,img_size.height/2,img_size.height,7);
@@ -198,10 +195,6 @@ int main(int argc,char** argv)
 				     	dDensity = d;
 				     }
 				}
-
-				imshow("Normal Image",frame);
-                imshow("Queue Density",queueImg);
-                imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
 				//fstream myfile("out.txt",std::ios_base::app);
@@ -217,7 +210,7 @@ int main(int argc,char** argv)
                 }
  			}
 
-            auto endTime = chrono::high_resolution_clock::now();
+            auto endTime = chrono::high_resolution_clock::now(); 
 
             chrono::duration<float> execTime = endTime - startTime;
             cout<<execTime.count()<<endl;
