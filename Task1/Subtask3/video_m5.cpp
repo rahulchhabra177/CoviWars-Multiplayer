@@ -5,9 +5,16 @@
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
+#include<thread>
 
 using namespace std;
 using namespace cv;
+
+//Queue density and Dynamic density values for the last frame. Note that we 
+//don't calculate these values for the first frame, as we have taken the first 
+//frame as reference.
+double qDensity;
+double dDensity;
 
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
 //the queue density and the dynamic density 
@@ -15,18 +22,67 @@ double black_density(Mat mat)
 {      
 	double k=0.0;
 
-    	for(int i=0; i<mat.size().height; i++)
-    	{
-        	for(int j=0; j<mat.size().width; j++)
-        	{
-            		//Checking if the current pixel is black i.e. value = 0.0
-            		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
-        	}
-    	}
-    	double area=(float)mat.size().height*mat.size().width;
-    	
-    	//k = Total black coloured area on screen, area = Total area of screen
-    	return k/area;
+	for(int i=0; i<mat.size().height; i++)
+	{
+		for(int j=0; j<mat.size().width; j++)
+		{
+				//Checking if the current pixel is black i.e. value = 0.0
+				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
+		}
+	}
+	double area=(float)mat.size().height*mat.size().width;
+	
+	//k = Total black coloured area on screen, area = Total area of screen
+	return k/area;
+}
+
+void processFrame(Mat frame,Mat lastFrame,Mat initialFrame,int frameNo){
+
+	//queueImg = Image showing the queued traffic of the current frame
+	//diffImg = Image showing the moving traffic of the current frame  
+	Mat diffImg;
+	Mat queueImg;
+	
+	//queueImg can be obtained by background subtraction, i.e. by subtracting 
+	//the background/reference frame from the current frame.
+	absdiff(frame,initialFrame,queueImg);
+	
+	//diffImg can be obtained by subtraction of consecutive frames, i.e.
+	//by subtracting last frame(stored in currentImg) from the current frame
+	absdiff(frame,lastFrame,diffImg);
+
+	//Removing distortions(noise) from both the images by applying a 
+	//threshold filter and a Gaussian blur
+	threshold(queueImg,queueImg,50,255,0); 
+	GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
+	threshold(diffImg,diffImg,20,255,0); 
+	GaussianBlur(diffImg,diffImg,Size(45,45),10,10);
+
+	double q = 1-black_density(queueImg);
+	double d = 1-black_density(diffImg); 
+
+	//This block of code applies a filter to the queue density and dynamic 
+	//density values to reduce fluctuations and distortions in adjacent 
+	//values to obtain a "relatively" smooth graph
+	if(frameNo == 1){
+		qDensity = q;
+		dDensity = d;
+	}else{
+		//If the density values of consecutive frames differ by more than
+		//0.2, we extrapolate the last value, else we accept the density
+		//values of current frame. 
+		if(abs(q-qDensity)<=0.1){
+			qDensity = q;
+		}
+		if(abs(d-dDensity)<=0.1){
+			dDensity = d;
+		}
+	}
+	
+	//Writing the frame number and density values in the command line
+	//fstream myfile("out.txt",std::ios_base::app);
+	//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+	cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 }
 
 //Helper function to check file format for valid videos
@@ -100,12 +156,8 @@ int main(int argc,char** argv)
 			
 			//Current frame number
 			int frameNo = 1;
-			
-			//Queue density and Dynamic density values for the last frame. Note that we 
-			//don't calculate these values for the first frame, as we have taken the first 
-			//frame as reference.
-			float qDensity;
-			float dDensity;
+
+			auto startTime = chrono::high_resolution_clock::now();
 
  			while(true){
  				
@@ -120,70 +172,85 @@ int main(int argc,char** argv)
  					break;
  				}
  				
- 				//Manipulating the current frame so that it can be operated with the 
- 				//reference frame
- 				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
- 				cvtColor(frame,frame,COLOR_BGR2GRAY);
- 				warpPerspective(frame,frame,h,cropped_size);
-
-				//queueImg = Image showing the queued traffic of the current frame
-				//diffImg = Image showing the moving traffic of the current frame  
-				Mat diffImg;
-				Mat queueImg;
-				
-				//queueImg can be obtained by background subtraction, i.e. by subtracting 
-				//the background/reference frame from the current frame.
-				absdiff(frame,initialImg,queueImg);
-				
-				//diffImg can be obtained by subtraction of consecutive frames, i.e.
-				//by subtracting last frame(stored in currentImg) from the current frame
-				absdiff(frame,currentImg,diffImg);
-
-				//Removing distortions(noise) from both the images by applying a 
-				//threshold filter and a Gaussian blur
-				threshold(queueImg,queueImg,50,255,0); 
-				GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-				threshold(diffImg,diffImg,20,255,0); 
-				GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
-
-				//This block of code applies a filter to the queue density and dynamic 
-				//density values to reduce fluctuations and distortions in adjacent 
-				//values to obtain a "relatively" smooth graph
-				if(frameNo == 1){
-				     qDensity = (1-black_density(queueImg));
-				     dDensity = (1-black_density(diffImg));
-				}else{
-				     float q = 1-black_density(queueImg);
-				     float d = 1-black_density(diffImg);
-				     
-				     //If the density values of consecutive frames differ by more than
-				     //0.2, we extrapolate the last value, else we accept the density
-				     //values of current frame. 
-				     if(abs(q-qDensity)<=0.1){
-				     	qDensity = q;
-				     }
-				     if(abs(d-dDensity)<=0.1){
-				     	dDensity = d;
-				     }
-				}
-
-				imshow("Normal Image",frame);
-                imshow("Queue Density",queueImg);
-                imshow("Dynamic Density",diffImg);
-				
-				//Writing the frame number and density values in the command line
-				//fstream myfile("out.txt",std::ios_base::app);
-				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-
+				//Manipulating the current frame so that it can be operated with the 
+				//reference frame
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+ 				thread t1(processFrame,frame,currentImg,initialImg,frameNo++);
 				//Iterating through the frames
 				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t2(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t3(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t4(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t5(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t6(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t7(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+				cap.read(frame);
+				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+				cvtColor(frame,frame,COLOR_BGR2GRAY);
+				warpPerspective(frame,frame,h,cropped_size);
+				thread t8(processFrame,frame,currentImg,initialImg,frameNo++);
+				//Iterating through the frames
+				currentImg = frame;
+
+				t1.join();
+				t2.join();
+				t3.join();
+				t4.join();
+				t5.join();
+				t6.join();
+				t7.join();
+				t8.join();
+
+				
 				frameNo++;
 
 				if(waitKey(10) == 27){
                     break;
                 }
  			}
+
+			auto endTime = chrono::high_resolution_clock::now(); 
+
+            chrono::duration<float> execTime = endTime - startTime;
+            cout<<execTime.count()<<endl;
  		}
 		
 	}else{
