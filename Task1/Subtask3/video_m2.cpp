@@ -47,6 +47,10 @@ bool check_format(string video){
 
 int main(int argc,char** argv)
 {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
 	//Checking number of arguments
 	if(argc == 2){
 		
@@ -126,7 +130,7 @@ int main(int argc,char** argv)
  				if(!notOver){
  					break;
  				}
- 				
+
  				//Manipulating the current frame so that it can be operated with the 
  				//reference frame
  				resize(frame,frame,Size(X,Y));
@@ -175,9 +179,9 @@ int main(int argc,char** argv)
 				}
 
 				//Writing the frame number and density values in the command line
-				// fstream myfile("out.txt",std::ios_base::app);
-				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				fstream myfile("output_m2.txt",std::ios_base::app);
+				myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				//cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 				//Iterating through the frames
 				currentImg = frame;

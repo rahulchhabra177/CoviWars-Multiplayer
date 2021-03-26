@@ -159,7 +159,7 @@ int main(int argc,char** argv)
 
 			auto startTime = chrono::high_resolution_clock::now();
 
- 			while(true){
+ 			while(frameNo<800){
  				
  				//Processing the current frame of the video
  				Mat frame;

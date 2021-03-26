@@ -1,3 +1,5 @@
+
+
 //Designed by:
 // 1) Rahul Chhabra (2019CS11016)
 // 2) Shrey Patel (2019CS10400)
@@ -48,6 +50,10 @@ bool check_format(string video){
 
 int main(int argc,char** argv)
 {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
 	//Checking number of arguments
 	if(argc == 2){
 		
@@ -182,9 +188,9 @@ int main(int argc,char** argv)
                 // imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
-				//fstream myfile("out.txt",std::ios_base::app);
-				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				fstream myfile("out_m1.txt",std::ios_base::app);
+				myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				//cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 				//Iterating through the frames
 				currentImg = frame;

@@ -47,6 +47,10 @@ bool check_format(string video){
 
 int main(int argc,char** argv)
 {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
 	//Checking number of arguments
 	if(argc == 2){
 		
@@ -80,10 +84,10 @@ int main(int argc,char** argv)
 
 			//Warping the frame to fit in the cropped frame whose size we defined above
  			vector<Point2f> pts_dst;
- 			pts_dst.push_back(Point2f(1214,309));
-			pts_dst.push_back(Point2f(43,1265));
-			pts_dst.push_back(Point2f(2613,1519));							
-			pts_dst.push_back(Point2f(2017,303));
+ 			pts_dst.push_back(Point2f(1214/1.5,309/1.5));
+			pts_dst.push_back(Point2f(43/1.5,1265/1.5));
+			pts_dst.push_back(Point2f(2613/1.5,1519/1.5));							
+			pts_dst.push_back(Point2f(2017/1.5,303/1.5));
 
 			vector<Point2f> pts_dst2;
 			pts_dst2.push_back(Point2f(0,0));
@@ -104,8 +108,8 @@ int main(int argc,char** argv)
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
-			float qDensity;
-			float dDensity;
+			double qDensity;
+			double dDensity;
 
 			auto startTime = chrono::high_resolution_clock::now();
 
@@ -130,43 +134,40 @@ int main(int argc,char** argv)
 
 				//queueImg = Image showing the queued traffic of the current frame
 				//diffImg = Image showing the moving traffic of the current frame  
-				Mat diffImg;
 				Mat queueImg;
+				Mat diffImg;
 				
 				//queueImg can be obtained by background subtraction, i.e. by subtracting 
 				//the background/reference frame from the current frame.
 				absdiff(frame,initialImg,queueImg);
-				
-				//diffImg can be obtained by subtraction of consecutive frames, i.e.
-				//by subtracting last frame(stored in currentImg) from the current frame
 				absdiff(frame,currentImg,diffImg);
-
+				
 				//Removing distortions(noise) from both the images by applying a 
 				//threshold filter and a Gaussian blur
 				threshold(queueImg,queueImg,50,255,0); 
 				GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-				threshold(diffImg,diffImg,20,255,0); 
-				GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
+				threshold(diffImg,queueImg,50,255,0); 
+				GaussianBlur(diffImg,queueImg,Size(45,45),10,10);
 
 				//This block of code applies a filter to the queue density and dynamic 
 				//density values to reduce fluctuations and distortions in adjacent 
 				//values to obtain a "relatively" smooth graph
 				if(frameNo == 1){
-				     qDensity = (1-black_density(queueImg));
-				     dDensity = (1-black_density(diffImg));
+				    qDensity = (1-black_density(queueImg));
+					dDensity = (1-black_density(diffImg));
 				}else{
-				     float q = 1-black_density(queueImg);
-				     float d = 1-black_density(diffImg);
+				    double q = 1-black_density(queueImg);
+					double d = 1-black_density(diffImg);
 				     
-				     //If the density values of consecutive frames differ by more than
-				     //0.2, we extrapolate the last value, else we accept the density
-				     //values of current frame. 
-				     if(abs(q-qDensity)<=0.1){
-				     	qDensity = q;
-				     }
-				     if(abs(d-dDensity)<=0.1){
-				     	dDensity = d;
-				     }
+				    //If the density values of consecutive frames differ by more than
+				    //0.2, we extrapolate the last value, else we accept the density
+				    //values of current frame. 
+					if(abs(q-qDensity)<=0.1){
+				    	qDensity = q;
+				    }
+					if(abs(d-dDensity)<=0.1){
+				    	dDensity = d;
+				    }
 				}
 				
 				//Writing the frame number and density values in the command line
@@ -174,9 +175,8 @@ int main(int argc,char** argv)
 				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
-				//Iterating through the frames
-				currentImg = frame;
 				frameNo++;
+				currentImg = frame;
 
 				if(waitKey(10) == 27){
                     break;

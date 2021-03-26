@@ -48,8 +48,12 @@ bool check_format(string video){
 	}
 }
 
-int main(int argc,char** argv)
-{
+int main(int argc,char** argv){
+
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+	
 	//Checking number of arguments
 	if(argc == 2){
 		
@@ -79,7 +83,7 @@ int main(int argc,char** argv)
  			Mat initialImg;
  			cap.read(initialImg);
  			Size src_size=initialImg.size();		//Resolution=1920*1080 
- 			resize(initialImg,initialImg,Size(1.5*src_size.width,1.5*src_size.height));
+ 			//resize(initialImg,initialImg,Size(1.5*src_size.width,1.5*src_size.height));
 			cvtColor(initialImg,initialImg,COLOR_BGR2GRAY);
 			Size img_size=initialImg.size();
  			
@@ -135,7 +139,7 @@ int main(int argc,char** argv)
  				
  				//Manipulating the current frame so that it can be operated with the 
  				//reference frame
- 				resize(frame,frame,Size(1.5*src_size.width,1.5*src_size.height));
+ 				//resize(frame,frame,Size(1.5*src_size.width,1.5*src_size.height));
  				cvtColor(frame,frame,COLOR_BGR2GRAY);
  				warpPerspective(frame,frame,h,cropped_size);
 
