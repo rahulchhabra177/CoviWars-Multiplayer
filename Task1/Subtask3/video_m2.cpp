@@ -5,6 +5,7 @@
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
+#include<chrono>
 
 using namespace std;
 using namespace cv;
@@ -74,8 +75,8 @@ int main(int argc,char** argv)
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
 
-            float X,Y;
-            cout<<"Enter space separated values of required resolution: ";
+            double X,Y;
+            cerr<<"Enter space separated values of required resolution: ";
             cin>>X>>Y;
 
  			Mat initialImg;
@@ -179,9 +180,9 @@ int main(int argc,char** argv)
 				}
 
 				//Writing the frame number and density values in the command line
-				fstream myfile("output_m2.txt",std::ios_base::app);
-				myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				//cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				// fstream myfile("output_m2.txt",std::ios_base::app);
+				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 				//Iterating through the frames
 				currentImg = frame;

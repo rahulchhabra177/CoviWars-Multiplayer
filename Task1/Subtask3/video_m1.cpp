@@ -26,7 +26,7 @@ double black_density(Mat mat)
             		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
         	}
     	}
-    	double area=(float)mat.size().height*mat.size().width;
+    	double area=(double)mat.size().height*mat.size().width;
     	
     	//k = Total black coloured area on screen, area = Total area of screen
     	return k/area;
@@ -75,7 +75,7 @@ int main(int argc,char** argv)
  		}else{
 
             int x;
-            cout<<"Enter the number of frames to skip in every iteration: ";
+            cerr<<"Enter the number of frames to skip in every iteration: ";
             cin>>x;
  		
  			//The first frame of the video, which we have taken as the background/reference
@@ -188,9 +188,9 @@ int main(int argc,char** argv)
                 // imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
-				fstream myfile("out_m1.txt",std::ios_base::app);
-				myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				//cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				// fstream myfile("out_m1.txt",std::ios_base::app);
+				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 				//Iterating through the frames
 				currentImg = frame;
