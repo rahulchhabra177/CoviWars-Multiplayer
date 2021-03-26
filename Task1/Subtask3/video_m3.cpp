@@ -5,31 +5,36 @@
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
-#include<chrono>
-#include<thread>
 
 using namespace std;
 using namespace cv;
+
+struct bounds{
+	Mat currentFrame;
+	int x0,x1,y0,y1;
+};
 
 vector<double> bArea;
 
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
 //the queue density and the dynamic density 
-void black_area(Mat mat,int x0,int x1,int y0,int y1,int i)
+void *black_density(void* frameData)
 {      
 	double k=0.0;
 
-    	for(int i=y0; i<y1; i++)
-    	{
-        	for(int j=x0; j<x1; j++)
-        	{
-            		//Checking if the current pixel is black i.e. value = 0.0
-            		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
-        	}
-    	}
-    	
-    	//k = Total black coloured area on screen, area = Total area of screen
-    	bArea[i] = k;
+	for(int i=0; i<mat.size().height; i++)
+	{
+		for(int j=0; j<mat.size().width; j++)
+		{
+				//Checking if the current pixel is black i.e. value = 0.0
+				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
+		}
+	}
+	double area=(float)mat.size().height*mat.size().width;
+	
+	//k = Total black coloured area on screen, area = Total area of screen
+	return k/area;
+
 }
 
 //Helper function to check file format for valid videos
@@ -48,12 +53,12 @@ bool check_format(string video){
 	}
 }
 
-int main(int argc,char** argv){
-
+int main(int argc,char** argv)
+{
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	cout.tie(NULL);
-	
+
 	//Checking number of arguments
 	if(argc == 2){
 		
@@ -73,29 +78,24 @@ int main(int argc,char** argv){
  		if(!check_format(string(argv[1]))){
  			cerr << "Incorrect video format. Accepted file formats: .mp4, .mpeg and .wmv"<<endl;
  		}else{
- 		
-			for(int i=0;i<8;i++){
-				bArea.push_back(0.0);
-			}
 
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
  			Mat initialImg;
  			cap.read(initialImg);
- 			Size src_size=initialImg.size();		//Resolution=1920*1080 
- 			//resize(initialImg,initialImg,Size(1.5*src_size.width,1.5*src_size.height));
+ 			Size img_size=initialImg.size();		//Resolution=1920*1080 
+ 			//resize(initialImg,initialImg,Size(1.5*img_size.width,1.5*img_size.height));
 			cvtColor(initialImg,initialImg,COLOR_BGR2GRAY);
-			Size img_size=initialImg.size();
  			
  			//Size of the cropped image which we are interested in
  			Size cropped_size=Size(900,1200);
 
 			//Warping the frame to fit in the cropped frame whose size we defined above
  			vector<Point2f> pts_dst;
- 			pts_dst.push_back(Point2f(1214,309));
-			pts_dst.push_back(Point2f(43,1265));
-			pts_dst.push_back(Point2f(2613,1519));							
-			pts_dst.push_back(Point2f(2017,303));
+ 			pts_dst.push_back(Point2f(1214/1.5,309/1.5));
+			pts_dst.push_back(Point2f(43/1.5,1265/1.5));
+			pts_dst.push_back(Point2f(2613/1.5,1519/1.5));							
+			pts_dst.push_back(Point2f(2017/1.5,303/1.5));
 
 			vector<Point2f> pts_dst2;
 			pts_dst2.push_back(Point2f(0,0));
@@ -112,9 +112,6 @@ int main(int argc,char** argv){
 			
 			//Current frame number
 			int frameNo = 1;
-
-			//Area of frame
-			double area = img_size.width * img_size.height;
 			
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
@@ -122,7 +119,9 @@ int main(int argc,char** argv){
 			double qDensity;
 			double dDensity;
 
-            auto startTime = chrono::high_resolution_clock::now();
+			auto startTime = chrono::high_resolution_clock::now();
+
+			pthread_t threads[numberOfThreads];
 
  			while(true){
  				
@@ -139,65 +138,46 @@ int main(int argc,char** argv){
  				
  				//Manipulating the current frame so that it can be operated with the 
  				//reference frame
- 				//resize(frame,frame,Size(1.5*src_size.width,1.5*src_size.height));
+ 				//resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
  				cvtColor(frame,frame,COLOR_BGR2GRAY);
  				warpPerspective(frame,frame,h,cropped_size);
 
 				//queueImg = Image showing the queued traffic of the current frame
 				//diffImg = Image showing the moving traffic of the current frame  
+				Mat queueImg;
 				Mat diffImg;
-				Mat queueImg; 
 				
 				//queueImg can be obtained by background subtraction, i.e. by subtracting 
 				//the background/reference frame from the current frame.
 				absdiff(frame,initialImg,queueImg);
-				
-				//diffImg can be obtained by subtraction of consecutive frames, i.e.
-				//by subtracting last frame(stored in currentImg) from the current frame
 				absdiff(frame,currentImg,diffImg);
-
+				
 				//Removing distortions(noise) from both the images by applying a 
 				//threshold filter and a Gaussian blur
 				threshold(queueImg,queueImg,50,255,0); 
 				GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-				threshold(diffImg,diffImg,20,255,0); 
-				GaussianBlur(diffImg,diffImg,Size(45,45),10,10);
-
-				thread t1(black_area,queueImg,0,img_size.width/2,0,img_size.height/2,0);
-				thread t2(black_area,queueImg,img_size.width/2,img_size.width,0,img_size.height/2,1);
-				thread t3(black_area,queueImg,img_size.width/2,img_size.width,img_size.height/2,img_size.height,2);
-				thread t4(black_area,queueImg,0,img_size.width/2,img_size.height/2,img_size.height,3);
-				thread t5(black_area,diffImg,0,img_size.width/2,0,img_size.height/2,4);
-				thread t6(black_area,diffImg,img_size.width/2,img_size.width,0,img_size.height/2,5);
-				thread t7(black_area,diffImg,img_size.width/2,img_size.width,img_size.height/2,img_size.height,6);
-				thread t8(black_area,diffImg,0,img_size.width/2,img_size.height/2,img_size.height,7);
-				t1.join();
-				t2.join();
-				t3.join();
-				t4.join();
-				t5.join();
-				t6.join();
-				t7.join();
-				t8.join();
-				double q = 1.0 - (bArea[0] + bArea[1] + bArea[2] + bArea[3])/area; 
-				double d = 1.0 - (bArea[4] + bArea[5] + bArea[6] + bArea[7])/area;
+				threshold(diffImg,queueImg,50,255,0); 
+				GaussianBlur(diffImg,queueImg,Size(45,45),10,10);
 
 				//This block of code applies a filter to the queue density and dynamic 
 				//density values to reduce fluctuations and distortions in adjacent 
 				//values to obtain a "relatively" smooth graph
 				if(frameNo == 1){
-				     qDensity = q;
-				     dDensity = d;
-				}else{ 
-				     //If the density values of consecutive frames differ by more than
-				     //0.2, we extrapolate the last value, else we accept the density
-				     //values of current frame. 
-				     if(abs(q-qDensity)<=0.1){
-				     	qDensity = q;
-				     }
-				     if(abs(d-dDensity)<=0.1){
-				     	dDensity = d;
-				     }
+				    qDensity = (1-black_density(queueImg));
+					dDensity = (1-black_density(diffImg));
+				}else{
+				    double q = 1-black_density(queueImg);
+					double d = 1-black_density(diffImg);
+				     
+				    //If the density values of consecutive frames differ by more than
+				    //0.2, we extrapolate the last value, else we accept the density
+				    //values of current frame. 
+					if(abs(q-qDensity)<=0.1){
+				    	qDensity = q;
+				    }
+					if(abs(d-dDensity)<=0.1){
+				    	dDensity = d;
+				    }
 				}
 				
 				//Writing the frame number and density values in the command line
@@ -205,23 +185,22 @@ int main(int argc,char** argv){
 				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
-				//Iterating through the frames
-				currentImg = frame;
 				frameNo++;
+				currentImg = frame;
 
 				if(waitKey(10) == 27){
                     break;
                 }
  			}
-
-            auto endTime = chrono::high_resolution_clock::now(); 
+			
+			auto endTime = chrono::high_resolution_clock::now(); 
 
             chrono::duration<float> execTime = endTime - startTime;
             cout<<execTime.count()<<endl;
- 		}
+  		}
 		
 	}else{
 		cerr<<"Exactly two arguments are acceptable. The correct input format on the command line should be ./video sample_video.mp4"<<endl;
 	}
-	return 0;	
+	pthread_exit(NULL);		
 }

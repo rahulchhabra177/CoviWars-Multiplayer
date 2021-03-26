@@ -13,12 +13,12 @@ using namespace cv;
 struct currentThread{
 	Mat currentFrame;
 	Mat lastFrame;
-	int frameNo;
 };
 
-double qDensity;
-double dDensity;
 Mat initialImg;
+int frameNo=0;
+vector<double> qDensity;
+vector<double> dDensity;
 
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
 //the queue density and the dynamic density 
@@ -26,18 +26,19 @@ double black_density(Mat mat)
 {      
 	double k=0.0;
 
-    	for(int i=0; i<mat.size().height; i++)
-    	{
-        	for(int j=0; j<mat.size().width; j++)
-        	{
-            		//Checking if the current pixel is black i.e. value = 0.0
-            		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
-        	}
-    	}
-    	double area=(float)mat.size().height*mat.size().width;
-    	
-    	//k = Total black coloured area on screen, area = Total area of screen
-    	return k/area;
+	for(int i=0; i<mat.size().height; i++)
+	{
+		for(int j=0; j<mat.size().width; j++)
+		{
+				//Checking if the current pixel is black i.e. value = 0.0
+				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
+		}
+	}
+	double area=(float)mat.size().height*mat.size().width;
+	
+	//k = Total black coloured area on screen, area = Total area of screen
+	return k/area;
+
 }
 
 void *processFrame(void *frameData){
@@ -59,17 +60,17 @@ void *processFrame(void *frameData){
 	
 	//Removing distortions(noise) from both the images by applying a 
 	//threshold filter and a Gaussian blur
-	threshold(queueImg,queueImg,50,2currentImg55,0); 
+	threshold(queueImg,queueImg,50,255,0); 
 	GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-	threshold(diffImg,queueImg,50,255,0); 
-	GaussianBlur(diffImg,queueImg,Size(45,45),10,10);
+	threshold(diffImg,diffImg,50,255,0); 
+	GaussianBlur(diffImg,diffImg,Size(45,45),10,10);
 
 	//This block of code applies a filter to the queue density and dynamic 
 	//density values to reduce fluctuations and distortions in adjacent 
 	//values to obtain a "relatively" smooth graph
-	if(myFrames->frameNo == 1){
-		qDensity = (1-black_density(queueImg));
-		dDensity = (1-black_density(diffImg));
+	if(frameNo == 0){
+		qDensity.push_back(1-black_density(queueImg));
+		dDensity.push_back(1-black_density(diffImg));
 	}else{
 		double q = 1-black_density(queueImg);
 		double d = 1-black_density(diffImg);
@@ -77,18 +78,18 @@ void *processFrame(void *frameData){
 		//If the density values of consecutive frames differ by more than
 		//0.2, we extrapolate the last value, else we accept the density
 		//values of current frame. 
-		if(abs(q-qDensity)<=0.1){
-			qDensity = q;
+		if(abs(q-qDensity[frameNo-1])<=0.1){
+			qDensity.push_back(q);
 		}
-		if(abs(d-dDensity)<=0.1){
-			dDensity = d;
+		if(abs(d-dDensity[frameNo-1])<=0.1){
+			dDensity.push_back(d);
 		}
 	}
 	
 	//Writing the frame number and density values in the command line
 	//fstream myfile("out.txt",std::ios_base::app);
 	//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-	cout<<(myFrames->frameNo)<<","<<(qDensity)<<","<<(dDensity)<<endl;
+	//cout<<frameNo++<<","<<(qDensity)<<","<<(dDensity)<<endl;
 
 	pthread_exit(NULL);
 }
@@ -178,6 +179,7 @@ int main(int argc,char** argv)
 			auto startTime = chrono::high_resolution_clock::now();
 
 			pthread_t threads[numberOfThreads];
+			void *status;
 
  			while(true){ 
 
@@ -199,19 +201,24 @@ int main(int argc,char** argv)
  				warpPerspective(frame,frame,h,cropped_size);
 
 				struct currentThread newThread;
-				newThread.frameNo=frameNo;
 				newThread.currentFrame=frame;
 				newThread.lastFrame=currentImg;
 
+				if(frameNo/numberOfThreads!=0){
+					pthread_join(threads[frameNo%numberOfThreads],&status);
+				}
 				pthread_create(&threads[frameNo%numberOfThreads],NULL,processFrame,(void *)&newThread);
 
-				frameNo++;
 				currentImg = frame;
 
 				if(waitKey(10) == 27){
                     break;
                 }
  			}
+
+			for(int i=0;i<qDensity.size();i++){
+				cout<<i<<","<<qDensity[i]<<","<<dDensity[i]<<"\n";
+			}
 			
 			auto endTime = chrono::high_resolution_clock::now(); 
 
