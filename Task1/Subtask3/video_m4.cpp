@@ -62,8 +62,8 @@ void *processFrame(void *frameData){
 	//threshold filter and a Gaussian blur
 	threshold(queueImg,queueImg,50,255,0); 
 	GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-	threshold(diffImg,diffImg,50,255,0); 
-	GaussianBlur(diffImg,diffImg,Size(45,45),10,10);
+	threshold(diffImg,diffImg,20,255,0); 
+	GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
 
 	//This block of code applies a filter to the queue density and dynamic 
 	//density values to reduce fluctuations and distortions in adjacent 

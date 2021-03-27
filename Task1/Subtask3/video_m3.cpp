@@ -11,7 +11,8 @@ using namespace cv;
 
 struct bounds{
 	Mat currentFrame;
-	int x0,x1,y0,y1;
+	int x_low,x_high,y_low,y_high;
+	int threadNumber;
 };
 
 vector<double> bArea;
@@ -21,20 +22,29 @@ vector<double> bArea;
 void *black_density(void* frameData)
 {      
 	double k=0.0;
+	struct bounds *myFrame;
+	myFrame = (struct bounds *)frameData;
+	Mat mat = myFrame->currentFrame;
+	int x0 = myFrame->x_low;
+	int x1 = myFrame->x_high;
+	int y0 = myFrame->y_low;
+	int y1 = myFrame->y_high;
+	int nt = myFrame->threadNumber;
 
-	for(int i=0; i<mat.size().height; i++)
+	for(int i=y0; i<y1; i++)
 	{
-		for(int j=0; j<mat.size().width; j++)
+		for(int j=x0; j<x1; j++)
 		{
 				//Checking if the current pixel is black i.e. value = 0.0
 				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
 		}
 	}
-	double area=(float)mat.size().height*mat.size().width;
-	
-	//k = Total black coloured area on screen, area = Total area of screen
-	return k/area;
+	double area = mat.size().width * mat.size().height;
 
+	//k = Total black coloured area on screen
+	bArea[nt]=k/area;
+
+	pthread_exit(NULL);
 }
 
 //Helper function to check file format for valid videos
@@ -79,6 +89,13 @@ int main(int argc,char** argv)
  			cerr << "Incorrect video format. Accepted file formats: .mp4, .mpeg and .wmv"<<endl;
  		}else{
 
+			int numberOfThreads;
+			cerr<<"Enter the number of threads for temporal threading(Max 8): ";cin>>numberOfThreads;
+
+			for(int i=0;i<2*numberOfThreads;i++){
+				bArea.push_back(0.0);
+			}
+
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
  			Mat initialImg;
@@ -111,7 +128,7 @@ int main(int argc,char** argv)
 			Mat currentImg = initialImg;
 			
 			//Current frame number
-			int frameNo = 1;
+			int frameNo = 0;
 			
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
@@ -121,10 +138,10 @@ int main(int argc,char** argv)
 
 			auto startTime = chrono::high_resolution_clock::now();
 
-			pthread_t threads[numberOfThreads];
+			pthread_t threads[2*numberOfThreads];
+			void *status;
 
  			while(true){
- 				
  				//Processing the current frame of the video
  				Mat frame;
  				//Indicates if we reached the end of the video i.e. no more frames to 
@@ -156,27 +173,51 @@ int main(int argc,char** argv)
 				//threshold filter and a Gaussian blur
 				threshold(queueImg,queueImg,50,255,0); 
 				GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-				threshold(diffImg,queueImg,50,255,0); 
-				GaussianBlur(diffImg,queueImg,Size(45,45),10,10);
+				threshold(diffImg,diffImg,20,255,0); 
+				GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
+
+				struct bounds currentThread;
+
+				for(int i=0;i<2*numberOfThreads;i++){
+					if(i<numberOfThreads){
+						currentThread.currentFrame = queueImg;
+					}else{
+						currentThread.currentFrame = diffImg;
+					}
+					int j=i%numberOfThreads;
+					currentThread.threadNumber=i;
+					currentThread.y_low=0;
+					currentThread.y_high=img_size.height;
+					currentThread.x_low=j*img_size.width/numberOfThreads;
+					currentThread.x_high=(j+1)*img_size.width/numberOfThreads;
+					pthread_create(&threads[i],NULL,black_density,(void *)&currentThread);
+				}
+
+				for(int i=0;i<2*numberOfThreads;i++){
+					pthread_join(threads[i],&status);
+				}
+
+				double q=0.0;double d=0.0;
+				for(int i=0;i<numberOfThreads;i++){
+					q+=bArea[i];
+					d+=bArea[i+numberOfThreads];
+				}
 
 				//This block of code applies a filter to the queue density and dynamic 
 				//density values to reduce fluctuations and distortions in adjacent 
 				//values to obtain a "relatively" smooth graph
-				if(frameNo == 1){
-				    qDensity = (1-black_density(queueImg));
-					dDensity = (1-black_density(diffImg));
+				if(frameNo == 0){
+				    qDensity = (1.0-q);
+					dDensity = (1.0-d);
 				}else{
-				    double q = 1-black_density(queueImg);
-					double d = 1-black_density(diffImg);
-				     
 				    //If the density values of consecutive frames differ by more than
 				    //0.2, we extrapolate the last value, else we accept the density
 				    //values of current frame. 
 					if(abs(q-qDensity)<=0.1){
-				    	qDensity = q;
+				    	qDensity = 1.0-q;
 				    }
 					if(abs(d-dDensity)<=0.1){
-				    	dDensity = d;
+				    	dDensity = 1.0-d;
 				    }
 				}
 				
@@ -184,6 +225,10 @@ int main(int argc,char** argv)
 				//fstream myfile("out.txt",std::ios_base::app);
 				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				for(int i=0;i<2*numberOfThreads;i++){
+					cout<<bArea[i]<<" ";
+				}
+				cout<<"\n\n";
 
 				frameNo++;
 				currentImg = frame;
