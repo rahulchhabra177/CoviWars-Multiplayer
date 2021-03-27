@@ -5,7 +5,8 @@
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
-#include <thread>
+#include <pthread.h>
+
 using namespace std;
 using namespace cv;
 
@@ -65,7 +66,8 @@ int main(int argc,char** argv)
  		//Checking if the input video is of the correct format
  		if(!check_format(string(argv[1]))){
  			cerr << "Incorrect video format. Accepted file formats: .mp4, .mpeg and .wmv"<<endl;
- 		}else{
+ 		}
+ 		else{
  		
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
@@ -106,22 +108,38 @@ int main(int argc,char** argv)
 			//frame as reference.
 			float qDensity;
 			float dDensity;
-			vector<thread>threads;
-			for (int i=0;i<number_of_threads;i++){
-				threads.push_back(thread([initial_frame,final_frame]{
-					cout<<"Thread_changed\n";
-					if (frameNo>=initial_frame and frameNo<final_frame){
-			 			while(true){
+			int number_of_threads;
+			int number_of_frames=cap.get(CAP_PROP_FRAME_COUNT);
+			cout<<"Please Enter number of threads:";
+			cin>>number_of_threads;
+			int step=number_of_frames/number_of_threads;
+			vector<thread> threads(number_of_threads);
+			auto startTime = chrono::high_resolution_clock::now();
+			//Processing the current frame of the video
+			 Mat frame;
+			bool stop=false;
+			for (int i = 0; !stop; i++) {
+							// if (threads[i].joinable()) {
+						    // threads[i].join();
+						    // }
+
+						    if (i/number_of_threads!=0){
+						    	// if (threads[i%number_of_threads].joinable()){
+						    	threads[i%number_of_threads].join();
+						    // }
+						    }	
+						    cout<<i<<"\n";
+			    			threads[i%number_of_threads]=thread([&]() {
 			 				
-			 				//Processing the current frame of the video
-			 				Mat frame;
+			 				
 			 				//Indicates if we reached the end of the video i.e. no more frames to 
 			 				//process
 			 				bool notOver = cap.read(frame);
 			 				
 			 				//Exiting the loop if video is over
 			 				if(!notOver){
-			 					break;
+			 					stop=true;
+
 			 				}
 			 				
 			 				//Manipulating the current frame so that it can be operated with the 
@@ -132,7 +150,7 @@ int main(int argc,char** argv)
 
 							//queueImg = Image showing the queued traffic of the current frame
 							//diffImg = Image showing the moving traffic of the current frame  
-							Mat diffImg;
+							// Mat diffImg;
 							Mat queueImg;
 							
 							//queueImg can be obtained by background subtraction, i.e. by subtracting 
@@ -141,24 +159,24 @@ int main(int argc,char** argv)
 							
 							//diffImg can be obtained by subtraction of consecutive frames, i.e.
 							//by subtracting last frame(stored in currentImg) from the current frame
-							absdiff(frame,currentImg,diffImg);
+							// absdiff(frame,currentImg,diffImg);
 
 							//Removing distortions(noise) from both the images by applying a 
 							//threshold filter and a Gaussian blur
 							threshold(queueImg,queueImg,50,255,0); 
 							GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-							threshold(diffImg,diffImg,20,255,0); 
-							GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
+							// threshold(diffImg,diffImg,20,255,0); 
+							// GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
 
 							//This block of code applies a filter to the queue density and dynamic 
 							//density values to reduce fluctuations and distortions in adjacent 
 							//values to obtain a "relatively" smooth graph
 							if(frameNo == 1){
 							     qDensity = (1-black_density(queueImg));
-							     dDensity = (1-black_density(diffImg));
+							     // dDensity = (1-black_density(diffImg));
 							}else{
 							     float q = 1-black_density(queueImg);
-							     float d = 1-black_density(diffImg);
+							     // float d = 1-black_density(diffImg);
 							     
 							     //If the density values of consecutive frames differ by more than
 							     //0.2, we extrapolate the last value, else we accept the density
@@ -166,33 +184,37 @@ int main(int argc,char** argv)
 							     if(abs(q-qDensity)<=0.1){
 							     	qDensity = q;
 							     }
-							     if(abs(d-dDensity)<=0.1){
-							     	dDensity = d;
-							     }
+							     // if(abs(d-dDensity)<=0.1){
+							     	// dDensity = d;
+							     // }
 							}
 							
 							//Writing the frame number and density values in the command line
 							//fstream myfile("out.txt",std::ios_base::app);
 							//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-							cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+							cout<<frameNo<<","<<(qDensity)<<","<<endl;
 
 							//Iterating through the frames
 							currentImg = frame;
 							frameNo++;
-			 			}
-		 		}
-	 		}
-	 		));
+			 			
+      			
+    			});
+    			
 
-	}	
-	for (thread &t:threads){
-		if (t.joinable()){
-			t.join();
-		}
-	}	
- 		}
-		
-	}else{
+  			}
+
+			
+			auto endTime = chrono::high_resolution_clock::now(); 
+            chrono::duration<float> execTime = endTime - startTime;
+            cout<<execTime.count()<<endl;
+			
+						
+	}
+
+
+}
+	else{
 		cerr<<"Exactly two arguments are acceptable. The correct input format on the command line should be ./video sample_video.mp4"<<endl;
 	}
 	return 0;	

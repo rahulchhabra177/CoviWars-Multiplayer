@@ -117,8 +117,8 @@ int main(int argc,char** argv)
 			for (int i = 0; i < number_of_threads; i++) {
 				cout<<(int)(frameNo>=i*step)<<" "<<(int)(frameNo<((i+1)*step))<<"\n";			
     			threads.push_back(std::thread([&]() {
+    				cout<<i<<"\n";
       				while(frameNo>=i*step and frameNo<((i+1)*step)){
-      					cout<<1;
 			 				
 			 				//Processing the current frame of the video
 			 				Mat frame;
