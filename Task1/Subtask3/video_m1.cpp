@@ -91,10 +91,10 @@ int main(int argc,char** argv)
 
 			//Warping the frame to fit in the cropped frame whose size we defined above
  			vector<Point2f> pts_dst;
- 			pts_dst.push_back(Point2f(1214,309));
-			pts_dst.push_back(Point2f(43,1265));
-			pts_dst.push_back(Point2f(2613,1519));							
-			pts_dst.push_back(Point2f(2017,303));
+ 			pts_dst.push_back(Point2f(1214/1.5,309/1.5));
+			pts_dst.push_back(Point2f(43/1.5,1265/1.5));
+			pts_dst.push_back(Point2f(2613/1.5,1519/1.5));							
+			pts_dst.push_back(Point2f(2017/1.5,303/1.5));
 
 			vector<Point2f> pts_dst2;
 			pts_dst2.push_back(Point2f(0,0));
