@@ -34,7 +34,7 @@ double black_density(Mat mat)
 				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
 		}
 	}
-	double area=(float)mat.size().height*mat.size().width;
+	double area=(double)mat.size().height*mat.size().width;
 	
 	//k = Total black coloured area on screen, area = Total area of screen
 	return k/area;
