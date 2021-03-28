@@ -5,6 +5,7 @@
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
+#include<chrono>
 
 using namespace std;
 using namespace cv;
@@ -23,7 +24,7 @@ double black_density(Mat mat)
             		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
         	}
     	}
-    	double area=(float)mat.size().height*mat.size().width;
+    	double area=(double)mat.size().height*mat.size().width;
     	
     	//k = Total black coloured area on screen, area = Total area of screen
     	return k/area;
@@ -47,6 +48,10 @@ bool check_format(string video){
 
 int main(int argc,char** argv)
 {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
 	//Checking number of arguments
 	if(argc == 2){
 		
@@ -66,13 +71,17 @@ int main(int argc,char** argv)
  		if(!check_format(string(argv[1]))){
  			cerr << "Incorrect video format. Accepted file formats: .mp4, .mpeg and .wmv"<<endl;
  		}else{
+
+            int x;
+            cerr<<"Enter the number of frames to skip in every iteration: ";
+            cin>>x;
  		
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
  			Mat initialImg;
  			cap.read(initialImg);
  			Size img_size=initialImg.size();		//Resolution=1920*1080 
- 			resize(initialImg,initialImg,Size(1.5*img_size.width,1.5*img_size.height));
+ 			//resize(initialImg,initialImg,Size(1.5*img_size.width,1.5*img_size.height));
 			cvtColor(initialImg,initialImg,COLOR_BGR2GRAY);
  			
  			//Size of the cropped image which we are interested in
@@ -99,10 +108,10 @@ int main(int argc,char** argv)
 			Mat currentImg = initialImg;
 			
 			//Current frame number
-			int frameNo = 1,x;
-			cout<<"Please Enter the value of x\n";
-			cin>>x;
+			int frameNo = 1;
 			
+            auto startTime = chrono::high_resolution_clock::now();
+
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
@@ -116,71 +125,84 @@ int main(int argc,char** argv)
  				//Indicates if we reached the end of the video i.e. no more frames to 
  				//process
  				bool notOver = cap.read(frame);
-
+ 				
  				//Exiting the loop if video is over
  				if(!notOver){
  					break;
  				}
- 				//Manipulating the current frame so that it can be operated with the 
- 				//reference frame
- 				resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
- 				cvtColor(frame,frame,COLOR_BGR2GRAY);
- 				warpPerspective(frame,frame,h,cropped_size);
- 				if (frameNo%x==0){
-	 				
 
-					//queueImg = Image showing the queued traffic of the current frame
-					//diffImg = Image showing the moving traffic of the current frame  
-					Mat diffImg;
-					Mat queueImg;
-					
-					//queueImg can be obtained by background subtraction, i.e. by subtracting 
-					//the background/reference frame from the current frame.
-					absdiff(frame,initialImg,queueImg);
-					
-					//diffImg can be obtained by subtraction of consecutive frames, i.e.
-					//by subtracting last frame(stored in currentImg) from the current frame
-					absdiff(frame,currentImg,diffImg);
-						
-					//Removing distortions(noise) from both the images by applying a 
-					//threshold filter and a Gaussian blur to them
-					threshold(queueImg,queueImg,50,255,0); 
-					GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-					threshold(diffImg,diffImg,20,255,0); 
-					GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
+				//Manipulating the current frame so that it can be operated with the 
+                //reference frame
+                //resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+                cvtColor(frame,frame,COLOR_BGR2GRAY);
+                warpPerspective(frame,frame,h,cropped_size);
+ 				
+                if(frameNo%x==0){ 
 
-					//This block of code applies a filter to the queue density and dynamic 
-   					//density values to reduce fluctuations and distortions in adjacent 
-					//values to obtain a "relatively" smooth graph
-					if(frameNo == 1){
-					     qDensity = (1-black_density(queueImg));
-					     dDensity = (1-black_density(diffImg));
-					}else{
-					     float q = 1-black_density(queueImg);
-					     float d = 1-black_density(diffImg);
-					     
-					     //If the density values of consecutive frames differ by more than
-					     //0.2, we extrapolate the last value, else we accept the density
-					     //values of current frame. 
-					     if(abs(q-qDensity)<=0.1){
-					     	qDensity = q;
-					     }
-					     if(abs(d-dDensity)<=0.1){
-					     	dDensity = d;
-					     }
-					}
-					
-					//Writing the frame number and density values in the command line
-					//fstream myfile("out.txt",std::ios_base::app);
-					//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+                    //queueImg = Image showing the queued traffic of the current frame
+                    //diffImg = Image showing the moving traffic of the current frame  
+                    Mat diffImg;
+                    Mat queueImg;
+                    
+                    //queueImg can be obtained by background subtraction, i.e. by subtracting 
+                    //the background/reference frame from the current frame.
+                    absdiff(frame,initialImg,queueImg);
+                    
+                    //diffImg can be obtained by subtraction of consecutive frames, i.e.
+                    //by subtracting last frame(stored in currentImg) from the current frame
+                    absdiff(frame,currentImg,diffImg);
+
+                    //Removing distortions(noise) from both the images by applying a 
+                    //threshold filter and a Gaussian blur
+                    threshold(queueImg,queueImg,50,255,0); 
+                    GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
+                    threshold(diffImg,diffImg,20,255,0); 
+                    GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
+
+                    //This block of code applies a filter to the queue density and dynamic 
+                    //density values to reduce fluctuations and distortions in adjacent 
+                    //values to obtain a "relatively" smooth graph
+                    if(frameNo == 1){
+                        qDensity = (1-black_density(queueImg));
+                        dDensity = (1-black_density(diffImg));
+                    }else{
+                        float q = 1-black_density(queueImg);
+                        float d = 1-black_density(diffImg);
+                        
+                        //If the density values of consecutive frames differ by more than
+                        //0.2, we extrapolate the last value, else we accept the density
+                        //values of current frame. 
+                        if(abs(q-qDensity)<=0.1){
+                            qDensity = q;
+                        }
+                    	if(abs(d-dDensity)<=0.1){
+                    	    dDensity = d;
+                        }
+                    }
+                }
+
+				// imshow("Normal Image",frame);
+                // imshow("Queue Density",queueImg);
+                // imshow("Dynamic Density",diffImg);
 				
-				}
-				//Iterating through the frames
-				currentImg = frame;	
+				//Writing the frame number and density values in the command line
+				// fstream myfile("out_m1.txt",std::ios_base::app);
+				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
 				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+
+				//Iterating through the frames
+				currentImg = frame;
 				frameNo++;
-	 		}
- 		
+
+				if(waitKey(10) == 27){
+                    break;
+                }
+ 			}
+
+            auto endTime = chrono::high_resolution_clock::now(); 
+
+            chrono::duration<float> execTime = endTime - startTime;
+            cout<<execTime.count()<<endl;
  		}
 		
 	}else{
