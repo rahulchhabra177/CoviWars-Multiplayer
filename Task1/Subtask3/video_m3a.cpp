@@ -39,7 +39,7 @@ double black_density(Mat mat)
 	double area=(double)mat.size().height*mat.size().width;
 	
 	//k = Total black coloured area on screen, area = Total area of screen
-	return k/area;
+	return k;
 
 }
 
@@ -53,7 +53,6 @@ void *processFrame(void *frameData){
 
     Mat queueImg;
 	Mat diffImg;
-	
 	//queueImg can be obtained by background subtraction, i.e. by subtracting 
 	//the background/reference frame from the current frame.
 	absdiff(frame,initialImg,queueImg);
@@ -115,7 +114,7 @@ int main(int argc,char** argv)
         }else{
 
             int numberOfThreads;
-            cerr<<"Enter the number of threads for temporal threading(Max 8): ";cin>>numberOfThreads;
+            cerr<<"Enter the number of threads for temporal threading: ";cin>>numberOfThreads;
 
             for(int i=0;i<2*numberOfThreads;i++){
                 bArea.push_back(0.0);
@@ -151,6 +150,7 @@ int main(int argc,char** argv)
             //We store the recently processed frame in currentImg, for calculating dynamic
             //density. The initial value of currentImg is the first frame i.e. initialImg
             Mat currentImg = initialImg;
+            double area = cropped_size.width * cropped_size.height;
 
             auto startTime = chrono::high_resolution_clock::now();
 
@@ -187,13 +187,13 @@ int main(int argc,char** argv)
                     currentThread.threadNumber1=i;
                     currentThread.threadNumber2=i+numberOfThreads;
                     if(i==numberOfThreads-1){
-                        currentThread.currentFrame = frame(Rect(0,i*numberOfThreads,cropped_size.width,cropped_size.height-i*cropped_size.height/numberOfThreads));
-                        currentThread.lastFrame=currentImg(Rect(0,i*numberOfThreads,cropped_size.width,cropped_size.height-i*cropped_size.height/numberOfThreads));
-                        currentThread.initialFrame=initialImg(Rect(0,i*numberOfThreads,cropped_size.width,cropped_size.height-i*cropped_size.height/numberOfThreads));
+                        currentThread.currentFrame = frame(Rect(0,i*cropped_size.height/numberOfThreads,cropped_size.width,cropped_size.height-i*cropped_size.height/numberOfThreads));
+                        currentThread.lastFrame=currentImg(Rect(0,i*cropped_size.height/numberOfThreads,cropped_size.width,cropped_size.height-i*cropped_size.height/numberOfThreads));
+                        currentThread.initialFrame=initialImg(Rect(0,i*cropped_size.height/numberOfThreads,cropped_size.width,cropped_size.height-i*cropped_size.height/numberOfThreads));
                     }else{
-                        currentThread.currentFrame = frame(Rect(0,i*numberOfThreads,cropped_size.width,cropped_size.height/numberOfThreads));
-                        currentThread.lastFrame=currentImg(Rect(0,i*numberOfThreads,cropped_size.width,cropped_size.height/numberOfThreads));
-                        currentThread.initialFrame=initialImg(Rect(0,i*numberOfThreads,cropped_size.width,cropped_size.height/numberOfThreads));
+                        currentThread.currentFrame = frame(Rect(0,i*cropped_size.height/numberOfThreads,cropped_size.width,cropped_size.height/numberOfThreads));
+                        currentThread.lastFrame=currentImg(Rect(0,i*cropped_size.height/numberOfThreads,cropped_size.width,cropped_size.height/numberOfThreads));
+                        currentThread.initialFrame=initialImg(Rect(0,i*cropped_size.height/numberOfThreads,cropped_size.width,cropped_size.height/numberOfThreads));
                     }
                     all_threads[i]=currentThread;
                 }
@@ -212,6 +212,8 @@ int main(int argc,char** argv)
                     d+=bArea[i+numberOfThreads];
                 }
 
+                q=q/area;
+                d=d/area;
                 q=1-q;
                 d=1-d;
                 // cout<<1-q<<" "<<1-d<<"\n";
@@ -238,11 +240,6 @@ int main(int argc,char** argv)
                 //fstream myfile("out.txt",std::ios_base::app);
                 //myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
                 cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-                // for(int i=0;i<2*numberOfThreads;i++){
-                //     cout<<bArea[i]<<" ";
-                // }
-                // cout<<"\n\n";
-                // cout<<fixed<<area<<endl;
 
                 frameNo++;
                 currentImg = frame;
