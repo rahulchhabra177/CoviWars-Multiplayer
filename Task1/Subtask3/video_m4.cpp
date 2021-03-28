@@ -80,11 +80,17 @@ void *processFrame(void *frameData){
 		//values of current frame. 
 		if(abs(q-qDensity[frameNo-1])<=0.1){
 			qDensity.push_back(q);
+		}else{
+			qDensity.push_back(qDensity[frameNo-1]);
 		}
 		if(abs(d-dDensity[frameNo-1])<=0.1){
 			dDensity.push_back(d);
+		}else{
+			dDensity.push_back(dDensity[frameNo-1]);
 		}
 	}
+
+	frameNo++;
 	
 	//Writing the frame number and density values in the command line
 	//fstream myfile("out.txt",std::ios_base::app);
@@ -217,7 +223,7 @@ int main(int argc,char** argv)
  			}
 
 			for(int i=0;i<qDensity.size();i++){
-				cout<<i<<","<<qDensity[i]<<","<<dDensity[i]<<"\n";
+				cout<<(i+1)<<","<<qDensity[i]<<","<<dDensity[i]<<"\n";
 			}
 			
 			auto endTime = chrono::high_resolution_clock::now(); 

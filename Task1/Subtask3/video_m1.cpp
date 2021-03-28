@@ -18,18 +18,18 @@ double black_density(Mat mat)
 {      
 	double k=0.0;
 
-    	for(int i=0; i<mat.size().height; i++)
-    	{
-        	for(int j=0; j<mat.size().width; j++)
-        	{
-            		//Checking if the current pixel is black i.e. value = 0.0
-            		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
-        	}
-    	}
-    	double area=(double)mat.size().height*mat.size().width;
-    	
-    	//k = Total black coloured area on screen, area = Total area of screen
-    	return k/area;
+	for(int i=0; i<mat.size().height; i++)
+	{
+		for(int j=0; j<mat.size().width; j++)
+		{
+				//Checking if the current pixel is black i.e. value = 0.0
+				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
+		}
+	}
+	double area=(double)mat.size().height*mat.size().width;
+	
+	//k = Total black coloured area on screen, area = Total area of screen
+	return k/area;
 }
 
 //Helper function to check file format for valid videos
@@ -110,15 +110,15 @@ int main(int argc,char** argv)
 			Mat currentImg = initialImg;
 			
 			//Current frame number
-			int frameNo = 1;
+			int frameNo = 0;
 			
             auto startTime = chrono::high_resolution_clock::now();
 
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
-			float qDensity;
-			float dDensity;
+			double qDensity;
+			double dDensity;
 
  			while(true){
  				
@@ -164,20 +164,21 @@ int main(int argc,char** argv)
                     //This block of code applies a filter to the queue density and dynamic 
                     //density values to reduce fluctuations and distortions in adjacent 
                     //values to obtain a "relatively" smooth graph
-                    if(frameNo == 1){
+					
+                    if(frameNo == 0){
                         qDensity = (1-black_density(queueImg));
-                        dDensity = (1-black_density(diffImg));
+                    	dDensity = (1-black_density(diffImg));
                     }else{
-                        float q = 1-black_density(queueImg);
-                        float d = 1-black_density(diffImg);
+                        double q = 1-black_density(queueImg);
+                        double d = 1-black_density(diffImg);
                         
                         //If the density values of consecutive frames differ by more than
                         //0.2, we extrapolate the last value, else we accept the density
                         //values of current frame. 
-                        if(abs(q-qDensity)<=0.1){
+                        if(abs(q-qDensity)<=0.15){
                             qDensity = q;
                         }
-                    	if(abs(d-dDensity)<=0.1){
+                    	if(abs(d-dDensity)<=0.15){
                     	    dDensity = d;
                         }
                     }
