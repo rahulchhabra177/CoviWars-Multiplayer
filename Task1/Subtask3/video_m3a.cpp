@@ -114,7 +114,7 @@ int main(int argc,char** argv)
         }else{
 
             int numberOfThreads;
-            cerr<<"Enter the number of threads for temporal threading: ";cin>>numberOfThreads;
+            cerr<<"Enter the number of threads for spatial threading: ";cin>>numberOfThreads;
 
             for(int i=0;i<2*numberOfThreads;i++){
                 bArea.push_back(0.0);

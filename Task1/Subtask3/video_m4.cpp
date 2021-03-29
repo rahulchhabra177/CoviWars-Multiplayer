@@ -174,9 +174,6 @@ int main(int argc,char** argv)
 			//We store the recently processed frame in currentImg, for calculating dynamic
 			//density. The initial value of currentImg is the first frame i.e. initialImg
 			Mat currentImg = initialImg;
-			
-			//Current frame number
-			int frameNo = 1;
 
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
