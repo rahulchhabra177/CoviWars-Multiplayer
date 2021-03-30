@@ -123,10 +123,7 @@ int main(int argc,char** argv)
             Mat h = findHomography(pts_dst,pts_dst2);       
             warpPerspective(initialImg,initialImg,h,cropped_size);
 
-            //We store the recently processed frame in currentImg, for calculating dynamic
-            //density. The initial value of currentImg is the first frame i.e. initialImg
-            Mat currentImg = initialImg;
-
+    
             //Current frame number
             int frameNo = 0;
 
@@ -143,7 +140,6 @@ int main(int argc,char** argv)
                 //don't calculate these values for the first frame, as we have taken the first 
                 //frame as reference.
                 double qDensity;
-                double dDensity;
 
                 //Indicates if we reached the end of the video i.e. no more frames to 
                 //process
@@ -163,28 +159,20 @@ int main(int argc,char** argv)
                 //queueImg = Image showing the queued traffic of the current frame
                 //diffImg = Image showing the moving traffic of the current frame  
                 Mat queueImg;
-                Mat diffImg;
 
                 //queueImg can be obtained by background subtraction, i.e. by subtracting 
                 //the background/reference frame from the current frame.
                 absdiff(frame,initialImg,queueImg);
-                absdiff(frame,currentImg,diffImg);
 
                 //Removing distortions(noise) from both the images by applying a 
                 //threshold filter and a Gaussian blur to them.
                 threshold(queueImg,queueImg,50,255,0); 
                 GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-                threshold(diffImg,diffImg,20,255,0); 
-                GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
 
                 struct bounds currentThread;
-                struct bounds all_threads[2*numberOfThreads];
-                for(int i=0;i<2*numberOfThreads;i++){
-                    if(i<numberOfThreads){
-                        currentThread.currentFrame = queueImg;
-                    }else{
-                        currentThread.currentFrame = diffImg;
-                    }
+                struct bounds all_threads[numberOfThreads];
+                for(int i=0;i<numberOfThreads;i++){
+                    currentThread.currentFrame = queueImg;
                     int j=i%numberOfThreads;
                     currentThread.threadNumber=i;
                     currentThread.y_low=0;
@@ -197,7 +185,7 @@ int main(int argc,char** argv)
                     all_threads[i]=currentThread;
                 }
 
-                for(int i=0;i<2*numberOfThreads;i++){
+                for(int i=0;i<numberOfThreads;i++){
                     pthread_create(&threads[i],NULL,black_density,(void *)&all_threads[i]);
                 }    
 
@@ -205,23 +193,19 @@ int main(int argc,char** argv)
                     pthread_join(threads[i],&status);
                 }
 
-                double q=0.0;double d=0.0;
+                double q=0.0;
                 for(int i=0;i<numberOfThreads;i++){
                     q+=bArea[i];
-                    d+=bArea[i+numberOfThreads];
                 }
 
                 q=q/area;
-                d=d/area;
                 q=1-q;
-                d=1-d;
                 // cout<<1-q<<" "<<1-d<<"\n";
                 //This block of code applies a filter to the queue density and dynamic 
                 //density values to reduce fluctuations and distortions in adjacent 
                 //values to obtain a "relatively" smooth graph
                 if(frameNo == 0){
                     qDensity = q;
-                    dDensity = d;
                 }else{
                     //If the density values of consecutive frames differ by more than
                     //0.1, we extrapolate the last value, else we accept the density
@@ -230,15 +214,13 @@ int main(int argc,char** argv)
                     if(abs(q-qDensity)<=0.1){
                         qDensity = q;
                     }
-                    if(abs(d-dDensity)<=0.1){
-                        dDensity = d;
-                    }
+                   
                 }
 
                 //Writing the frame number and density values in the command line
                 //fstream myfile("out.txt",std::ios_base::app);
                 //myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-                cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+                cout<<frameNo<<","<<(qDensity)<<endl;
                 // for(int i=0;i<2*numberOfThreads;i++){
                 //     cout<<bArea[i]<<" ";
                 // }
@@ -246,7 +228,6 @@ int main(int argc,char** argv)
                 // cout<<fixed<<area<<endl;
 
                 frameNo++;
-                currentImg = frame;
 
                 if(waitKey(10) == 27){
                     break;

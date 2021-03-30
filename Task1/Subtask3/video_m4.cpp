@@ -18,7 +18,6 @@ struct currentThread{
 Mat initialImg;
 int frameNo=0;
 vector<double> qDensity;
-vector<double> dDensity;
 
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
 //the queue density and the dynamic density 
@@ -44,36 +43,28 @@ double black_density(Mat mat)
 void *processFrame(void *frameData){
 	struct currentThread *myFrames;
 	myFrames = (struct currentThread *) frameData;
-
 	Mat frame = myFrames->currentFrame;
-	Mat currentImg = myFrames->lastFrame;
 
 	//queueImg = Image showing the queued traffic of the current frame
 	//diffImg = Image showing the moving traffic of the current frame  
 	Mat queueImg;
-	Mat diffImg;
 	
 	//queueImg can be obtained by background subtraction, i.e. by subtracting 
 	//the background/reference frame from the current frame.
 	absdiff(frame,initialImg,queueImg);
-	absdiff(frame,currentImg,diffImg);
 	
 	//Removing distortions(noise) from both the images by applying a 
 	//threshold filter and a Gaussian blur
 	threshold(queueImg,queueImg,50,255,0); 
 	GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-	threshold(diffImg,diffImg,20,255,0); 
-	GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
 
 	//This block of code applies a filter to the queue density and dynamic 
 	//density values to reduce fluctuations and distortions in adjacent 
 	//values to obtain a "relatively" smooth graph
 	if(frameNo == 0){
 		qDensity.push_back(1-black_density(queueImg));
-		dDensity.push_back(1-black_density(diffImg));
 	}else{
 		double q = 1-black_density(queueImg);
-		double d = 1-black_density(diffImg);
 			
 		//If the density values of consecutive frames differ by more than
 		//0.2, we extrapolate the last value, else we accept the density
@@ -83,11 +74,7 @@ void *processFrame(void *frameData){
 		}else{
 			qDensity.push_back(qDensity[frameNo-1]);
 		}
-		if(abs(d-dDensity[frameNo-1])<=0.1){
-			dDensity.push_back(d);
-		}else{
-			dDensity.push_back(dDensity[frameNo-1]);
-		}
+		
 	}
 
 	frameNo++;
@@ -171,10 +158,6 @@ int main(int argc,char** argv)
 			Mat h = findHomography(pts_dst,pts_dst2);		
  			warpPerspective(initialImg,initialImg,h,cropped_size);
 
-			//We store the recently processed frame in currentImg, for calculating dynamic
-			//density. The initial value of currentImg is the first frame i.e. initialImg
-			Mat currentImg = initialImg;
-
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
@@ -205,14 +188,12 @@ int main(int argc,char** argv)
 
 				struct currentThread newThread;
 				newThread.currentFrame=frame;
-				newThread.lastFrame=currentImg;
 
 				if(frameNo/numberOfThreads!=0){
 					pthread_join(threads[frameNo%numberOfThreads],&status);
 				}
 				pthread_create(&threads[frameNo%numberOfThreads],NULL,processFrame,(void *)&newThread);
 
-				currentImg = frame;
 
 				if(waitKey(10) == 27){
                     break;
@@ -220,7 +201,7 @@ int main(int argc,char** argv)
  			}
 
 			for(int i=0;i<qDensity.size();i++){
-				cout<<(i+1)<<","<<qDensity[i]<<","<<dDensity[i]<<"\n";
+				cout<<(i+1)<<","<<qDensity[i]<<"\n";
 			}
 			
 			auto endTime = chrono::high_resolution_clock::now(); 
