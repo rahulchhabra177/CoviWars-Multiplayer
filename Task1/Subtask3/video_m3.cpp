@@ -15,6 +15,7 @@ struct bounds{
     int threadNumber;
 };
 
+
 vector<double> bArea;
 
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
