@@ -10,6 +10,7 @@
 using namespace std;
 using namespace cv;
 
+
 //Helper Function to calculate the proportion of black color on screen, this helps us to calculate
 //the queue density and the dynamic density 
 double black_density(Mat mat)
