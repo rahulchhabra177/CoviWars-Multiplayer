@@ -1,0 +1,33 @@
+The contents of this folder have been prepared by Shrey Patel(2019CS10400) and Rahul Chhabra(2019CS11016)
+
+This folder named "Code" contains two sub-folders:
+
+1)C++ codes using OpenCV
+	a)video.cpp     -> Original code from subtask-2 (but without dynamic density calculation)
+	b)video_m1.cpp  -> Sub-sampling of frames
+	c)video_m2.cpp  -> Changing Resolution 
+	d)video_m3.cpp  -> Spatial Threading
+	e)video_m4.cpp  -> Temporal Threading
+
+2) The Makefile which is used to create all executables. 
+	
+--How to compile?
+Type "make all" in command line to build the executables "video","video1","video2","video3" and "video4"
+
+--How to run the executables?
+To execute "video" file, type "./video" in the command line followed by the video you want to input. 
+For e.g. "./video trafficvideo.mp4" and similar for other executables. After running the executable
+the program will ask for the required parameter(s) according to the method used which have to be provided
+in the console itself.
+
+--Notes
+1) The build files can be cleaned from the directory by typing "make clean" in command line.
+
+2) Double quotes in this document are not to be literally typed in command line, they have been used 
+to separate actual commands from plain text.
+
+3) Any failure to follow the above steps for compilation/running/providing input will be accompanied by 
+an error message which will instruct/suggest the correct procedure. 
+
+
+
