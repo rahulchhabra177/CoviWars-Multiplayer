@@ -1,3 +1,5 @@
+
+
 //Designed by:
 // 1) Rahul Chhabra (2019CS11016)
 // 2) Shrey Patel (2019CS10400)
@@ -5,6 +7,7 @@
 #include<opencv2/opencv.hpp>
 #include<bits/stdc++.h>
 #include<fstream>
+#include<chrono>
 
 using namespace std;
 using namespace cv;
@@ -15,18 +18,18 @@ double black_density(Mat mat)
 {      
 	double k=0.0;
 
-    	for(int i=0; i<mat.size().height; i++)
-    	{
-        	for(int j=0; j<mat.size().width; j++)
-        	{
-            		//Checking if the current pixel is black i.e. value = 0.0
-            		if (mat.at<double>(i,j)==0.0){k=k+1.0;}
-        	}
-    	}
-    	double area=(float)mat.size().height*mat.size().width;
-    	
-    	//k = Total black coloured area on screen, area = Total area of screen
-    	return k/area;
+	for(int i=0; i<mat.size().height; i++)
+	{
+		for(int j=0; j<mat.size().width; j++)
+		{
+				//Checking if the current pixel is black i.e. value = 0.0
+				if (mat.at<double>(i,j)==0.0){k=k+1.0;}
+		}
+	}
+	double area=(double)mat.size().height*mat.size().width;
+	
+	//k = Total black coloured area on screen, area = Total area of screen
+	return k/area;
 }
 
 //Helper function to check file format for valid videos
@@ -70,6 +73,10 @@ int main(int argc,char** argv)
  		if(!check_format(string(argv[1]))){
  			cerr << "Incorrect video format. Accepted file formats: .mp4, .mpeg and .wmv"<<endl;
  		}else{
+
+            int x;
+            cerr<<"Enter the number of frames to skip in every iteration: ";
+            cin>>x;
  		
  			//The first frame of the video, which we have taken as the background/reference
  			//frame for calculating queue density.
@@ -99,8 +106,8 @@ int main(int argc,char** argv)
  			warpPerspective(initialImg,initialImg,h,cropped_size);
 			
 			//Current frame number
-			int frameNo = 1;
-			
+			int frameNo = 0;
+
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
@@ -120,58 +127,67 @@ int main(int argc,char** argv)
  				if(!notOver){
  					break;
  				}
+
+				//Manipulating the current frame so that it can be operated with the 
+                //reference frame
+                //resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
+                cvtColor(frame,frame,COLOR_BGR2GRAY);
+                warpPerspective(frame,frame,h,cropped_size);
  				
- 				//Manipulating the current frame so that it can be operated with the 
- 				//reference frame
- 				//resize(frame,frame,Size(1.5*img_size.width,1.5*img_size.height));
- 				cvtColor(frame,frame,COLOR_BGR2GRAY);
- 				warpPerspective(frame,frame,h,cropped_size);
+                if(frameNo%x==0){ 
 
-				//queueImg = Image showing the queued traffic of the current frame  
-				Mat queueImg;
-				
-				//queueImg can be obtained by background subtraction, i.e. by subtracting 
-				//the background/reference frame from the current frame.
-				absdiff(frame,initialImg,queueImg);
-				
-				//Removing distortions(noise) from both the images by applying a 
-				//threshold filter and a Gaussian blur
-				threshold(queueImg,queueImg,50,255,0); 
-				GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
+                    //queueImg = Image showing the queued traffic of the current frame  
+                    Mat queueImg;
+                    
+                    //queueImg can be obtained by background subtraction, i.e. by subtracting 
+                    //the background/reference frame from the current frame.
+                    absdiff(frame,initialImg,queueImg);
 
-				//This block of code applies a filter to the queue density and dynamic 
-				//density values to reduce fluctuations and distortions in adjacent 
-				//values to obtain a "relatively" smooth graph
-				if(frameNo == 1){
-				    qDensity = (1-black_density(queueImg));
-				}else{
-				    double q = 1-black_density(queueImg);
-				     
-				    //If the density values of consecutive frames differ by more than
-				    //0.1, we extrapolate the last value, else we accept the density
-				    //values of current frame. 
-					if(abs(q-qDensity)<=0.1){
-				    	qDensity = q;
-				    }
-				}
+                    //Removing distortions(noise) from both the images by applying a 
+                    //threshold filter and a Gaussian blur
+                    threshold(queueImg,queueImg,50,255,0); 
+                    GaussianBlur(queueImg,queueImg,Size(45,45),10,10); 
+
+                    //This block of code applies a filter to the queue density and dynamic 
+                    //density values to reduce fluctuations and distortions in adjacent 
+                    //values to obtain a "relatively" smooth graph
+					
+                    if(frameNo == 0){
+                        qDensity = (1-black_density(queueImg));
+                    }else{
+                        double q = 1-black_density(queueImg);
+                        
+                        //If the density values of consecutive frames differ by more than
+                        //0.2, we extrapolate the last value, else we accept the density
+                        //values of current frame. 
+                        if(abs(q-qDensity)<=0.15){
+                            qDensity = q;
+                        }
+                    }
+                }
+
+				// imshow("Normal Image",frame);
+                // imshow("Queue Density",queueImg);
+                // imshow("Dynamic Density",diffImg);
 				
 				//Writing the frame number and density values in the command line
-				//fstream myfile("out.txt",std::ios_base::app);
-				//myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				// fstream myfile("out_m1.txt",std::ios_base::app);
+				// myfile<<frameNo<<","<<(qDensity)<<endl;
 				cout<<frameNo<<","<<(qDensity)<<endl;
 
+				//Iterating through the frames
 				frameNo++;
 
 				if(waitKey(10) == 27){
                     break;
                 }
  			}
-			
-			auto endTime = chrono::high_resolution_clock::now(); 
+
+            auto endTime = chrono::high_resolution_clock::now(); 
 
             chrono::duration<float> execTime = endTime - startTime;
             cout<<execTime.count()<<endl;
-  		}
+ 		}
 		
 	}else{
 		cerr<<"Exactly two arguments are acceptable. The correct input format on the command line should be ./video sample_video.mp4"<<endl;
