@@ -104,21 +104,16 @@ int main(int argc,char** argv)
 
 			Mat h = findHomography(pts_dst,pts_dst2);		
  			warpPerspective(initialImg,initialImg,h,cropped_size);
-
-			//We store the recently processed frame in currentImg, for calculating dynamic
-			//density. The initial value of currentImg is the first frame i.e. initialImg
-			Mat currentImg = initialImg;
 			
 			//Current frame number
 			int frameNo = 0;
-			
-            auto startTime = chrono::high_resolution_clock::now();
 
 			//Queue density and Dynamic density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
 			double qDensity;
-			double dDensity;
+
+			auto startTime = chrono::high_resolution_clock::now();
 
  			while(true){
  				
@@ -141,25 +136,17 @@ int main(int argc,char** argv)
  				
                 if(frameNo%x==0){ 
 
-                    //queueImg = Image showing the queued traffic of the current frame
-                    //diffImg = Image showing the moving traffic of the current frame  
-                    Mat diffImg;
+                    //queueImg = Image showing the queued traffic of the current frame  
                     Mat queueImg;
                     
                     //queueImg can be obtained by background subtraction, i.e. by subtracting 
                     //the background/reference frame from the current frame.
                     absdiff(frame,initialImg,queueImg);
-                    
-                    //diffImg can be obtained by subtraction of consecutive frames, i.e.
-                    //by subtracting last frame(stored in currentImg) from the current frame
-                    absdiff(frame,currentImg,diffImg);
 
                     //Removing distortions(noise) from both the images by applying a 
                     //threshold filter and a Gaussian blur
                     threshold(queueImg,queueImg,50,255,0); 
-                    GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-                    threshold(diffImg,diffImg,20,255,0); 
-                    GaussianBlur(diffImg,diffImg,Size(45,45),10,10); 
+                    GaussianBlur(queueImg,queueImg,Size(45,45),10,10); 
 
                     //This block of code applies a filter to the queue density and dynamic 
                     //density values to reduce fluctuations and distortions in adjacent 
@@ -167,19 +154,14 @@ int main(int argc,char** argv)
 					
                     if(frameNo == 0){
                         qDensity = (1-black_density(queueImg));
-                    	dDensity = (1-black_density(diffImg));
                     }else{
                         double q = 1-black_density(queueImg);
-                        double d = 1-black_density(diffImg);
                         
                         //If the density values of consecutive frames differ by more than
                         //0.2, we extrapolate the last value, else we accept the density
                         //values of current frame. 
                         if(abs(q-qDensity)<=0.15){
                             qDensity = q;
-                        }
-                    	if(abs(d-dDensity)<=0.15){
-                    	    dDensity = d;
                         }
                     }
                 }
@@ -190,11 +172,10 @@ int main(int argc,char** argv)
 				
 				//Writing the frame number and density values in the command line
 				// fstream myfile("out_m1.txt",std::ios_base::app);
-				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
-				cout<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+				// myfile<<frameNo<<","<<(qDensity)<<endl;
+				cout<<frameNo<<","<<(qDensity)<<endl;
 
 				//Iterating through the frames
-				currentImg = frame;
 				frameNo++;
 
 				if(waitKey(10) == 27){
