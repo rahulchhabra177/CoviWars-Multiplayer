@@ -42,7 +42,6 @@ double black_density(Mat mat)
 void *processFrame(void *frameData){
 	struct currentThread *myFrames;
 	myFrames = (struct currentThread *) frameData;
-
 	Mat frame = myFrames->currentFrame;
 
 	//queueImg = Image showing the queued traffic of the current frame 
@@ -56,6 +55,28 @@ void *processFrame(void *frameData){
 	//threshold filter and a Gaussian blur
 	threshold(queueImg,queueImg,50,255,0); 
 	GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
+<<<<<<< HEAD
+=======
+
+	//This block of code applies a filter to the queue density and dynamic 
+	//density values to reduce fluctuations and distortions in adjacent 
+	//values to obtain a "relatively" smooth graph
+	if(frameNo == 0){
+		qDensity.push_back(1-black_density(queueImg));
+	}else{
+		double q = 1-black_density(queueImg);
+			
+		//If the density values of consecutive frames differ by more than
+		//0.2, we extrapolate the last value, else we accept the density
+		//values of current frame. 
+		if(abs(q-qDensity[frameNo-1])<=0.1){
+			qDensity.push_back(q);
+		}else{
+			qDensity.push_back(qDensity[frameNo-1]);
+		}
+		
+	}
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 
 	qDensity[frameNo]=1-black_density(queueImg);
 	frameNo++;
@@ -144,6 +165,13 @@ int main(int argc,char** argv)
 			Mat h = findHomography(pts_dst,pts_dst2);		
  			warpPerspective(initialImg,initialImg,h,cropped_size);
 
+<<<<<<< HEAD
+=======
+			//Queue density and Dynamic density values for the last frame. Note that we 
+			//don't calculate these values for the first frame, as we have taken the first 
+			//frame as reference.
+
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 			auto startTime = chrono::high_resolution_clock::now();
 
 			pthread_t threads[numberOfThreads];
@@ -176,11 +204,16 @@ int main(int argc,char** argv)
 				}
 				pthread_create(&threads[frameNo%numberOfThreads],NULL,processFrame,(void *)&newThread);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 				if(waitKey(10) == 27){
                     break;
                 }
  			}
 
+<<<<<<< HEAD
 			//This block of code applies a filter to the queue density and dynamic 
 			//density values to reduce fluctuations and distortions in adjacent 
 			//values to obtain a "relatively" smooth graph
@@ -192,6 +225,9 @@ int main(int argc,char** argv)
 				if(abs(qDensity[i]-qDensity[i-1])>0.1){
 					qDensity[i]=qDensity[i-1];
 				}
+=======
+			for(int i=0;i<qDensity.size();i++){
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 				cout<<(i+1)<<","<<qDensity[i]<<"\n";
 			}
 			auto endTime = chrono::high_resolution_clock::now(); 

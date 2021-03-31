@@ -103,11 +103,15 @@ int main(int argc,char** argv)
 
 			Mat h = findHomography(pts_dst,pts_dst2);		
  			warpPerspective(initialImg,initialImg,h,cropped_size);
+<<<<<<< HEAD
 			
+=======
+
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 			//Current frame number
 			int frameNo = 1;
 			
-			//Queue density and Dynamic density values for the last frame. Note that we 
+			//Queue density values for the last frame. Note that we 
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
 			float qDensity;
@@ -139,7 +143,11 @@ int main(int argc,char** argv)
 				//queueImg can be obtained by background subtraction, i.e. by subtracting 
 				//the background/reference frame from the current frame.
 				absdiff(frame,initialImg,queueImg);
+<<<<<<< HEAD
 
+=======
+			
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 				//Removing distortions(noise) from both the images by applying a 
 				//threshold filter and a Gaussian blur
 				threshold(queueImg,queueImg,50,255,0); 
@@ -159,11 +167,19 @@ int main(int argc,char** argv)
 				     if(abs(q-qDensity)<=0.1){
 				     	qDensity = q;
 				     }
+<<<<<<< HEAD
+=======
+				   
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 				}
 
 				//Writing the frame number and density values in the command line
 				// fstream myfile("output_m2.txt",std::ios_base::app);
+<<<<<<< HEAD
 				// myfile<<frameNo<<","<<(qDensity)<<endl;
+=======
+				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
+>>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 				cout<<frameNo<<","<<(qDensity)<<endl;
 
 				//Iterating through the frames
