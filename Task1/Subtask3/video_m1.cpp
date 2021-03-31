@@ -104,12 +104,7 @@ int main(int argc,char** argv)
 
 			Mat h = findHomography(pts_dst,pts_dst2);		
  			warpPerspective(initialImg,initialImg,h,cropped_size);
-<<<<<<< HEAD
 			
-=======
-
-		
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 			//Current frame number
 			int frameNo = 0;
 
@@ -117,11 +112,8 @@ int main(int argc,char** argv)
 			//don't calculate these values for the first frame, as we have taken the first 
 			//frame as reference.
 			double qDensity;
-<<<<<<< HEAD
 
 			auto startTime = chrono::high_resolution_clock::now();
-=======
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 
  			while(true){
  				
@@ -150,33 +142,19 @@ int main(int argc,char** argv)
                     //queueImg can be obtained by background subtraction, i.e. by subtracting 
                     //the background/reference frame from the current frame.
                     absdiff(frame,initialImg,queueImg);
-<<<<<<< HEAD
-=======
- 
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 
                     //Removing distortions(noise) from both the images by applying a 
                     //threshold filter and a Gaussian blur
                     threshold(queueImg,queueImg,50,255,0); 
-<<<<<<< HEAD
                     GaussianBlur(queueImg,queueImg,Size(45,45),10,10); 
 
-=======
-                    GaussianBlur(queueImg,queueImg,Size(45,45),10,10);
-          
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
                     //This block of code applies a filter to the queue density and dynamic 
                     //density values to reduce fluctuations and distortions in adjacent 
                     //values to obtain a "relatively" smooth graph
 					
                     if(frameNo == 0){
                         qDensity = (1-black_density(queueImg));
-<<<<<<< HEAD
                     }else{
-=======
-                    }
-                    else{
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
                         double q = 1-black_density(queueImg);
                         
                         //If the density values of consecutive frames differ by more than
@@ -185,10 +163,6 @@ int main(int argc,char** argv)
                         if(abs(q-qDensity)<=0.15){
                             qDensity = q;
                         }
-<<<<<<< HEAD
-=======
-                    	
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
                     }
                 }
 
@@ -198,11 +172,7 @@ int main(int argc,char** argv)
 				
 				//Writing the frame number and density values in the command line
 				// fstream myfile("out_m1.txt",std::ios_base::app);
-<<<<<<< HEAD
 				// myfile<<frameNo<<","<<(qDensity)<<endl;
-=======
-				// myfile<<frameNo<<","<<(qDensity)<<","<<(dDensity)<<endl;
->>>>>>> 440e4b3e8df77659515eeff52d08b72463e44b3f
 				cout<<frameNo<<","<<(qDensity)<<endl;
 
 				//Iterating through the frames
