@@ -1,6 +1,10 @@
 #include "game.hpp"
 #include <iostream>
+#include "SDL_image.h"
 using namespace std;
+
+SDL_Texture *
+
 
 Game::Game(){
 
@@ -32,6 +36,7 @@ void Game::init(char* title, int xcor,int ycor,int width_window,int height_windo
 					cout<<"Renderer initialized Successfully...\n";
 				}
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
+
 				running=true;
 			}
 
