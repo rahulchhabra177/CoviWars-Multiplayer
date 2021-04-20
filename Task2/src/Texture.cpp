@@ -7,7 +7,7 @@ SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 
 
 				SDL_Surface* tmp;
-				tmp=SDL_LoadBMP(path);
+				tmp=IMG_Load(path);
 				SDL_Texture* returng=NULL;
 				if (tmp==NULL){
 					cout<<"Error:Couldn't initialize image\n";
@@ -23,3 +23,15 @@ SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 
 
 } 
+
+
+// SDL_Texture* Texture::LoadWord(char * content,SDL_Renderer* renderer){
+
+
+
+
+
+
+
+	
+// }

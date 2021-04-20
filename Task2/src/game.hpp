@@ -18,13 +18,14 @@ public:
 	void close();
 	bool isrunning();
 	bool running;
+	SDL_Renderer *renderer;
+	int state;
 
 private:
 	int cnt=0;
 
 	SDL_Window	*window;
-	SDL_Renderer *renderer;
-	SDL_Texture* backg= NULL;
+	SDL_Texture* menuback= NULL,*gameback=NULL,*menu=NULL;
 	
 
 

@@ -16,14 +16,14 @@ pacman::pacman(char * path,SDL_Renderer* rendere,int init_x,int init_y,bool isen
 void pacman::update(){
 
 	
-	cout<<x<<" "<<y<<"\n";
+	// cout<<x<<" "<<y<<"\n";
 	// srcr.h=32;
 	// srcr.w=32;
 	temp=(temp+1)%10;
 	dstr.h=height;
 	dstr.w=width;
-	if (isenemy and temp%2==0){y+=temp/9;temp+=18;}
-	if (isenemy and temp%2==1){x+=temp/9;temp+=21;}
+	// if (isenemy and temp%2==0){y+=temp/9;temp+=18;}
+	// if (isenemy and temp%2==1){x+=temp/9;temp+=21;}
 	dstr.x=x;
 	dstr.y=y;
 
