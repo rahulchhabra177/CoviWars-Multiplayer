@@ -5,7 +5,7 @@
 class pacman{
 
 public:
-	int x,y,height=64,width=64;
+	int x,y,height=40,width=40;
 	SDL_Rect dstr;
 	pacman(char * path,SDL_Renderer* rendere,int init_x,int init_y,bool isenemy);
 	void update();

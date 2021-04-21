@@ -2,36 +2,48 @@
 
 #define Game_hpp
 #include <SDL2/SDL.h>
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+using namespace std;
 
-// bool debug=false;
+
 class Game{
 
-public:
-	Game();
-	void init(char* title, int x,int y,int w,int h);
-	void handle_event();
-	void process();
-	void render();
-	void close();
-	bool isrunning();
-	bool running;
-	SDL_Renderer *renderer;
-	int state;
+	public:
+		Game(char* title, int x,int y,int w,int h);
+		void handle_event();
+		void process();
+		void render();
+		void close();
+		bool isRunning();
+		bool running;
+		SDL_Renderer *renderer;
+		int state;
 
-private:
-	int cnt=0;
+	private:
+		int cnt=0; 
 
-	SDL_Window	*window;
-	SDL_Texture* menuback= NULL,*gameback=NULL,*menu=NULL;
+		SDL_Window *window;
+		SDL_Texture* menuback= NULL,*gameback=NULL,*menu=NULL,*menu1=NULL,*logos=NULL;
 	
-
-
-
-
 };
 
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

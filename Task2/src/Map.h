@@ -1,15 +1,13 @@
 #include "game.hpp";
+#include "button.h";
 
 class Map{
 public:
-	int mat[40][30];
+	int mat[20][20];
 	void LoadMap(SDL_Renderer*renderer);
 	void RenderMap(SDL_Renderer *renderer);
-	SDL_Texture* text;
-	SDL_Rect rectange;
-
-
-
-
+	SDL_Texture* text1,*text2;
+	Button* tape=nullptr;
+	
 
 };

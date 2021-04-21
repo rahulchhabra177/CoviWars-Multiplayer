@@ -1,28 +1,27 @@
 #include "game.hpp"
-#include <iostream>
+#include <bits/stdc++.h>
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+
 #include "Texture.h";
 #include "pacman.h";
-#include "button.h";
+//#include "button.h";
 #include "Map.h";
+
 using namespace std;
-int rooot=0;
-pacman * mainplayer=nullptr,*enemy1=nullptr,*tile=nullptr;
-Button* start_button=nullptr;
-int SCREENWIDTH=400;
-int SCREENHEIGHT=300;
+
+pacman *mainplayer=nullptr,*enemy1=nullptr,*tile=nullptr;
+Button *start_button=nullptr,*exit_button=nullptr,*logo=nullptr;
+
+int SCREENWIDTH=3840;
+int SCREENHEIGHT=2160;
+
 Map *lvl1=nullptr;
-SDL_Rect dst,src;
-Game::Game(){
 
-}
-
-void Game::init(char* title, int xcor,int ycor,int width_window,int height_window){
+Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
-		if (true){
-			cout<<"SDL Initialised succesfully....\n";
-		}
+		cout<<"SDL Initialised succesfully....\n";
 		window=SDL_CreateWindow(title,xcor,ycor,width_window,height_window,flag);
 
 		if (window==NULL){
@@ -30,43 +29,41 @@ void Game::init(char* title, int xcor,int ycor,int width_window,int height_windo
 			cout<<"Error:Couldn't initialize window\n";
 		}
 		else{
-			if (true){
-				cout<<"Window Inititalised Successfully....\n";
-			}
+			cout<<"Window Inititalised Successfully....\n";
 			renderer=SDL_CreateRenderer(window,-1,0);
 			if (renderer==NULL){
 				running=false;
 				cout<<"Error:Couldn't initialize Renderer\n";
 			}
 			else{
-				if (true){
-					cout<<"Renderer initialized Successfully...\n";
-				}
+				cout<<"Renderer initialized Successfully...\n";
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
-				// dst={32,32,32,32};
-				dst.x=100;dst.y=100;dst.h=80;dst.w=180;
-				src.x=150;src.y=75;src.h=60,src.w=323;
+				
 				start_button=new Button();
+				exit_button=new Button();
+				logo=new Button();
+				
 				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
 				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
-				menu=start_button->LoadButtonFromImage("./../assets/menu.jpg",renderer,"Play",160,80,60,300);
+				logos=logo->LoadButtonFromImage("./../assets/logo.png",renderer,"LOGO");
+				logo->set_cor(SCREENWIDTH/4,SCREENHEIGHT/20,SCREENWIDTH/10,SCREENHEIGHT/2);
+				menu=start_button->LoadButtonFromImage("./../assets/start].png",renderer,"START");
 				start_button->set_cor(297,358,49,217);
+				menu1=exit_button->LoadButtonFromImage("./../assets/start].png",renderer,"EXIT");
+				exit_button->set_cor(297,438,49,217);
 				state=0;
 				if (menuback==NULL){
 					running=false;
-					cout<<"Error:Couldn't initialize image\n";
+					cout<<"Error:Couldn't initialize background image\n";
 					cout<<IMG_GetError()<<"\n";
 				}
-				
 				else{
-					
-				running=true;
-				mainplayer=new pacman("./../assets/hero.bmp",renderer,SCREENWIDTH/2,SCREENHEIGHT,false);
-				enemy1=new pacman("./../assets/corona.xcf",renderer,0,0,true);
-				lvl1=new Map();
-				lvl1->LoadMap(renderer);
-				
-    			}
+					running=true;
+					mainplayer=new pacman("./../assets/hero.bmp",renderer,SCREENWIDTH/2,SCREENHEIGHT,false);
+					enemy1=new pacman("./../assets/corona.xcf",renderer,0,0,true);
+					lvl1=new Map();
+					lvl1->LoadMap(renderer);
+    				}
 			}
 
 		}
@@ -80,11 +77,17 @@ void Game::init(char* title, int xcor,int ycor,int width_window,int height_windo
 void Game::handle_event(){
 	SDL_Event event;
 	SDL_PollEvent(&event);
+	cnt=(cnt+1)%20;
+	if(cnt==0){
+		enemy1->x++;
+	}
+	
 	start_button->handle_event(event,&state);
+	// exit_button->handle_event(event,&state);
 	switch (event.type){
 		case SDL_QUIT:	
-			running=false;
-			break;
+			{running=false;
+			break;}
 		case SDL_KEYDOWN:
 			switch ( event.key.keysym.sym ){
 				case SDLK_UP:
@@ -103,42 +106,40 @@ void Game::handle_event(){
 					break;					
 			}	
 		case SDL_MOUSEBUTTONDOWN:
-			cout<<"butten\n";
+			cout<<"button\n";
 			int a,b;
 			SDL_GetMouseState( &a, &b );
-			cout<<a<<" "<<b<<"\n";	
+			cout<<a<<" "<<b<<"\n";
+			break;	
 		default:
 			break;
 	}
-// backg=Texture::LoadT("/home/rahul/Downloads/hell.bmp",renderer);
 }
 
 void Game::process(){
 	if (state==1){
 		mainplayer->update();
 		enemy1->update();
+	}
+	//Add waiting animation
 }
-	
 
-}
-//state=0 means menu and 1 means game
 void Game::render(){
 
 	SDL_RenderClear(renderer);
 	if (state==0){
 		SDL_RenderCopy(renderer,menuback,NULL,NULL);
-		// SDL_RenderCopy(renderer,menu,&src,&dst);
+		exit_button->render(renderer,menu1);
+		logo->render(renderer,logos);
 		start_button->render(renderer,menu);
 	}
 	else{
-
 		SDL_RenderCopy(renderer,gameback,NULL,NULL);
-	mainplayer->render();
-	enemy1->render();
-	lvl1->RenderMap(renderer);
+		mainplayer->render();
+		enemy1->render();
+		lvl1->RenderMap(renderer);
+		// exit_button->render(renderer,menu1);
 	}
-	
-
 	SDL_RenderPresent(renderer);
 }
 
@@ -146,11 +147,8 @@ void Game::close(){
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
-	if (true){
-		cout<<"Game Quitted...\n";
-	}
-
+	cout<<"Game Closed...\n";
 }
-bool Game::isrunning(){
+bool Game::isRunning(){
 	return running;
 }
