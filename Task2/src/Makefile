@@ -1,4 +1,4 @@
-OBJS = main.cpp game.cpp Texture.cpp pacman.cpp button.cpp Map.cpp
+OBJS = main.cpp game.cpp Texture.cpp pacman.cpp button.cpp Map.cpp play.cpp menu.cpp
 CC = g++
 COMPILER_FLAGS = -w
 LINKER_FLAGS = -lSDL2 -lSDL2_image

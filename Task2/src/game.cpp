@@ -1,12 +1,8 @@
 #include "game.hpp"
-#include <bits/stdc++.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
-#include "Texture.h";
-#include "pacman.h";
-//#include "button.h";
 #include "Map.h";
+#include "menu.cpp";
+#include "play.cpp";
+
 
 using namespace std;
 
@@ -15,15 +11,17 @@ Button *start_button=nullptr,*exit_button=nullptr,*logo=nullptr;
 
 int SCREENWIDTH=3840;
 int SCREENHEIGHT=2160;
+int SPEED=20;
 
 Map *lvl1=nullptr;
+
+vector<State*> stateList;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
 		cout<<"SDL Initialised succesfully....\n";
 		window=SDL_CreateWindow(title,xcor,ycor,width_window,height_window,flag);
-
 		if (window==NULL){
 			running=false;
 			cout<<"Error:Couldn't initialize window\n";
@@ -43,6 +41,13 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				exit_button=new Button();
 				logo=new Button();
 				
+				play* playState = new play("Play");
+				stateList.push_back(playState);
+				
+				vector<Button> newList;
+				men* newMenu = new men("Start",newList);
+				stateList.push_back(newMenu);
+				
 				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
 				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
 				logos=logo->LoadButtonFromImage("./../assets/logo.png",renderer,"LOGO");
@@ -51,7 +56,7 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				start_button->set_cor(297,358,49,217);
 				menu1=exit_button->LoadButtonFromImage("./../assets/start].png",renderer,"EXIT");
 				exit_button->set_cor(297,438,49,217);
-				state=0;
+				state=1;
 				if (menuback==NULL){
 					running=false;
 					cout<<"Error:Couldn't initialize background image\n";
@@ -81,7 +86,6 @@ void Game::handle_event(){
 	if(cnt==0){
 		enemy1->x++;
 	}
-	
 	start_button->handle_event(event,&state);
 	// exit_button->handle_event(event,&state);
 	switch (event.type){
@@ -125,7 +129,6 @@ void Game::process(){
 }
 
 void Game::render(){
-
 	SDL_RenderClear(renderer);
 	if (state==0){
 		SDL_RenderCopy(renderer,menuback,NULL,NULL);
@@ -133,12 +136,18 @@ void Game::render(){
 		logo->render(renderer,logos);
 		start_button->render(renderer,menu);
 	}
-	else{
+	else if(state==1){
 		SDL_RenderCopy(renderer,gameback,NULL,NULL);
 		mainplayer->render();
 		enemy1->render();
 		lvl1->RenderMap(renderer);
 		// exit_button->render(renderer,menu1);
+	}else if(state==2){
+	
+	}else if(state==3){
+	
+	}else{
+		running = false;
 	}
 	SDL_RenderPresent(renderer);
 }
@@ -149,6 +158,7 @@ void Game::close(){
 	SDL_Quit();
 	cout<<"Game Closed...\n";
 }
+
 bool Game::isRunning(){
 	return running;
 }

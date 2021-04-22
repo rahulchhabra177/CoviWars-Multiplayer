@@ -1,4 +1,9 @@
-#include "game.hpp"
+#ifndef BUTTON_H
+
+#define BUTTON_H
+#include <SDL2/SDL.h>
+#include <bits/stdc++.h>
+#include <SDL2/SDL_image.h>
 
 class Button{
 	
@@ -12,3 +17,4 @@ class Button{
 		void set_cor(int x,int y,int a ,int b);
 
 };
+#endif

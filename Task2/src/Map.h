@@ -1,4 +1,6 @@
-#include "game.hpp";
+#include <SDL2/SDL.h>
+#include <bits/stdc++.h>
+#include <SDL2/SDL_image.h>
 #include "button.h";
 
 class Map{
@@ -8,6 +10,4 @@ public:
 	void RenderMap(SDL_Renderer *renderer);
 	SDL_Texture* text1,*text2;
 	Button* tape=nullptr;
-	
-
 };

@@ -1,6 +1,6 @@
-#ifndef Game_hpp
+#ifndef GAME_HPP
 
-#define Game_hpp
+#define GAME_HPP
 #include <SDL2/SDL.h>
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
@@ -27,9 +27,15 @@ class Game{
 		SDL_Texture* menuback= NULL,*gameback=NULL,*menu=NULL,*menu1=NULL,*logos=NULL;
 	
 };
-
-
 #endif
+
+//Phases of the game
+
+// 1 : Start Menu
+// 0 : Play 
+// 2 : Pause
+// 3 : Options
+// 4 : Exit
 
 
 

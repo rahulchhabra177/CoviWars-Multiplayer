@@ -1,6 +1,4 @@
 #include "Map.h";
-// #include "button.h";
-
 
 void Map::LoadMap(SDL_Renderer*renderer){
 

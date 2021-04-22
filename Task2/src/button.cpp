@@ -1,5 +1,4 @@
 #include "button.h";
-#include "game.hpp";
 
 using namespace std;
 
@@ -13,7 +12,6 @@ SDL_Texture* Button::LoadButtonFromImage(char * path,SDL_Renderer* renderer,char
 		cout<<"Error:Couldn't initialize button:"<<label<<"\n";
 	}
 	else{
-		
 		returng=SDL_CreateTextureFromSurface(renderer,tmp);
 		SDL_FreeSurface(tmp);
 	}
@@ -34,7 +32,7 @@ bool Button::isInside(int a,int b){
 }
 
 
-void Button::handle_event(SDL_Event event,int * state){
+void Button::handle_event(SDL_Event event,int* state){
 	switch (event.type){
 		case SDL_MOUSEBUTTONDOWN:
 			int a,b;
