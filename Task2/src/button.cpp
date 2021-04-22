@@ -2,21 +2,17 @@
 
 using namespace std;
 
-
-SDL_Texture* Button::LoadButtonFromImage(char * path,SDL_Renderer* renderer,char* label_1){
-	label=label_1;
+Button::Button(char* name, SDL_Renderer* renderer, char* path){
+	label = name;
 	SDL_Surface* tmp;
 	tmp=IMG_Load(path);
-	SDL_Texture* returng=NULL;
 	if (tmp==NULL){
-		cout<<"Error:Couldn't initialize button:"<<label<<"\n";
+		cout<<"Error:Couldn't initialize button:"<<label<<"\n";		//To manage exit condition
 	}
 	else{
-		returng=SDL_CreateTextureFromSurface(renderer,tmp);
+		texture=SDL_CreateTextureFromSurface(renderer,tmp);
 		SDL_FreeSurface(tmp);
 	}
-	texture=returng;
-	return returng;
 } 
 
 void Button::set_cor(int a,int b,int q,int w){
@@ -33,18 +29,17 @@ bool Button::isInside(int a,int b){
 }
 
 
-void Button::handle_event(SDL_Event event,int* state){
-	switch (event.type){
-		case SDL_MOUSEBUTTONDOWN:
-			int a,b;
-			SDL_GetMouseState( &a, &b );
-			if (isInside(a,b)){
-				cout<<"State change\n";
-				*state=1;
-			}
-			break;
-		default:
-			break;		
+void Button::handle_event(int* state){
+	if(strcmp(label,"Exit")==0){
+		*state=4;	
+	}else if(strcmp(label,"Start")==0){
+		*state=0;
+	}else if(strcmp(label,"Options")==0){
+		*state=3;
+	}else if(strcmp(label,"Pause")==0){
+		*state=2;
+	}else if(strcmp(label,"Resume")==0){
+		*state=0;
 	}
 }
 

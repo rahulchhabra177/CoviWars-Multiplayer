@@ -8,11 +8,11 @@
 class Button{
 	
 	public:
+		Button(char* name, SDL_Renderer* renderer, char* path);
 		char* label;
 		SDL_Rect dest;
 		SDL_Texture* texture;
-		SDL_Texture * LoadButtonFromImage(char * path,SDL_Renderer* renderer,char* label_1);
-		void handle_event(SDL_Event e,int*state);
+		void handle_event(int*state);
 		bool isInside(int a,int b);
 		void render(SDL_Renderer *renderer);
 		void set_cor(int x,int y,int a ,int b);

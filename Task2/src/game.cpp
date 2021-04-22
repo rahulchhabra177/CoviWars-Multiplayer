@@ -3,22 +3,21 @@
 #include "menu.cpp";
 #include "play.cpp";
 
+int SCREENWIDTH=3840;
+int SCREENHEIGHT=2160;
 
 using namespace std;
 
-pacman *mainplayer=nullptr,*enemy1=nullptr,*tile=nullptr;
-Button *start_button=nullptr,*exit_button=nullptr,*logo=nullptr;
-
-int SCREENWIDTH=3840;
-int SCREENHEIGHT=2160;
-int SPEED=20;
+Character * tile=nullptr;
 
 Map *lvl1=nullptr;
 
-vector<State*> stateList;
+vector<Menu*> menuList;
+play* playState=nullptr;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
+	running = true;
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
 		cout<<"SDL Initialised succesfully....\n";
 		window=SDL_CreateWindow(title,xcor,ycor,width_window,height_window,flag);
@@ -37,44 +36,37 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				cout<<"Renderer initialized Successfully...\n";
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
 				
-				start_button=new Button();
-				exit_button=new Button();
-				logo=new Button();
-				
 				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
 				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
 				
-				play* playState = new play("Play",1,gameback);
-				stateList.push_back(playState);
-				
-				vector<Button> newList;
-				men* newMenu = new men("Start",1,menuback);
-				stateList.push_back(newMenu);
-				
-				logos=logo->LoadButtonFromImage("./../assets/logo.png",renderer,"LOGO");
-				logo->set_cor(SCREENWIDTH/4,SCREENHEIGHT/20,SCREENWIDTH/10,SCREENHEIGHT/2);
-				menu=start_button->LoadButtonFromImage("./../assets/start].png",renderer,"START");
-				start_button->set_cor(297,358,49,217);
-				menu1=exit_button->LoadButtonFromImage("./../assets/start].png",renderer,"EXIT");
-				exit_button->set_cor(297,438,49,217);
-				state=1;
 				if (menuback==NULL){
 					running=false;
 					cout<<"Error:Couldn't initialize background image\n";
 					cout<<IMG_GetError()<<"\n";
 				}
 				else{
-					running=true;
-					mainplayer=new pacman("./../assets/hero.bmp",renderer,SCREENWIDTH/2,SCREENHEIGHT,false);
-					enemy1=new pacman("./../assets/corona.xcf",renderer,0,0,true);
 					lvl1=new Map();
 					lvl1->LoadMap(renderer);
     				}
+				
+				playState = new play("Play",1,gameback,renderer);
+				
+				Menu* startMenu = new Menu("Start",1,menuback,renderer);
+				menuList.push_back(startMenu);
+				
+				Menu* pauseMenu = new Menu("Pause",2,menuback,renderer);
+				menuList.push_back(pauseMenu);
+				
+				Menu* optionsMenu = new Menu("Options",3,menuback,renderer);
+				menuList.push_back(optionsMenu);
+				
+				state=1;
 			}
 
 		}
 	}
 	else{
+		cout<<"Initialisation unsuccesful...\n";
 		running=false;
 	}
 }
@@ -83,75 +75,30 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 void Game::handle_event(){
 	SDL_Event event;
 	SDL_PollEvent(&event);
-	cnt=(cnt+1)%20;
-	if(cnt==0){
-		enemy1->x++;
+	if(state==0){
+		playState->handle_event(event,&state);
+	}else{
+		menuList[state-1]->handle_event(event,&state);
 	}
-	stateList[state]->handle_event(event,&state);
-	/*start_button->handle_event(event,&state);
-	exit_button->handle_event(event,&state);
-	switch (event.type){
-		case SDL_QUIT:	
-			{running=false;
-			break;}
-		case SDL_KEYDOWN:
-			switch ( event.key.keysym.sym ){
-				case SDLK_UP:
-					mainplayer->y--;
-					break;
-				case SDLK_DOWN:
-					mainplayer->y++;
-					break;
-				case SDLK_RIGHT:
-					mainplayer->x++;
-					break;
-				case SDLK_LEFT:
-					mainplayer->x--;
-					break;
-				default:
-					break;					
-			}	
-		case SDL_MOUSEBUTTONDOWN:
-			cout<<"button\n";
-			int a,b;
-			SDL_GetMouseState( &a, &b );
-			cout<<a<<" "<<b<<"\n";
-			break;	
-		default:
-			break;
-	}*/
 }
 
 void Game::process(){
-	if (state==1){
-		mainplayer->update();
-		enemy1->update();
+	if (state==0){
+		playState->update();
+	}else if(state==4){
+		running = false;
+	}else{
+		menuList[state-1]->update();
 	}
-	//Add waiting animation
 }
 
 void Game::render(){
 	SDL_RenderClear(renderer);
-	stateList[state]->render(renderer);	
-	/*if (state==0){
-		SDL_RenderCopy(renderer,menuback,NULL,NULL);
-		exit_button->render(renderer,menu1);
-		logo->render(renderer,logos);
-		start_button->render(renderer,menu);
-	}
-	else if(state==1){
-		SDL_RenderCopy(renderer,gameback,NULL,NULL);
-		mainplayer->render();
-		enemy1->render();
-		lvl1->RenderMap(renderer);
-		// exit_button->render(renderer,menu1);
-	}else if(state==2){
-	
-	}else if(state==3){
-	
+	if(state==0){
+		playState->render();
 	}else{
-		running = false;
-	}*/
+		menuList[state-1]->render();
+	}	
 	SDL_RenderPresent(renderer);
 }
 

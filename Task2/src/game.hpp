@@ -21,18 +21,17 @@ class Game{
 		int state;
 
 	private:
-		int cnt=0; 
 
 		SDL_Window *window;
-		SDL_Texture* menuback= NULL,*gameback=NULL,*menu=NULL,*menu1=NULL,*logos=NULL;
+		SDL_Texture* menuback= NULL,*gameback=NULL;
 	
 };
 #endif
 
 //Phases of the game
 
-// 1 : Start Menu
-// 0 : Play 
+// 0 : Play
+// 1 : Start Menu 
 // 2 : Pause
 // 3 : Options
 // 4 : Exit

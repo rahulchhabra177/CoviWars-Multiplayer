@@ -2,7 +2,6 @@
 
 void Map::LoadMap(SDL_Renderer*renderer){
 
-	tape=new Button();
 	mat[2][5]=1;mat[15][14]=1;mat[22][10]=1;
 	// text=tape->LoadButtonFromImage("./../assets/police.jpeg",renderer,"Play",-1,-1,-1,-1);
 	// 			tape->set_cor(50,80,25,80);
@@ -18,14 +17,14 @@ void Map::LoadMap(SDL_Renderer*renderer){
 		for (int j=0;j<20;j++){
 			if (mat[i][j]==1){
 				// std::cout<<i<<" "<<j<<"\n";
-				text1=tape->LoadButtonFromImage("./../assets/police1.jpeg",renderer,"Play");
+				tape = new Button("Map1",renderer,"./../assets/police1.jpeg");
 				tape->set_cor(20*i,20*j,15,80);
 
 				
 			}
 			else if (mat[i][j]==2){
 				// std::cout<<i<<" "<<j<<"\n";
-				text2=tape->LoadButtonFromImage("./../assets/police2.jpeg",renderer,"Play");
+				tape = new Button("Map2",renderer,"./../assets/police2.jpeg");
 				tape->set_cor(20*i,20*j,15,80);
 				
 			}
