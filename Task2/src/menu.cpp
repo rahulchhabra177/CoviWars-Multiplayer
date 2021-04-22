@@ -19,6 +19,15 @@ class men : public State{
 			}
 			return -1;
 		}
+		
+		void render(SDL_Renderer* renderer){
+			SDL_RenderCopy(renderer,background,NULL,NULL);
+			for(int i=0;i<buttons.size();i++){
+				buttons[i]->render(renderer);
+			}
+		}
+		
+		
 	
 };
 

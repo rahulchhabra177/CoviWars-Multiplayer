@@ -15,6 +15,7 @@ SDL_Texture* Button::LoadButtonFromImage(char * path,SDL_Renderer* renderer,char
 		returng=SDL_CreateTextureFromSurface(renderer,tmp);
 		SDL_FreeSurface(tmp);
 	}
+	texture=returng;
 	return returng;
 } 
 
@@ -47,7 +48,7 @@ void Button::handle_event(SDL_Event event,int* state){
 	}
 }
 
-void Button::render(SDL_Renderer *renderer,SDL_Texture *tect){
-	SDL_RenderCopy(renderer,tect,NULL,&dest);
+void Button::render(SDL_Renderer *renderer){
+	SDL_RenderCopy(renderer,texture,NULL,&dest);
 }
 

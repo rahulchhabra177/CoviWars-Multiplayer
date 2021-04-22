@@ -9,9 +9,9 @@ class State{
 
 	public:
 		char* name;
-		vector<Button> buttons;
+		vector<Button*> buttons;
 		SDL_Texture* background;
-		void render(SDL_Renderer *renderer,SDL_Texture* tect);
+		void render(SDL_Renderer *renderer);
 		int locatePointer(int a,int b);
 		void handle_event(SDL_Event e,int* state);
 		

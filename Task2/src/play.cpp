@@ -25,6 +25,16 @@ class play : public State{
 			return -1;
 		}
 		
+		void render(SDL_Renderer* renderer){
+			SDL_RenderCopy(renderer,background,NULL,NULL);
+			mainPlayer->render();
+			for(int i=0;i<enemies.size();i++){
+				enemies[i]->render();
+			}
+			for(int i=0;i<buttons.size();i++){
+				buttons[i]->render(renderer);
+			}
+		}
 		
 	
 };

@@ -41,15 +41,16 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				exit_button=new Button();
 				logo=new Button();
 				
-				play* playState = new play("Play");
+				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
+				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
+				
+				play* playState = new play("Play",1,gameback);
 				stateList.push_back(playState);
 				
 				vector<Button> newList;
-				men* newMenu = new men("Start",newList);
+				men* newMenu = new men("Start",1,menuback);
 				stateList.push_back(newMenu);
 				
-				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
-				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
 				logos=logo->LoadButtonFromImage("./../assets/logo.png",renderer,"LOGO");
 				logo->set_cor(SCREENWIDTH/4,SCREENHEIGHT/20,SCREENWIDTH/10,SCREENHEIGHT/2);
 				menu=start_button->LoadButtonFromImage("./../assets/start].png",renderer,"START");
@@ -86,8 +87,9 @@ void Game::handle_event(){
 	if(cnt==0){
 		enemy1->x++;
 	}
-	start_button->handle_event(event,&state);
-	// exit_button->handle_event(event,&state);
+	stateList[state]->handle_event(event,&state);
+	/*start_button->handle_event(event,&state);
+	exit_button->handle_event(event,&state);
 	switch (event.type){
 		case SDL_QUIT:	
 			{running=false;
@@ -117,7 +119,7 @@ void Game::handle_event(){
 			break;	
 		default:
 			break;
-	}
+	}*/
 }
 
 void Game::process(){
@@ -130,7 +132,8 @@ void Game::process(){
 
 void Game::render(){
 	SDL_RenderClear(renderer);
-	if (state==0){
+	stateList[state]->render(renderer);	
+	/*if (state==0){
 		SDL_RenderCopy(renderer,menuback,NULL,NULL);
 		exit_button->render(renderer,menu1);
 		logo->render(renderer,logos);
@@ -148,7 +151,7 @@ void Game::render(){
 	
 	}else{
 		running = false;
-	}
+	}*/
 	SDL_RenderPresent(renderer);
 }
 
