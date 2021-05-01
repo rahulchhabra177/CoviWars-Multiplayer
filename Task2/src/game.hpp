@@ -1,37 +1,54 @@
-#ifndef Game_hpp
+#ifndef GAME_HPP
 
-#define Game_hpp
+#define GAME_HPP
 #include <SDL2/SDL.h>
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+using namespace std;
 
-// bool debug=false;
+
 class Game{
 
-public:
-	Game();
-	void init(char* title, int x,int y,int w,int h);
-	void handle_event();
-	void process();
-	void render();
-	void close();
-	bool isrunning();
-	bool running;
-	SDL_Renderer *renderer;
-	int state;
+	public:
+		Game(char* title, int x,int y,int w,int h);
+		void handle_event();
+		void process();
+		void render();
+		void close();
+		bool isRunning();
+		bool running;
+		SDL_Renderer *renderer;
+		int state;
 
-private:
-	int cnt=0;
+	private:
 
-	SDL_Window	*window;
-	SDL_Texture* menuback= NULL,*gameback=NULL,*menu=NULL;
+		SDL_Window *window;
+		SDL_Texture* menuback= NULL,*gameback=NULL;
 	
-
-
-
-
 };
-
-
 #endif
+
+//Phases of the game
+
+// 0 : Play
+// 1 : Start Menu 
+// 2 : Pause
+// 3 : Options
+// 4 : Exit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
