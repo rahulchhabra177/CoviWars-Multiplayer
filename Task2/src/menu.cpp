@@ -41,6 +41,14 @@ class Menu{
 				Button* exit_button=new Button("Exit",renderer,"./../assets/exit.png");
 				exit_button->set_cor(1920,1100,70,300);
 				buttons.push_back(exit_button);
+			}else if(menuType==4){
+				Button* playAgain=new Button("Play Again",renderer,"./../assets/playagain.jpeg");
+				playAgain->set_cor(1920,1500,70,300);
+				buttons.push_back(playAgain);
+				
+				Button* exit_button=new Button("Exit",renderer,"./../assets/exit.png");
+				exit_button->set_cor(1920,1800,70,300);
+				buttons.push_back(exit_button);
 			}
 		}
 		
@@ -66,7 +74,7 @@ class Menu{
 		
 		void handle_event(SDL_Event e,int* state){
 			if(e.type==SDL_QUIT){
-				*state=4;
+				*state=5;
 			}else if(e.type==SDL_MOUSEBUTTONDOWN){
 				int a,b;
 				SDL_GetMouseState(&a,&b);

@@ -22,12 +22,17 @@ class play{
 			name = title;
 			background = poster;
 			renderer = localRenderer;
-			pacman = new Character("./../assets/hero.bmp",renderer,1920,1080,false);
 			
 			for(int i=0;i<numEnemies;i++){
-				Character* enemy=new Character("./../assets/corona.xcf",renderer,0,0,true);
+				Character* enemy=nullptr;
 				enemies.push_back(enemy);
 			}
+			
+			for(int i=0;i<numEnemies;i++){
+				enemies[i]=new Character("./../assets/corona.bmp",renderer,1000,1000,false);
+			}
+			
+			pacman = new Character("./../assets/hero.bmp",renderer,0,0,false);
 		}
 		
 		int locatePointer(int a,int b){
@@ -41,23 +46,31 @@ class play{
 		
 		void render(){
 			SDL_RenderCopy(renderer,background,NULL,NULL);
-			pacman->render();
+			pacman->render(renderer);
 			for(int i=0;i<enemies.size();i++){
-				enemies[i]->render();
+				enemies[i]->render(renderer);
 			}
 			for(int i=0;i<buttons.size();i++){
 				buttons[i]->render(renderer);
 			}
 		}
 		
-		void update(){
-		
+		void update(int* state){
+			pacman->updatePlayer();
+			/*for(int i=0;i<enemies.size();i++{
+				enemies[i].updatePlayer();
+			}*/
+			for(int i=0;i<enemies.size();i++){
+				if(pacman->collide(enemies[i])){
+					*state = 4;
+				}	
+			}
 		}
 		
 		void handle_event(SDL_Event e,int* state){
-			pacman->update(e);
+			pacman->changeSpeed(e);
 			if(e.type==SDL_QUIT){
-				*state=4;
+				*state=5;
 			}else if(e.type==SDL_MOUSEBUTTONDOWN){
 				int a,b;
 				SDL_GetMouseState(&a,&b);
@@ -67,7 +80,7 @@ class play{
 				}
 			}else if(e.type==SDL_KEYDOWN){
 				if(e.key.keysym.sym==SDLK_ESCAPE){
-					*state=4;
+					*state=5;
 				}else if(e.key.keysym.sym==SDLK_p){
 					*state=2;
 				}

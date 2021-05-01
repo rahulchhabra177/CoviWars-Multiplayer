@@ -23,7 +23,7 @@ class Game{
 	private:
 
 		SDL_Window *window;
-		SDL_Texture* menuback= NULL,*gameback=NULL;
+		SDL_Texture* menuback= NULL,*gameback=NULL,*overback=NULL;
 	
 };
 #endif

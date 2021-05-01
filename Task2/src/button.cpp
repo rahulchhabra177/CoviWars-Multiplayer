@@ -31,7 +31,7 @@ bool Button::isInside(int a,int b){
 
 void Button::handle_event(int* state){
 	if(strcmp(label,"Exit")==0){
-		*state=4;	
+		*state=5;	
 	}else if(strcmp(label,"Start")==0){
 		*state=0;
 	}else if(strcmp(label,"Options")==0){
@@ -40,6 +40,8 @@ void Button::handle_event(int* state){
 		*state=2;
 	}else if(strcmp(label,"Resume")==0){
 		*state=0;
+	}else if(strcmp(label,"Play Again")==0){
+		*state=-2;
 	}
 }
 
