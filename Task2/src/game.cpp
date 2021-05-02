@@ -2,7 +2,6 @@
 #include "menu.cpp";
 #include "play.cpp";
 #include "sounds.h";
-#include "maze.h";
 
 int SCREEN_WIDTH=3840;
 int SCREEN_HEIGHT=2160;
@@ -12,7 +11,6 @@ using namespace std;
 vector<Menu*> menuList;
 play* playState=nullptr;
 Menu* gameOver=nullptr;
-Maze* maze=nullptr;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
@@ -44,8 +42,6 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 					cout<<"Error:Couldn't initialize background image\n";
 					cout<<IMG_GetError()<<"\n";
 				}
-				
-				maze = new Maze(SCREEN_WIDTH/100,SCREEN_HEIGHT/100,1,renderer);
 				
 				playState = new play("Play",1,gameback,renderer);
 				
@@ -87,13 +83,11 @@ void Game::handle_event(){
 
 void Game::process(){
 	if (state==0){
-		maze->update();
-		playState->update(&state);
+		playState->update(&state,true);
 	}else if(state==5){
 		running = false;
 	}else if(state==-2){
 		playState = new play("Play",1,gameback,renderer);
-		maze->reinitialize();
 		state = 0;
 	}else{
 		menuList[state-1]->update();
@@ -104,7 +98,6 @@ void Game::render(){
 	SDL_RenderClear(renderer);
 	if(state==0){
 		playState->render();
-		maze->render(renderer);
 	}else{
 		menuList[state-1]->render();
 	}	

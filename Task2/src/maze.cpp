@@ -40,6 +40,11 @@ void Maze::render(SDL_Renderer* renderer){
 			}
 		}
 	}
+	mazeCell.x=m_width*100;
+	for(int i=0;i<m_height;i++){
+		mazeCell.y = 100*i;
+		SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+	}
 }
 
 void Maze::update(){
