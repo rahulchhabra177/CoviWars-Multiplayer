@@ -32,7 +32,7 @@ class play{
 				enemies[i]=new Character("./../assets/corona.bmp",renderer,1000,1000,false);
 			}
 			
-			pacman = new Character("./../assets/hero.bmp",renderer,0,0,false);
+			pacman = new Character("./../assets/hero.bmp",renderer,100,100,false);
 		}
 		
 		int locatePointer(int a,int b){

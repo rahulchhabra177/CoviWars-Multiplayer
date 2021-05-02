@@ -28,14 +28,6 @@ class Game{
 };
 #endif
 
-//Phases of the game
-
-// 0 : Play
-// 1 : Start Menu 
-// 2 : Pause
-// 3 : Options
-// 4 : Exit
-
 
 
 
