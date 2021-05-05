@@ -4,6 +4,10 @@
 #include <SDL2/SDL.h>
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+// #include "sounds.h";
+#include "menu.cpp";
+#include "play.cpp";
+
 using namespace std;
 
 
@@ -23,18 +27,10 @@ class Game{
 	private:
 
 		SDL_Window *window;
-		SDL_Texture* menuback= NULL,*gameback=NULL;
+		SDL_Texture* menuback= NULL,*gameback=NULL,*overback=NULL;
 	
 };
 #endif
-
-//Phases of the game
-
-// 0 : Play
-// 1 : Start Menu 
-// 2 : Pause
-// 3 : Options
-// 4 : Exit
 
 
 

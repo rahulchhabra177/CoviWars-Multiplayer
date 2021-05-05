@@ -1,20 +1,14 @@
 #include "game.hpp"
-#include "Map.h";
-#include "menu.cpp";
-#include "play.cpp";
-#include "sounds.h";
-int SCREENWIDTH=800;
-int SCREENHEIGHT=600;
 
+int SCREEN_WIDTH=800;
+int SCREEN_HEIGHT=600;
+bool music=true;
 using namespace std;
 
-Character * tile=nullptr;
-SoundClass *MusicManager=nullptr;
-Map *lvl1=nullptr;
-// SoundClass* dj=nullptr;
 vector<Menu*> menuList;
 play* playState=nullptr;
-
+Menu* gameOver=nullptr;
+SoundClass* MusicManager=nullptr;
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
 	running = true;
@@ -38,16 +32,13 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				
 				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
 				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
+				overback=Texture::LoadT("./../assets/gameover.jpg",renderer);
 				
 				if (menuback==NULL){
 					running=false;
 					cout<<"Error:Couldn't initialize background image\n";
 					cout<<IMG_GetError()<<"\n";
 				}
-				else{
-					lvl1=new Map();
-					lvl1->LoadMap(renderer);
-    				}
 				
 				playState = new play("Play",1,gameback,renderer);
 				
@@ -59,11 +50,15 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				
 				Menu* optionsMenu = new Menu("Options",3,menuback,renderer);
 				menuList.push_back(optionsMenu);
+				
+				Menu* gameOver = new Menu("Game Over",4,overback,renderer);
+				menuList.push_back(gameOver);
 				MusicManager=new SoundClass();
 				MusicManager->InitializeAll();
-				MusicManager->PlaySound("a");
+				MusicManager->PlaySound("gamestart");
+				music=true;
+				
 				state=1;
-				// dj=new SoundClass();
 			}
 
 		}
@@ -79,18 +74,22 @@ void Game::handle_event(){
 	SDL_Event event;
 	SDL_PollEvent(&event);
 	if(state==0){
-		playState->handle_event(event,&state);
-	}
-	else{
-		menuList[state-1]->handle_event(event,&state);
+		playState->handle_event(event,&state,MusicManager,music);
+	}else if(state==-1){
+		gameOver->handle_event(event,&state,MusicManager,music);
+	}else{
+		menuList[state-1]->handle_event(event,&state,MusicManager,music);
 	}
 }
 
 void Game::process(){
 	if (state==0){
-		playState->update();
-	}else if(state==4){
+		playState->update(&state,true,MusicManager,music);
+	}else if(state==5){
 		running = false;
+	}else if(state==-2){
+		playState = new play("Play",1,gameback,renderer);
+		state = 0;
 	}else{
 		menuList[state-1]->update();
 	}
@@ -100,9 +99,7 @@ void Game::render(){
 	SDL_RenderClear(renderer);
 	if(state==0){
 		playState->render();
-	}
-	else{
-		cout<<"renfering menu list\n";
+	}else{
 		menuList[state-1]->render();
 	}	
 	SDL_RenderPresent(renderer);

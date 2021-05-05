@@ -1,4 +1,3 @@
-#include "game.hpp"
 #include "button.h"
 #include "Texture.h"
 using namespace std;
@@ -19,15 +18,15 @@ class Menu{
 			
 			if(menuType==1){
 				Button* start_button=new Button("Start",renderer,"./../assets/start.png");
-				start_button->set_cor(500,300,70,300);
+				start_button->set_cor(100,70,70,300);
 				buttons.push_back(start_button);
 				
 				Button* options_button=new Button("Options",renderer,"./../assets/options.png");
-				options_button->set_cor(600,200,70,300);
+				options_button->set_cor(250,250,70,300);
 				buttons.push_back(options_button);
 				
 				Button* exit_button=new Button("Exit",renderer,"./../assets/exit.png");
-				exit_button->set_cor(120,400,70,300);
+				exit_button->set_cor(192,110,70,300);
 				buttons.push_back(exit_button);
 				
 				Button* logo=new Button("Logo",renderer,"./../assets/logo.png");
@@ -35,11 +34,19 @@ class Menu{
 				buttons.push_back(logo);
 			}else if(menuType==2){
 				Button* resume_button=new Button("Resume",renderer,"./../assets/resume.png");
-				resume_button->set_cor(1920,900,70,300);
+				resume_button->set_cor(192,500,70,300);
 				buttons.push_back(resume_button);
 				
 				Button* exit_button=new Button("Exit",renderer,"./../assets/exit.png");
-				exit_button->set_cor(1920,1100,70,300);
+				exit_button->set_cor(192,600,70,300);
+				buttons.push_back(exit_button);
+			}else if(menuType==4){
+				Button* playAgain=new Button("Play Again",renderer,"./../assets/playagain.jpeg");
+				playAgain->set_cor(192,400,70,300);
+				buttons.push_back(playAgain);
+				
+				Button* exit_button=new Button("Exit",renderer,"./../assets/exit.png");
+				exit_button->set_cor(192,180,70,300);
 				buttons.push_back(exit_button);
 			}
 		}
@@ -64,17 +71,21 @@ class Menu{
 			
 		}
 		
-		void handle_event(SDL_Event e,int* state){
+		void handle_event(SDL_Event e,int* state,SoundClass* m,bool music_on){
 			if(e.type==SDL_QUIT){
-				*state=4;
-			}else if(e.type==SDL_MOUSEBUTTONDOWN){
+				*state=5;
+			}
+			else if(e.type==SDL_MOUSEBUTTONDOWN){
 				int a,b;
 				SDL_GetMouseState(&a,&b);
 				int i = locatePointer(a,b);
+				
 				if(i>=0){
-					buttons[i]->handle_event(state);
+					buttons[i]->handle_event(state,m,music_on);
 				}
-			}else if(e.type==SDL_KEYDOWN){
+			}
+			else if(e.type==SDL_KEYDOWN){
+				
 				if(e.key.keysym.sym==SDLK_ESCAPE && *state==2){
 					*state=0;
 				}
