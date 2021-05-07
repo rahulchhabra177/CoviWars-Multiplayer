@@ -3,7 +3,10 @@
 using namespace std;
 
 int main(int argc,char* args[]){
-	Game *game=new Game("COROMAN",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,3840,2160);
+	int sw,sh;
+	cout<<"Enter your resolution: ";
+	cin>>sw>>sh;
+	Game *game=new Game("COROMAN",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh);
 	while (game->isRunning()){
 		game->handle_event();
 		game->process();

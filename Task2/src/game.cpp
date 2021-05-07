@@ -14,6 +14,8 @@ Menu* gameOver=nullptr;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
+	SCREEN_HEIGHT = height_window;
+	SCREEN_WIDTH = width_window;
 	running = true;
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
 		cout<<"SDL Initialised succesfully....\n";
@@ -43,21 +45,21 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 					cout<<IMG_GetError()<<"\n";
 				}
 				
-				playState = new play("Play",1,gameback,renderer);
+				playState = new play("Play",1,gameback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
 				
-				Menu* startMenu = new Menu("Start",1,menuback,renderer);
+				Menu* startMenu = new Menu("Start",1,menuback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
 				menuList.push_back(startMenu);
 				
-				Menu* pauseMenu = new Menu("Pause",2,menuback,renderer);
+				Menu* pauseMenu = new Menu("Pause",2,menuback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
 				menuList.push_back(pauseMenu);
 				
-				Menu* optionsMenu = new Menu("Options",3,menuback,renderer);
+				Menu* optionsMenu = new Menu("Options",3,menuback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
 				menuList.push_back(optionsMenu);
 				
-				Menu* gameOver = new Menu("Game Over",4,overback,renderer);
+				Menu* gameOver = new Menu("Game Over",4,overback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
 				menuList.push_back(gameOver);
 				
-				state=0;
+				state=1;
 			}
 
 		}
@@ -87,7 +89,7 @@ void Game::process(){
 	}else if(state==5){
 		running = false;
 	}else if(state==-2){
-		playState = new play("Play",1,gameback,renderer);
+		playState = new play("Play",1,gameback,renderer,SCREEN_WIDTH,SCREEN_HEIGHT);
 		state = 0;
 	}else{
 		menuList[state-1]->update();

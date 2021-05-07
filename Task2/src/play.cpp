@@ -19,7 +19,7 @@ class play{
 		Character* pacman=nullptr;
 		vector<Character*> enemies;
 		
-		play(char* title,int numEnemies,SDL_Texture* poster, SDL_Renderer* localRenderer){
+		play(char* title,int numEnemies,SDL_Texture* poster, SDL_Renderer* localRenderer,int w,int h){
 			name = title;
 			background = poster;
 			renderer = localRenderer;
@@ -30,12 +30,12 @@ class play{
 			}
 			
 			for(int i=0;i<numEnemies;i++){
-				enemies[i]=new Character("./../assets/corona.bmp",renderer,1000,1000,false);
+				enemies[i]=new Character("./../assets/corona.bmp",renderer,1000,1000,false,w,h);
 			}
 			
-			pacman = new Character("./../assets/hero.bmp",renderer,100,100,false);
+			pacman = new Character("./../assets/hero.bmp",renderer,w * 100/3840,h * 100/3840,false,w,h);
 			
-			maze = new Maze(38,21,1,renderer);
+			maze = new Maze(w,h,1,renderer);
 		}
 		
 		void render(){
@@ -96,13 +96,13 @@ class play{
 		bool collidePlayer(){
 			if(pacman->x_speed!=0){
 				if(pacman->x_speed>0){
-					if(maze->mazeData[(pacman->x+pacman->width+1)/100][(pacman->y)/100]==1){
+					if(maze->mazeData[(pacman->x+pacman->width+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==1){
 						return false;
 					}else{
 						return true;
 					}
 				}else{
-					if(maze->mazeData[(pacman->x-1)/100][(pacman->y)/100]==1){
+					if(maze->mazeData[(pacman->x-1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==1){
 						return false;
 					}else{
 						return true;
@@ -110,13 +110,13 @@ class play{
 				}
 			}else{
 				if(pacman->y_speed>0){
-					if(maze->mazeData[(pacman->x)/100][(pacman->y+pacman->height+1)/100]==1){
+					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height+1)/(maze->mazeCell.h)]==1){
 						return false;
 					}else{
 						return true;
 					}
 				}else{
-					if(maze->mazeData[(pacman->x)/100][(pacman->y-1)/100]==1){
+					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y-1)/(maze->mazeCell.h)]==1){
 						return false;
 					}else{
 						return true;

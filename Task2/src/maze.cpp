@@ -1,15 +1,15 @@
 #include "maze.h"
 using namespace std;
 
-Maze::Maze(int w,int h,int l,SDL_Renderer* localRenderer){
-	m_width = w;
-	m_height = h;
+Maze::Maze(int s_width,int s_height,int l,SDL_Renderer* localRenderer){
 	lvl = l;
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
-	mazeCell.h = 100;
-	mazeCell.w = 100;
+	mazeCell.h = s_width * 100/3840;
+	mazeCell.w = s_width * 100/3840;
 	mazeCell.x = 0;
 	mazeCell.y = 0;
+	m_width = s_width/mazeCell.h;
+	m_height = s_height/mazeCell.h;
 	for(int i=0;i<m_width;i++){
 		vector<int> v;
 		for(int j=0;j<m_height;j++){
@@ -32,17 +32,17 @@ void Maze::reinitialize(){
 
 void Maze::render(SDL_Renderer* renderer){
 	for(int i=0;i<m_width;i++){
-		mazeCell.x = 100*i;
+		mazeCell.x = (mazeCell.h)*i;
 		for(int j=0;j<m_height;j++){
-			mazeCell.y = 100*j;
+			mazeCell.y = (mazeCell.h)*j;
 			if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 			}
 		}
 	}
-	mazeCell.x=m_width*100;
+	mazeCell.x=m_width*(mazeCell.h);
 	for(int i=0;i<m_height;i++){
-		mazeCell.y = 100*i;
+		mazeCell.y = (mazeCell.h)*i;
 		SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 	}
 }

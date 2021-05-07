@@ -18,7 +18,7 @@ class Maze{
 		SDL_Texture* sTexture = NULL;
 		vector<vector<int>> mazeData;
 		void reinitialize();
-		Maze(int w,int h,int l,SDL_Renderer* localRenderer);
+		Maze(int s_width,int s_height,int l,SDL_Renderer* localRenderer);
 		void render(SDL_Renderer* renderer);
 		SDL_Rect mazeCell;
 		void update();

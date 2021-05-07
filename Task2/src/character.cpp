@@ -3,10 +3,15 @@
 using namespace std;
 int temp=0;
 
-Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnem){
+Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnem,int s_width,int s_height){
 	texture=Texture::LoadT(path,localRenderer);
 	x=init_x;
 	y=init_y;
+	width = s_width * 100/3840;
+	height = width;
+	speed = (20 * s_width * s_width)/(3840*3840);
+	x_speed = speed;
+	y_speed = 0;
 	dstr.h=height;
 	dstr.w=width;
 	dstr.x=x;
@@ -17,8 +22,6 @@ Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init
 void Character::updatePlayer(){
 	y+=y_speed;
 	x+=x_speed;
-	dstr.h=height;
-	dstr.w=width;
 	dstr.x=x;
 	dstr.y=y;
 	cout<<x<<" "<<y<<"\n";
@@ -28,10 +31,10 @@ void Character::changeSpeed(SDL_Event e){
 	if(!isEnemy){
 		if(e.type==SDL_KEYDOWN){
 			switch(e.key.keysym.sym){
-				case SDLK_UP:{y_speed=-20;x_speed=0;break;}
-				case SDLK_DOWN:{y_speed=20;x_speed=0;break;}
-				case SDLK_RIGHT:{y_speed=0;x_speed=20;break;}
-				case SDLK_LEFT:{y_speed=0;x_speed=-20;break;}
+				case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;break;}
+				case SDLK_DOWN:{y_speed=speed;x_speed=0;break;}
+				case SDLK_RIGHT:{y_speed=0;x_speed=speed;break;}
+				case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;break;}
 			}
 		}
 	}
