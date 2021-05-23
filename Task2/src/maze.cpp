@@ -3,11 +3,19 @@ using namespace std;
 
 Maze::Maze(int s_width,int s_height,int l,SDL_Renderer* localRenderer){
 	lvl = l;
+	sTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
+	
 	mazeCell.h = s_width * 100/3840;
 	mazeCell.w = s_width * 100/3840;
 	mazeCell.x = 0;
 	mazeCell.y = 0;
+
+	maze_egg.h = s_width * 10/3840;
+	maze_egg.w = s_height * 10/3840;
+	maze_egg.x = 0;
+	maze_egg.y = 0;
+
 	m_width = s_width/mazeCell.h;
 	m_height = s_height/mazeCell.h;
 	for(int i=0;i<m_width;i++){
@@ -33,10 +41,14 @@ void Maze::reinitialize(){
 void Maze::render(SDL_Renderer* renderer){
 	for(int i=0;i<m_width;i++){
 		mazeCell.x = (mazeCell.h)*i;
+		maze_egg.x=(mazeCell.h)*i+mazeCell.h/2;
 		for(int j=0;j<m_height;j++){
 			mazeCell.y = (mazeCell.h)*j;
+			maze_egg.y=(mazeCell.h)*i+mazeCell.h/2;
 			if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+			}else{
+				SDL_RenderCopy(renderer,sTexture,NULL,&maze_egg);
 			}
 		}
 	}

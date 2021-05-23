@@ -1,6 +1,7 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<bits/stdc++.h>
+#include "sounds.h"
 
 class Character{
 
@@ -17,5 +18,5 @@ public:
 	void render(SDL_Renderer* renderer);
 	SDL_Texture* texture=NULL;
 	bool isEnemy;
-	bool collide(Character * enemy);
+	bool collide(Character * enemy,SoundClass* m,bool music_on);
 };

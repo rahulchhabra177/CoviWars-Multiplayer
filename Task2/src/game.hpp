@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+#include "menu.cpp";
+#include "play.cpp";
 using namespace std;
 
 

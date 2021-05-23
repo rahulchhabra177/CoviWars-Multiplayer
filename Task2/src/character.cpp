@@ -45,14 +45,16 @@ void Character::render(SDL_Renderer* renderer){
 	SDL_RenderCopy(renderer,texture,NULL,&dstr);
 }
 
-bool Character::collide(Character * obj){
+bool Character::collide(Character * obj,SoundClass *m,bool music_on){
 	int x1 = x + width;
 	int y1 = y + height;
 	int x2 = obj->x + obj->width;
 	int y2 = obj->y + obj->height;
 	if(obj->x>=x && obj->x<=x1 && obj->y>=y && obj->y<=y1){
+		m->PlaySound("collision");
 		return true;
 	}else if(x2>=x && x2<=x1 && y2>=y && y2<=y1){
+		m->PlaySound("collision");
 		return true;
 	}else{
 		return false;

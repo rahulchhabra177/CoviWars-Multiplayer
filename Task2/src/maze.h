@@ -20,7 +20,7 @@ class Maze{
 		void reinitialize();
 		Maze(int s_width,int s_height,int l,SDL_Renderer* localRenderer);
 		void render(SDL_Renderer* renderer);
-		SDL_Rect mazeCell;
+		SDL_Rect mazeCell,maze_egg;
 		void update();
 		
 	private:

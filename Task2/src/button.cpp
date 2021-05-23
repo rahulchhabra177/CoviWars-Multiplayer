@@ -29,18 +29,37 @@ bool Button::isInside(int a,int b){
 }
 
 
-void Button::handle_event(int* state){
+void Button::handle_event(int* state,SoundClass *m,bool music_on){
 	if(strcmp(label,"Exit")==0){
+		if (music_on){
+			m->PlaySound("button");
+		}	
 		*state=5;	
 	}else if(strcmp(label,"Start")==0){
-		*state=0;
+		if (music_on){
+			m->PlaySound("button");
+			m->PlaySound("start");
+		}
+		*state=0;	
 	}else if(strcmp(label,"Options")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
 		*state=3;
 	}else if(strcmp(label,"Pause")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
 		*state=2;
 	}else if(strcmp(label,"Resume")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
 		*state=0;
 	}else if(strcmp(label,"Play Again")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
 		*state=-2;
 	}
 }

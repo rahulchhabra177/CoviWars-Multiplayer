@@ -1,7 +1,6 @@
 #include "character.h";
-#include "game.hpp"
-#include "button.h"
-#include "Texture.h"
+#include "button.h";
+#include "Texture.h";
 #include "maze.h";
 using namespace std;
 
@@ -50,19 +49,19 @@ class play{
 			}
 		}
 		
-		void update(int* state,bool doUpdate){
+		void update(int* state,bool doUpdate,SoundClass* m,bool music_on){
 			maze->update();
 			if(collidePlayer()){
 				pacman->updatePlayer();
 			}
 			for(int i=0;i<enemies.size();i++){
-				if(pacman->collide(enemies[i])){
+				if(pacman->collide(enemies[i],m,music_on)){
 					*state = 4;
 				}	
 			}
 		}
 		
-		void handle_event(SDL_Event e,int* state){
+		void handle_event(SDL_Event e,int* state,SoundClass* m,bool music_on){
 			pacman->changeSpeed(e);
 			if(e.type==SDL_QUIT){
 				*state=5;
@@ -71,7 +70,7 @@ class play{
 				SDL_GetMouseState(&a,&b);
 				int i = locatePointer(a,b);
 				if(i>=0){
-					buttons[i]->handle_event(state);
+					buttons[i]->handle_event(state,m,music_on);
 				}
 			}else if(e.type==SDL_KEYDOWN){
 				if(e.key.keysym.sym==SDLK_ESCAPE){

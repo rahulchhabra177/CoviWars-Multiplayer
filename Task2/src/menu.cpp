@@ -1,4 +1,3 @@
-#include "game.hpp"
 #include "button.h"
 #include "Texture.h"
 using namespace std;
@@ -72,7 +71,7 @@ class Menu{
 			
 		}
 		
-		void handle_event(SDL_Event e,int* state){
+		void handle_event(SDL_Event e,int* state,SoundClass *m,bool music_on){
 			if(e.type==SDL_QUIT){
 				*state=5;
 			}else if(e.type==SDL_MOUSEBUTTONDOWN){
@@ -80,7 +79,7 @@ class Menu{
 				SDL_GetMouseState(&a,&b);
 				int i = locatePointer(a,b);
 				if(i>=0){
-					buttons[i]->handle_event(state);
+					buttons[i]->handle_event(state,m,music_on);
 				}
 			}else if(e.type==SDL_KEYDOWN){
 				if(e.key.keysym.sym==SDLK_ESCAPE && *state==2){

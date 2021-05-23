@@ -4,7 +4,7 @@ using namespace std;
 SoundClass::SoundClass(){
 
 	int res=Mix_OpenAudio(22050,AUDIO_S16SYS,2,4069);
-	//Here First parameter is audio rate ,Second paramerter is audio_format ,Third PArameter is number of audio channels,last parameter is for audio buffer
+	//Here First parameter is audio rate ,Second paramerter is audio_format ,Third parameter is number of audio channels,last parameter is for audio buffer
 	if (res!=0){
 		cout<<"Couldn't initialize audio:"<<Mix_GetError()<<"\n";
 		exit(-1);
@@ -12,66 +12,38 @@ SoundClass::SoundClass(){
 }
 
 
-void SoundClass::LoadSound(char* path,char* label){
+void SoundClass::LoadSound(char* path,string label){
 
 	Mix_Chunk * sound_chunk=Mix_LoadWAV(path);
 	if (sound_chunk==nullptr){
 		cout<<"Couldn't initialize sound at :"<<path<<"::"<<Mix_GetError()<<"\n";
 		exit(-1);
 	}
-	cout<<"work1\n";
-	LabelToInt[label]=SoundVector.size();
+	LabelToInt[label]=size_it;
 	cout<<LabelToInt.size();
 	for (auto u:LabelToInt){
 		cout<<u.first<<":"<<u.second<<"\n";
 	}
-	cout<<"Done\n";
 	SoundVector.push_back(sound_chunk);
-
-
+	size_it++;
 
 }
-
-// void SoundClass::LoadMusic(char* path,char* label){
-
-// 	Mix_Music * Music_chunk=Mix_LoadMUS(path);
-// 	if (Music_chunk==nullptr){
-// 		cout<<"Couldn't initialize sound at :"<<path<<"::"<<Mix_GetError()<<"\n";
-// 		exit(-1);
-// 	}
-// 	cout<<"work1\n";
-// 	LabelToInt[label]=MusicVector.size();
-// 	cout<<LabelToInt.size();
-// 	for (auto u:LabelToInt){
-// 		cout<<u.first<<":"<<u.second<<"\n";
-// 	}
-// 	cout<<"Done\n";
-// 	MusicVector.push_back(Music_chunk);
-
-
-
-// }
-
-
 
 void SoundClass::InitializeAll(){
-	LoadSound("./../Sounds/pacman_beginning.wav","Entry");
+	LoadSound("./../Sounds/start.wav","start");
+	LoadSound("./../Sounds/pauseState.wav","pause");
+	LoadSound("./../Sounds/collision.wav","collision");
+	LoadSound("./../Sounds/windowstart.wav","gamestart");
+	LoadSound("./../Sounds/button.wav","button");
 }
 
-void SoundClass::PlaySound(char* label){
-	cout<<LabelToInt.size();
-	for (auto u:LabelToInt){
-		cout<<u.first<<":"<<u.second<<"\n";
-	}
-	cout<<"Done\n";
-	// if (LabelToInt.find(label)==LabelToInt.end()){
-		// cout<<"Couldn't find sound with specified label:"<<label<<"\n";
-		// exit(-1);
-	// }
+void SoundClass::PlaySound(string label){
+	
+	Mix_HaltChannel(-1);
+
+	cout<<size_it<<"\n";
 	int loc=LabelToInt[label];
-	Mix_PlayChannel(-1,SoundVector[loc],0);
-
-
-
+	cout<<loc<<" "<<label<<"\n";
+	Mix_PlayChannel(-1,SoundVector.at(loc),0);
 
 }

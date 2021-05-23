@@ -1,16 +1,17 @@
 #include "game.hpp"
-#include "menu.cpp";
-#include "play.cpp";
 #include "sounds.h";
 
 int SCREEN_WIDTH=3840;
 int SCREEN_HEIGHT=2160;
+bool music=true;
 
 using namespace std;
 
 vector<Menu*> menuList;
 play* playState=nullptr;
 Menu* gameOver=nullptr;
+
+SoundClass* MusicManager=nullptr;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 	int flag=SDL_WINDOW_SHOWN;
@@ -59,6 +60,11 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				Menu* gameOver = new Menu("Game Over",4,overback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
 				menuList.push_back(gameOver);
 				
+				MusicManager = new SoundClass();
+				MusicManager->InitializeAll();
+				MusicManager->PlaySound("gamestart");
+				music = true;
+
 				state=1;
 			}
 
@@ -75,17 +81,17 @@ void Game::handle_event(){
 	SDL_Event event;
 	SDL_PollEvent(&event);
 	if(state==0){
-		playState->handle_event(event,&state);
+		playState->handle_event(event,&state,MusicManager,music);
 	}else if(state==-1){
-		gameOver->handle_event(event,&state);
+		gameOver->handle_event(event,&state,MusicManager,music);
 	}else{
-		menuList[state-1]->handle_event(event,&state);
+		menuList[state-1]->handle_event(event,&state,MusicManager,music);
 	}
 }
 
 void Game::process(){
 	if (state==0){
-		playState->update(&state,true);
+		playState->update(&state,true,MusicManager,music);
 	}else if(state==5){
 		running = false;
 	}else if(state==-2){
