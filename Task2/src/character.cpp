@@ -1,33 +1,43 @@
 #include "Texture.h";
 #include "character.h";
-using namespace std;
-int temp=0;
 
-Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnem,int s_width,int s_height){
+using namespace std;
+bool debug_character=false;
+
+Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnemy){
+	if (debug_character)cout<<"character.cpp::Character\n";
 	texture=Texture::LoadT(path,localRenderer);
 	x=init_x;
 	y=init_y;
-	width = s_width * 100/3840;
+	width =80;
 	height = width;
-	speed = (20 * s_width * s_width)/(3840*3840);
+	speed = 1;
 	x_speed = speed;
 	y_speed = 0;
 	dstr.h=height;
 	dstr.w=width;
 	dstr.x=x;
 	dstr.y=y;
-	isEnemy=isEnem;
+	isEnemy=isEnemy;
+	src.x=0;
+	src.y=350;
+	src.h=350;
+	src.w=500;
 }
 
 void Character::updatePlayer(){
+	if (debug_character)cout<<"character.cpp::updatePlayer\n";
+	if (y+y_speed>0 && y+y_speed<700 && x+x_speed>0 && x+x_speed<1200){
 	y+=y_speed;
 	x+=x_speed;
 	dstr.x=x;
 	dstr.y=y;
-	cout<<x<<" "<<y<<"\n";
+}
+	// cout<<"Player Coordinates::"<<x<<" "<<y<<"\n";
 }
 
 void Character::changeSpeed(SDL_Event e){
+	if (debug_character)cout<<"character.cpp::changeSpeed\n";
 	if(!isEnemy){
 		if(e.type==SDL_KEYDOWN){
 			switch(e.key.keysym.sym){
@@ -42,10 +52,14 @@ void Character::changeSpeed(SDL_Event e){
 
 
 void Character::render(SDL_Renderer* renderer){
+	if (debug_character)cout<<"character.cpp::render\n";
+	
 	SDL_RenderCopy(renderer,texture,NULL,&dstr);
 }
 
-bool Character::collide(Character * obj,SoundClass *m,bool music_on){
+bool Character::collide(Enemy * obj,SoundClass *m,bool music_on){
+	if (debug_character)cout<<"character.cpp::collide\n";
+	return false;
 	int x1 = x + width;
 	int y1 = y + height;
 	int x2 = obj->x + obj->width;

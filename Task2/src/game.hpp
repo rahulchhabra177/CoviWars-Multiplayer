@@ -12,7 +12,7 @@ using namespace std;
 class Game{
 
 	public:
-		Game(char* title, int x,int y,int w,int h);
+		Game(char* title, int x,int y);
 		void handle_event();
 		void process();
 		void render();

@@ -1,8 +1,6 @@
 #include "game.hpp"
 #include "sounds.h";
 
-int SCREEN_WIDTH=3840;
-int SCREEN_HEIGHT=2160;
 bool music=true;
 
 using namespace std;
@@ -10,17 +8,17 @@ using namespace std;
 vector<Menu*> menuList;
 play* playState=nullptr;
 Menu* gameOver=nullptr;
-
+bool debug_game=false;
 SoundClass* MusicManager=nullptr;
-
-Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
-	int flag=SDL_WINDOW_SHOWN;
-	SCREEN_HEIGHT = height_window;
-	SCREEN_WIDTH = width_window;
+int SCREEN_WIDTH=1200;
+int SCREEN_HEIGHT=700;
+Game::Game(char* title, int xcor,int ycor){
+	if (debug_game)cout<<"game.cpp::Game\n";
+	int flag=SDL_WINDOW_FULLSCREEN;
 	running = true;
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
 		cout<<"SDL Initialised succesfully....\n";
-		window=SDL_CreateWindow(title,xcor,ycor,width_window,height_window,flag);
+		window=SDL_CreateWindow(title,xcor,ycor,1300,650,flag);
 		if (window==NULL){
 			running=false;
 			cout<<"Error:Couldn't initialize window\n";
@@ -36,8 +34,8 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				cout<<"Renderer initialized Successfully...\n";
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
 				
-				menuback=Texture::LoadT("./../assets/welcome.jpg",renderer);
-				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
+				menuback=Texture::LoadT("./../assets/menb.png",renderer);
+				gameback=Texture::LoadT("./../assets/back.png",renderer);
 				overback=Texture::LoadT("./../assets/gameover.jpg",renderer);
 				
 				if (menuback==NULL){
@@ -46,18 +44,18 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 					cout<<IMG_GetError()<<"\n";
 				}
 				
-				playState = new play("Play",1,gameback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
+				playState = new play("Play",1,gameback,renderer);
 				
-				Menu* startMenu = new Menu("Start",1,menuback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
+				Menu* startMenu = new Menu("Start",1,menuback,renderer);
 				menuList.push_back(startMenu);
 				
-				Menu* pauseMenu = new Menu("Pause",2,menuback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
+				Menu* pauseMenu = new Menu("Pause",2,menuback,renderer);
 				menuList.push_back(pauseMenu);
 				
-				Menu* optionsMenu = new Menu("Options",3,menuback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
+				Menu* optionsMenu = new Menu("Options",3,menuback,renderer);
 				menuList.push_back(optionsMenu);
 				
-				Menu* gameOver = new Menu("Game Over",4,overback,renderer,SCREEN_WIDTH,SCREEN_WIDTH);
+				Menu* gameOver = new Menu("Game Over",4,overback,renderer);
 				menuList.push_back(gameOver);
 				
 				MusicManager = new SoundClass();
@@ -78,8 +76,19 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 
 
 void Game::handle_event(){
+	
+	if (debug_game)cout<<"game.cpp::handle_event\n";
 	SDL_Event event;
 	SDL_PollEvent(&event);
+	// cout<<event.type<<":"<<SDL_MOUSEMOTION<<":event\n";
+	if (event.type==SDL_MOUSEBUTTONDOWN){
+		int a,b;
+				SDL_GetMouseState(&a,&b);
+				
+				cout<<"\n\n\n\n\ncoordinates:"<<a<<" "<<b<<"\n\n\n";
+
+
+			}
 	if(state==0){
 		playState->handle_event(event,&state,MusicManager,music);
 	}else if(state==-1){
@@ -90,12 +99,13 @@ void Game::handle_event(){
 }
 
 void Game::process(){
+	if (debug_game)cout<<"game.cpp::process\n";
 	if (state==0){
 		playState->update(&state,true,MusicManager,music);
 	}else if(state==5){
 		running = false;
 	}else if(state==-2){
-		playState = new play("Play",1,gameback,renderer,SCREEN_WIDTH,SCREEN_HEIGHT);
+		playState = new play("Play",1,gameback,renderer);
 		state = 0;
 	}else{
 		menuList[state-1]->update();
@@ -103,6 +113,7 @@ void Game::process(){
 }
 
 void Game::render(){
+	if (debug_game)cout<<"game.cpp::render\n";
 	SDL_RenderClear(renderer);
 	if(state==0){
 		playState->render();
@@ -113,6 +124,7 @@ void Game::render(){
 }
 
 void Game::close(){
+	if (debug_game)cout<<"game.cpp::close\n";
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
