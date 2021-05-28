@@ -21,6 +21,7 @@ class Game{
 		bool running;
 		SDL_Renderer *renderer;
 		int state;
+		int s_width,s_height;
 
 	private:
 

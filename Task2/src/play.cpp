@@ -13,32 +13,43 @@ class play{
 		vector<Button*> buttons;
 		SDL_Texture* background;
 		SDL_Renderer* renderer;
+		int s_width,s_height;
+		
+		//SDL_Texture* heading = Texture::LoadText("Scoreboard",renderer);
 		
 		Maze* maze=nullptr;
 		Character* pacman=nullptr;
-		vector<Character*> enemies;
+		vector<Character*> players;
+		vector<Enemy*> enemies;
+		//ScoreBoard* score=nullptr;
+		//SDL_Rect* dst_hdng;
 		
-		play(char* title,int numEnemies,SDL_Texture* poster, SDL_Renderer* localRenderer,int w,int h){
+		play(char* title,int numEnemies,SDL_Texture* poster, SDL_Renderer* localRenderer,int width,int height){
 			name = title;
 			background = poster;
 			renderer = localRenderer;
+			s_width = width;
+			s_height = height;
 			
 			for(int i=0;i<numEnemies;i++){
-				Character* enemy=nullptr;
+				Enemy* enemy=nullptr;
 				enemies.push_back(enemy);
 			}
 			
 			for(int i=0;i<numEnemies;i++){
-				enemies[i]=new Character("./../assets/corona.bmp",renderer,1000,1000,false,w,h);
+				enemies[i]=new Enemy(renderer,1000,1000);
 			}
 			
-			pacman = new Character("./../assets/hero.bmp",renderer,w * 100/3840,h * 100/3840,false,w,h);
+			pacman = new Character("./../assets/hero.bmp",renderer,120,120);
 			
-			maze = new Maze(w,h,1,renderer);
+			maze = new Maze(1,renderer);
+			players.push_back(pacman);
+			//score = new ScoreBoard(players,renderer);
 		}
 		
 		void render(){
 			SDL_RenderCopy(renderer,background,NULL,NULL);
+			//score->render();
 			pacman->render(renderer);
 			maze->render(renderer);
 			for(int i=0;i<enemies.size();i++){
@@ -51,7 +62,8 @@ class play{
 		
 		void update(int* state,bool doUpdate,SoundClass* m,bool music_on){
 			maze->update();
-			if(collidePlayer()){
+			//score->update();
+			if(!collidePlayer()){
 				pacman->updatePlayer();
 			}
 			for(int i=0;i<enemies.size();i++){
@@ -93,32 +105,54 @@ class play{
 		}
 		
 		bool collidePlayer(){
+			int x = pacman->x;
+			int y = pacman->y;
+			int pw = pacman->width;
+			int ph = pacman->height;
+			int w = maze->mazeCell.w;
+			int h = maze->mazeCell.h;
 			if(pacman->x_speed!=0){
 				if(pacman->x_speed>0){
-					if(maze->mazeData[(pacman->x+pacman->width+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==1){
+					bool check1 = maze->mazeData[x/w+1][y/h]==0;
+					bool check2 = maze->mazeData[x/w+1][(y+ph)/h]==0;
+					if(check1 && check2){
 						return false;
 					}else{
 						return true;
 					}
 				}else{
-					if(maze->mazeData[(pacman->x-1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==1){
-						return false;
+					if(x%w==0){
+						bool check1 = maze->mazeData[x/w-1][y/h]==0;
+						bool check2 = maze->mazeData[x/w-1][(y+ph)/h]==0;
+						if(check1 && check2){
+							return false;
+						}else{
+							return true;
+						}
 					}else{
-						return true;
+						return false;
 					}
 				}
 			}else{
 				if(pacman->y_speed>0){
-					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height+1)/(maze->mazeCell.h)]==1){
+					bool check1 = maze->mazeData[x/w][y/h+1]==0;
+					bool check2 = maze->mazeData[(x+pw)/w][y/h+1]==0;
+					if(check1 && check2){
 						return false;
 					}else{
 						return true;
 					}
 				}else{
-					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y-1)/(maze->mazeCell.h)]==1){
-						return false;
+					if(y%h==0){
+						bool check1 = maze->mazeData[x/w][y/h-1]==0;
+						bool check2 = maze->mazeData[(x+pw)/w][y/h-1]==0;
+						if(check1 && check2){
+							return false;
+						}else{
+							return true;
+						}
 					}else{
-						return true;
+						return false;
 					}
 				}
 			}

@@ -1,23 +1,16 @@
 #include "maze.h"
+#include <time.h>
 using namespace std;
 
-Maze::Maze(int s_width,int s_height,int l,SDL_Renderer* localRenderer){
+Maze::Maze(int l,SDL_Renderer* localRenderer){
 	lvl = l;
-	sTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
 	
-	mazeCell.h = s_width * 100/3840;
-	mazeCell.w = s_width * 100/3840;
+	mazeCell.h = 100;
+	mazeCell.w = 100;
 	mazeCell.x = 0;
 	mazeCell.y = 0;
 
-	maze_egg.h = s_width * 10/3840;
-	maze_egg.w = s_height * 10/3840;
-	maze_egg.x = 0;
-	maze_egg.y = 0;
-
-	m_width = s_width/mazeCell.h;
-	m_height = s_height/mazeCell.h;
 	for(int i=0;i<m_width;i++){
 		vector<int> v;
 		for(int j=0;j<m_height;j++){
@@ -27,6 +20,7 @@ Maze::Maze(int s_width,int s_height,int l,SDL_Renderer* localRenderer){
 	}
 	
 	constructMaze();
+	removeDeadEnds();
 }
 
 void Maze::reinitialize(){
@@ -41,14 +35,10 @@ void Maze::reinitialize(){
 void Maze::render(SDL_Renderer* renderer){
 	for(int i=0;i<m_width;i++){
 		mazeCell.x = (mazeCell.h)*i;
-		maze_egg.x=(mazeCell.h)*i+mazeCell.h/2;
 		for(int j=0;j<m_height;j++){
 			mazeCell.y = (mazeCell.h)*j;
-			maze_egg.y=(mazeCell.h)*i+mazeCell.h/2;
 			if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
-			}else{
-				SDL_RenderCopy(renderer,sTexture,NULL,&maze_egg);
 			}
 		}
 	}
@@ -59,13 +49,104 @@ void Maze::render(SDL_Renderer* renderer){
 	}
 }
 
+int Maze::numWalls(int i,int j){
+	int n = -1;
+	if(mazeData[i-1][j]==0){
+		n=0;
+	}
+	if(mazeData[i][j+1]==0){
+		if(n<0){
+			n=1;
+		}else{
+			return -1;
+		}
+	}
+	if(mazeData[i+1][j]==0){
+		if(n<0){
+			n=2;
+		}else{
+			return -1;
+		}
+	}
+	if(mazeData[i][j-1]==0){
+		if(n<0){
+			n=3;
+		}else{
+			return -1;
+		}
+	}
+	return n;	
+}
+
+void Maze::removeDeadEnds(){
+	for(int i=1;i<m_width-1;i++){
+		for(int j=1;j<m_height-1;j++){
+			if(mazeData[i][j]==0){
+				int n = numWalls(i,j);
+				if(n>=0){
+					switch(n){
+						case 0:  {
+							if(i==m_width-1){
+								if(j==1){
+									mazeData[i][j+1]=0;
+								}else{
+									mazeData[i][j-1]=0;
+								}
+							}else{
+								mazeData[i+1][j]=0;
+							}
+							break;
+						}case 1: {
+							if(j==1){
+								if(i==1){
+									mazeData[i+1][j]=0;
+								}else{
+									mazeData[i-1][j]=0;
+								}
+							}else{
+								mazeData[i][j-1]=0;
+							}
+							break;
+						}case 2: {
+							if(i==1){
+								if(j==1){
+									mazeData[i][j+1]=0;
+								}else{
+									mazeData[i][j-1]=0;
+								}
+							}else{
+								mazeData[i-1][j]=0;
+							}
+							break;
+						}case 3: {
+							if(j==m_height-1){
+								if(i==1){
+									mazeData[i+1][j]=0;
+								}else{
+									mazeData[i-1][j]=0;
+								}
+							}else{
+								mazeData[i][j+1]=0;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void Maze::update(){
 
 }
 
 void Maze::constructMaze(){
 	stack<pair<int,int>> cells;
-	cells.push(make_pair(1,1));
+	srand(time(0));
+	int x = 2*(rand()%18)+1;
+	int y = 2*(rand()%10)+1;
+	cells.push(make_pair(x,y));
 	while(!cells.empty()){
 		vector<int> unvisited = neighbours(cells.top());
 		int x = cells.top().first;
@@ -113,12 +194,12 @@ vector<int> Maze::neighbours(pair<int,int> p){
 			unvisited.push_back(1);
 		}
 	}
-	if(y+2<=m_height){
+	if(y+2<m_height){
 		if(mazeData[x][y+2]==1){
 			unvisited.push_back(2);
 		}
 	}
-	if(x+2<=m_width){
+	if(x+2<m_width){
 		if(mazeData[x+2][y]==1){
 			unvisited.push_back(3);
 		}
