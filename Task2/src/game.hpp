@@ -4,17 +4,15 @@
 #include <SDL2/SDL.h>
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
-// #include "sounds.h";
 #include "menu.cpp";
 #include "play.cpp";
-
 using namespace std;
 
 
 class Game{
 
 	public:
-		Game(char* title, int x,int y,int w,int h);
+		Game(char* title, int x,int y,bool isServer);
 		void handle_event();
 		void process();
 		void render();
@@ -23,7 +21,9 @@ class Game{
 		bool running;
 		SDL_Renderer *renderer;
 		int state;
-
+		int player_id;
+		bool connected=false;
+		
 	private:
 
 		SDL_Window *window;
