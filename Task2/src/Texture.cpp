@@ -1,9 +1,9 @@
 #include "Texture.h";
 using namespace std;
-bool debug_texture=false;
+bool texture_debug=true;
 
 SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
-if (debug_texture)cout<<"Texture.cpp::LoadT\n";
+if (texture_debug)cout<<"Texture.cpp::LoadT\n";
 	SDL_Surface* tmp;
 	tmp=IMG_Load(path);
 	SDL_Texture* returng=NULL;
@@ -22,7 +22,7 @@ if (debug_texture)cout<<"Texture.cpp::LoadT\n";
 
 SDL_Texture* Texture::LoadText(char* label,SDL_Renderer* renderer){
 
-	if (debug_texture)cout<<"Texture.cpp::LoadText\n";
+	if (texture_debug)cout<<"Texture.cpp::LoadText\n";
 	TTF_Init();
 	TTF_Font * font=nullptr;//=new TTFont();
 	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);

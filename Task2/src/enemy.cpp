@@ -1,10 +1,10 @@
 #include "Texture.h";
 #include "enemy.h";
 using namespace std;
-bool debug_Enemy=false;
+bool enemy_debug=true;
 
 Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnemy){
-	if (debug_Enemy)cout<<"Enemy.cpp::Enemy\n";
+	if (enemy_debug)cout<<"Enemy.cpp::Enemy\n";
 // 	for(int i=0;i<8;i++){
 // 	char c=(char)('0'+i);
 // 	cout<<1;
@@ -43,7 +43,7 @@ Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnemy){
 }
 
 void Enemy::updatePlayer(){
-	if (debug_Enemy)cout<<"Enemy.cpp::updatePlayer\n";
+	if (enemy_debug)cout<<"Enemy.cpp::updatePlayer\n";
 	if (y+y_speed>0 && y+y_speed<700 && x+x_speed>0 && x+x_speed<1200){
 	y+=y_speed;
 	x+=x_speed;
@@ -54,7 +54,7 @@ void Enemy::updatePlayer(){
 }
 
 void Enemy::changeSpeed(SDL_Event e){
-	if (debug_Enemy)cout<<"Enemy.cpp::changeSpeed\n";
+	if (enemy_debug)cout<<"Enemy.cpp::changeSpeed\n";
 	if(!isEnemy){
 		if(e.type==SDL_KEYDOWN){
 			switch(e.key.keysym.sym){
@@ -69,7 +69,7 @@ void Enemy::changeSpeed(SDL_Event e){
 
 
 void Enemy::render(SDL_Renderer* renderer){
-	if (debug_Enemy)cout<<"Enemy.cpp::render\n";
+	if (enemy_debug)cout<<"Enemy.cpp::render\n";
 	// cout<<cur_texture<<":cur_texture\n";
 
 	SDL_RenderCopy(renderer,texture[cur_texture],NULL,&dstr);
@@ -80,7 +80,7 @@ void Enemy::render(SDL_Renderer* renderer){
 }
 
 bool Enemy::collide(Enemy * obj,SoundClass *m,bool music_on){
-	if (debug_Enemy)cout<<"Enemy.cpp::collide\n";
+	if (enemy_debug)cout<<"Enemy.cpp::collide\n";
 	return false;
 	int x1 = x + width;
 	int y1 = y + height;

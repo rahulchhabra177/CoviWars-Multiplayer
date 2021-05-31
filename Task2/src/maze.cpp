@@ -1,24 +1,22 @@
 #include "maze.h"
+#include <time.h>
 using namespace std;
-bool debug_maze=false;
+bool maze_debug=true;
 Maze::Maze(int l,SDL_Renderer* localRenderer){
-	if (debug_maze)cout<<"maze.cpp:Maze\n";
+	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	lvl = l;
-	sTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
 	wTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);
-	
-	mazeCell.h = 40;
-	mazeCell.w = 40;
+	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);
+
+	mazeCell.h = 20;
+	mazeCell.w = 20;
 	mazeCell.x = 0;
 	mazeCell.y = 0;
+	mazeEgg.h = 5;
+	mazeEgg.w = 5;
+	mazeEgg.x = 0;
+	mazeEgg.y = 0;
 
-	maze_egg.h = 5;
-	maze_egg.w = 5;
-	maze_egg.x = 0;
-	maze_egg.y = 0;
-
-	m_width = 24;
-	m_height = 18;
 	for(int i=0;i<m_width;i++){
 		vector<int> v;
 		for(int j=0;j<m_height;j++){
@@ -28,17 +26,11 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 	}
 	
 	constructMaze();
-	cout<<"Maze"<<m_width<<" "<<m_height<<"\n"; 
-	for (int i=1;i<4;i++){
-		for (int j=1;j<4;j++){
-			mazeData[i][j]=0;
-		}
-	}
-
+	removeDeadEnds();
 }
 
 void Maze::reinitialize(){
-	if (debug_maze)cout<<"maze.cpp:reinitialize\n";
+	if (maze_debug)cout<<"Maze.cpp.cpp:reinitialize\n";
 	for(int i=0;i<m_width;i++){
 		for(int j=0;j<m_height;j++){
 			mazeData[i][j] = 1;
@@ -48,42 +40,129 @@ void Maze::reinitialize(){
 }
 
 void Maze::render(SDL_Renderer* renderer){
-	if (debug_maze)cout<<"maze.cpp:render\n";
+	if (maze_debug)cout<<"Maze.cpp.cpp:render\n";
 	for(int i=0;i<m_width;i++){
-		mazeCell.x = (mazeCell.h)*(i)+120;
-		maze_egg.x=(mazeCell.h)*i+mazeCell.h/2;
+		mazeCell.x = (mazeCell.h)*i;
+		mazeEgg.x = (mazeCell.h)*i+(mazeCell.h)/2-mazeEgg.h/2;
 		for(int j=0;j<m_height;j++){
-			mazeCell.y = (mazeCell.h)*(j);
-			maze_egg.y=(mazeCell.h)*i+mazeCell.h/2;
+			mazeCell.y = (mazeCell.h)*j;
+			mazeEgg.y = (mazeCell.h)*j+(mazeCell.h)/2-mazeEgg.h/2;
 			if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 			}
-			else if (mazeData[i][j]==2){
-				SDL_RenderCopy(renderer,sTexture,NULL,&maze_egg);
+			else if(mazeData[i][j]==0){
+				SDL_RenderCopy(renderer,sTexture,NULL,&mazeEgg);
 			}
 		}
 	}
-	mazeCell.x=m_width*(mazeCell.h)+120;
+	mazeCell.x=m_width*(mazeCell.h)-2;
 	for(int i=0;i<m_height;i++){
 		mazeCell.y = (mazeCell.h)*i;
 		SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 	}
+}
 
-	mazeCell.y=m_height*(mazeCell.w);
-	for(int i=0;i<=m_width;i++){
-		mazeCell.x = (mazeCell.h)*i+120;
-		SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+int Maze::numWalls(int i,int j){
+	if (maze_debug)cout<<"Maze.cpp.cpp:numWalls\n";
+	int n = -1;
+	if(mazeData[i-1][j]==0){
+		n=0;
+	}
+	if(mazeData[i][j+1]==0){
+		if(n<0){
+			n=1;
+		}else{
+			return -1;
+		}
+	}
+	if(mazeData[i+1][j]==0){
+		if(n<0){
+			n=2;
+		}else{
+			return -1;
+		}
+	}
+	if(mazeData[i][j-1]==0){
+		if(n<0){
+			n=3;
+		}else{
+			return -1;
+		}
+	}
+	return n;	
+}
+
+void Maze::removeDeadEnds(){
+	if (maze_debug)cout<<"Maze.cpp.cpp:removeDeadEnds\n";
+	for(int i=1;i<m_width-1;i++){
+		for(int j=1;j<m_height-1;j++){
+			if(mazeData[i][j]==0){
+				int n = numWalls(i,j);
+				if(n>=0){
+					switch(n){
+						case 0:  {
+							if(i==m_width-1){
+								if(j==1){
+									mazeData[i][j+1]=0;
+								}else{
+									mazeData[i][j-1]=0;
+								}
+							}else{
+								mazeData[i+1][j]=0;
+							}
+							break;
+						}case 1: {
+							if(j==1){
+								if(i==1){
+									mazeData[i+1][j]=0;
+								}else{
+									mazeData[i-1][j]=0;
+								}
+							}else{
+								mazeData[i][j-1]=0;
+							}
+							break;
+						}case 2: {
+							if(i==1){
+								if(j==1){
+									mazeData[i][j+1]=0;
+								}else{
+									mazeData[i][j-1]=0;
+								}
+							}else{
+								mazeData[i-1][j]=0;
+							}
+							break;
+						}case 3: {
+							if(j==m_height-1){
+								if(i==1){
+									mazeData[i+1][j]=0;
+								}else{
+									mazeData[i-1][j]=0;
+								}
+							}else{
+								mazeData[i][j+1]=0;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
 void Maze::update(){
-if (debug_maze)cout<<"maze.cpp:update\n";
+
 }
 
 void Maze::constructMaze(){
-	if (debug_maze)cout<<"maze.cpp::constructMaze\n";
+	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	stack<pair<int,int>> cells;
-	cells.push(make_pair(1,1));
+	srand(time(0));
+	int x = 2*(rand()%18)+1;
+	int y = 2*(rand()%10)+1;
+	cells.push(make_pair(x,y));
 	while(!cells.empty()){
 		vector<int> unvisited = neighbours(cells.top());
 		int x = cells.top().first;
@@ -118,8 +197,7 @@ void Maze::constructMaze(){
 }
 
 vector<int> Maze::neighbours(pair<int,int> p){
-if (debug_maze)cout<<"maze.cpp::neighbours\n";
-
+	if (maze_debug)cout<<"Maze.cpp.cpp:neighbours\n";
 	vector<int> unvisited;
 	int x = p.first;
 	int y = p.second;
@@ -133,12 +211,12 @@ if (debug_maze)cout<<"maze.cpp::neighbours\n";
 			unvisited.push_back(1);
 		}
 	}
-	if(y+2<=m_height){
+	if(y+2<m_height){
 		if(mazeData[x][y+2]==1){
 			unvisited.push_back(2);
 		}
 	}
-	if(x+2<=m_width){
+	if(x+2<m_width){
 		if(mazeData[x+2][y]==1){
 			unvisited.push_back(3);
 		}

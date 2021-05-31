@@ -56,7 +56,7 @@ return connected;
 
 
 void network::send(string s){
-	// cout<<"send\n";
+	cout<<"send\n";
 		const char* tmp=&s[0];
 		int size=0;
 		int len=strlen(tmp);
@@ -84,16 +84,16 @@ void network::send(string s){
 
 
 string network::recieve(int num){
-// cout<<"recieve\n";
+cout<<"recieve\n";
 if (isServer and connected){
 			if (SDLNet_CheckSockets(sockets,0)>0 && SDLNet_SocketReady(client)){
 
 				int offset=0;
-				char temp[30];
+				char temp[num];
 				string result;
 				int offset_prv=-1;
 				while (offset<num){
-					// cout<<offset<<": "<<offset_prv<<": offset\n";
+					cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 					offset_prv=offset;
 					offset+=SDLNet_TCP_Recv(client,temp,num-result.size());
 					
@@ -101,12 +101,12 @@ if (isServer and connected){
 						cout<<"NOTYET|\n";
 						return "";
 					}
-					result+=string(temp);
+					result+=string(temp).substr(0,min(num,(int)strlen(temp)));
 				
 
 				}
 				// SDLNet_TCP_Recv(client,temp,20);
-				cout<<"Packet Recieved:"<<result<<"\n";
+				cout<<"Packet Recieved:"<<result<<":"<<result.size()<<"\n";
 				return result;
 				
 			}
@@ -117,24 +117,24 @@ else if (connected){
 	if (SDLNet_CheckSockets(sockets,0)>0 && SDLNet_SocketReady(server)){
 
 				int offset=0;
-				char temp[30];
+				char temp[num];
 				string result;
 				int offset_prv=-1;
 				while (offset<num){
-					// cout<<offset<<": "<<offset_prv<<": offset\n";
+					cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 					offset_prv=offset;
 					offset+=SDLNet_TCP_Recv(server,temp,num-result.size());
 					
 					if (offset<=0){
-						cout<<"NOTYET\n";
+						// cout<<"NOTYET\n";
 						return "";
 					}
-					result+=string(temp);
+					result+=string(temp).substr(0,min(num,(int)strlen(temp)));
 				
 
 				}
 				// SDLNet_TCP_Recv(client,temp,20);
-				cout<<"Packet Recieved:"<<result<<"\n";
+				cout<<"Packet Recieved:"<<result<<":"<<result.size()<<"\n";
 				return result;
 				}
 }
@@ -152,14 +152,14 @@ return x;
 
 
 string network::getResponse(string msg,int num){
-	// cout<<"getREsponse\n";
+	cout<<"getREsponse\n";
 	send(msg);
 	int debug=0;
 	string temp="";
 	while (debug<5 && temp==""){
 		temp=recieve(num);
 		debug++;
-		// cout<<"debug\n";
+		cout<<"debug\n";
 	}
 if (debug==4){return "";}	
 return temp;

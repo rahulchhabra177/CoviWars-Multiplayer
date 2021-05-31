@@ -1,9 +1,9 @@
 #include "button.h";
 
 using namespace std;
-bool debug_button=false;
+bool button_debug=true;
 Button::Button(char* name, SDL_Renderer* renderer){
-	if (debug_button)cout<<"button.cpp::Button\n";
+	if (button_debug)cout<<"button.cpp::Button\n";
 	TTF_Init();
 	label = name;
 	TTF_Font * font;//=new TTFont();
@@ -24,7 +24,7 @@ Button::Button(char* name, SDL_Renderer* renderer){
 	}
 } 
 void Button::set_cor(int a,int b,int q,int w){
-	if (debug_button)cout<<"button.cpp::set_cor\n";
+	if (button_debug)cout<<"button.cpp::set_cor\n";
 	dest.x=a;
 	dest.y=b;
 	dest.w=q;
@@ -32,7 +32,7 @@ void Button::set_cor(int a,int b,int q,int w){
 }
 
 void Button::set_rect(int a,int b,int q,int w){
-	if (debug_button)cout<<"button.cpp::set_rect\n";
+	if (button_debug)cout<<"button.cpp::set_rect\n";
 	dest.x=a;
 	dest.y=b;
 	dest.w=q-a;
@@ -40,13 +40,13 @@ void Button::set_rect(int a,int b,int q,int w){
 }
 
 bool Button::isInside(int a,int b){
-	if (debug_button)cout<<"button.cpp::isInside\n";
+	if (button_debug)cout<<"button.cpp::isInside\n";
 	if (a>=dest.x and a<=dest.x+dest.w and b>=dest.y and b<=dest.y+dest.h){return true;}
 	return false;
 }
 
 void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
-	if (debug_button)cout<<"button.cpp::handle_event\n";
+	if (button_debug)cout<<"button.cpp::handle_event\n";
 		if (e.type==SDL_MOUSEMOTION){
 		int x_c = e.motion.x;
         int y_c = e.motion.y;
@@ -73,6 +73,11 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 			m->PlaySound("start");
 		}
 		*state=0;	
+	}else if(strcmp(label,"Sounds")==0){
+		if (music_on){
+			m->PlaySound("button");
+			m->music_on=false;
+		}
 	}else if(strcmp(label,"Options")==0){
 		if(music_on){
 			m->PlaySound("button");
@@ -99,7 +104,7 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 }
 
 void Button::render(SDL_Renderer *renderer){
-	if (debug_button)cout<<"button.cpp::render\n";
+	if (button_debug)cout<<"button.cpp::render\n";
 	SDL_RenderCopy(renderer,texture,NULL,&dest);
 }
 
