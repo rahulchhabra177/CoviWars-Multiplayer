@@ -10,7 +10,7 @@
 class Character{
 
 public:
-	int x,y,height=60,width=60;
+	int x,y,height=80,width=80;
 	int speed = 10;
 	int x_speed = 10;
 	int y_speed = 0;

@@ -49,7 +49,7 @@ void Maze::render(SDL_Renderer* renderer){
 	}
 }
 
-int Maze::numWalls(int i,int j){
+int Maze::openCell(int i,int j){
 	int n = -1;
 	if(mazeData[i-1][j]==0){
 		n=0;
@@ -82,7 +82,7 @@ void Maze::removeDeadEnds(){
 	for(int i=1;i<m_width-1;i++){
 		for(int j=1;j<m_height-1;j++){
 			if(mazeData[i][j]==0){
-				int n = numWalls(i,j);
+				int n = openCell(i,j);
 				if(n>=0){
 					switch(n){
 						case 0:  {

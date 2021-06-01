@@ -11,9 +11,9 @@ class Enemy{
 
 	public:
 		
-		int x,y,height=60,width=60;
-		int speed = 20;
-		int x_speed = 20;
+		int x,y,height=100,width=100;
+		int speed = 10;
+		int x_speed = 10;
 		int y_speed = 0;
 		int count = 0;
 		int cur_texture = 0;

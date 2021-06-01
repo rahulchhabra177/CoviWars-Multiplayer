@@ -59,6 +59,14 @@ class Menu{
 				Button* exit_button=new Button("Exit",renderer,width,height,"./../assets/exit.png");
 				exit_button->set_cor(1700,1800,300,70);
 				buttons.push_back(exit_button);
+			}else if(menuType==5){
+				Button* playAgain=new Button("Play Again",renderer,width,height,"./../assets/playagain.jpeg");
+				playAgain->set_cor(1700,1500,300,70);
+				buttons.push_back(playAgain);
+				
+				Button* exit_button=new Button("Exit",renderer,width,height,"./../assets/exit.png");
+				exit_button->set_cor(1700,1800,300,70);
+				buttons.push_back(exit_button);
 			}
 		}
 		

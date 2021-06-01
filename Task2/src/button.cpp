@@ -62,7 +62,7 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on/*,SDL_Event e*/
 			if (music_on){
 				m->PlaySound("button");
 			}	
-			*state=5;	
+			*state=6;	
 		}else if(strcmp(label,"Start")==0){
 			if (music_on){
 				m->PlaySound("button");

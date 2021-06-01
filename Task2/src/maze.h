@@ -27,7 +27,7 @@ class Maze{
 		
 		void constructMaze();
 		void removeDeadEnds();
-		int numWalls(int i,int j);
+		int openCell(int i,int j);
 		vector<int> neighbours(pair<int,int> coord);
 
 };

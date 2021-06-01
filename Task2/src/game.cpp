@@ -38,6 +38,7 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				menuback=Texture::LoadT("./../assets/menb.png",renderer);
 				gameback=Texture::LoadT("./../assets/black.jpg",renderer);
 				overback=Texture::LoadT("./../assets/gameover.jpg",renderer);
+				winback=Texture::LoadT("./../assets/win.png",renderer);
 				
 				if (menuback==NULL){
 					running=false;
@@ -45,7 +46,7 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 					cout<<IMG_GetError()<<"\n";
 				}
 				
-				playState = new play("Play",0,gameback,renderer,width_window,height_window);
+				playState = new play("Play",3,gameback,renderer,width_window,height_window);
 				
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
 				menuList.push_back(startMenu);
@@ -58,6 +59,9 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 				
 				Menu* gameOver = new Menu("Game Over",4,overback,renderer,width_window,height_window);
 				menuList.push_back(gameOver);
+
+				Menu* winScreen = new Menu("Win Screen",5,winback,renderer,width_window,height_window);
+				menuList.push_back(winScreen);
 				
 				MusicManager = new SoundClass();
 				MusicManager->InitializeAll();
@@ -90,10 +94,10 @@ void Game::handle_event(){
 void Game::process(){
 	if (state==0){
 		playState->update(&state,true,MusicManager,music);
-	}else if(state==5){
+	}else if(state==6){
 		running = false;
 	}else if(state==-2){
-		playState = new play("Play",1,gameback,renderer,s_width,s_height);
+		playState = new play("Play",3,gameback,renderer,s_width,s_height);
 		state = 0;
 	}else{
 		menuList[state-1]->update();

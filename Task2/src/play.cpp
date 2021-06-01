@@ -2,6 +2,7 @@
 #include "button.h";
 #include "Texture.h";
 #include "maze.h";
+#include <time.h>
 using namespace std;
 
 
@@ -14,6 +15,7 @@ class play{
 		SDL_Texture* background;
 		SDL_Renderer* renderer;
 		int s_width,s_height;
+		bool winCondition=false;
 		
 		//SDL_Texture* heading = Texture::LoadText("Scoreboard",renderer);
 		
@@ -21,6 +23,7 @@ class play{
 		Character* pacman=nullptr;
 		vector<Character*> players;
 		vector<Enemy*> enemies;
+		vector<vector<int>> occupied;
 		//ScoreBoard* score=nullptr;
 		//SDL_Rect* dst_hdng;
 		
@@ -36,20 +39,39 @@ class play{
 				enemies.push_back(enemy);
 			}
 			
-			for(int i=0;i<numEnemies;i++){
-				enemies[i]=new Enemy(renderer,1000,1000);
-			}
-			
-			pacman = new Character("./../assets/hero.bmp",renderer,120,120);
+			pacman = new Character("./../assets/hero.bmp",renderer,110,110);
 			
 			maze = new Maze(1,renderer);
 			players.push_back(pacman);
+			
+			for(int i=0;i<maze->m_width;i++){
+				vector<int> v;
+				for(int j=0;j<maze->m_height;j++){
+					v.push_back(0);
+				}
+				occupied.push_back(v);
+			}
+			
+			occupied[1][1]=1;
+			
+			for(int i=0;i<numEnemies;i++){
+				while(true){
+					srand(time(0));
+					int x = 2*(rand()%18)+1;
+					int y = 2*(rand()%10)+1;
+					if(maze->mazeData[x][y]==0 && occupied[x][y]==0){
+						enemies[i]=new Enemy(renderer,100*x,100*y);
+						occupied[x][y]=1;
+						break;
+					}
+				}
+			}
 			//score = new ScoreBoard(players,renderer);
 		}
 		
 		void render(){
 			SDL_RenderCopy(renderer,background,NULL,NULL);
-			//score->render();
+			//score->render(); 
 			pacman->render(renderer);
 			maze->render(renderer);
 			for(int i=0;i<enemies.size();i++){
@@ -69,7 +91,11 @@ class play{
 			for(int i=0;i<enemies.size();i++){
 				if(pacman->collide(enemies[i],m,music_on)){
 					*state = 4;
-				}	
+				}
+				enemyAI(i);	
+			}
+			if(winCondition){
+				*state = 5;
 			}
 		}
 		
@@ -114,7 +140,7 @@ class play{
 			if(pacman->x_speed!=0){
 				if(pacman->x_speed>0){
 					bool check1 = maze->mazeData[x/w+1][y/h]==0;
-					bool check2 = maze->mazeData[x/w+1][(y+ph)/h]==0;
+					bool check2 = maze->mazeData[x/w+1][(y+ph-1)/h]==0;
 					if(check1 && check2){
 						return false;
 					}else{
@@ -123,7 +149,7 @@ class play{
 				}else{
 					if(x%w==0){
 						bool check1 = maze->mazeData[x/w-1][y/h]==0;
-						bool check2 = maze->mazeData[x/w-1][(y+ph)/h]==0;
+						bool check2 = maze->mazeData[x/w-1][(y+ph-1)/h]==0;
 						if(check1 && check2){
 							return false;
 						}else{
@@ -136,7 +162,7 @@ class play{
 			}else{
 				if(pacman->y_speed>0){
 					bool check1 = maze->mazeData[x/w][y/h+1]==0;
-					bool check2 = maze->mazeData[(x+pw)/w][y/h+1]==0;
+					bool check2 = maze->mazeData[(x+pw-1)/w][y/h+1]==0;
 					if(check1 && check2){
 						return false;
 					}else{
@@ -145,7 +171,126 @@ class play{
 				}else{
 					if(y%h==0){
 						bool check1 = maze->mazeData[x/w][y/h-1]==0;
-						bool check2 = maze->mazeData[(x+pw)/w][y/h-1]==0;
+						bool check2 = maze->mazeData[(x+pw-1)/w][y/h-1]==0;
+						if(check1 && check2){
+							return false;
+						}else{
+							return true;
+						}
+					}else{
+						return false;
+					}
+				}
+			}
+		}
+		
+		void enemyAI(int i){
+			Enemy* enemy = enemies[i];
+			if(enemy->x%100==0 && enemy->y%100==0){
+				int x = enemy->x;
+				int y = enemy->y;
+				int pw = enemy->width;
+				int ph = enemy->height;
+				int prevDirection;
+				int nextDirection;
+				if(enemy->x_speed>0){
+					prevDirection=2;	
+				}else if(enemy->x_speed<0){
+					prevDirection=0;
+				}else if(enemy->y_speed>0){
+					prevDirection=1;
+				}else{
+					prevDirection=3;
+				}
+				vector<int> unvisited;
+				if(maze->mazeData[x/100-1][y/100]==0){
+					unvisited.push_back(0);
+				}
+				if(maze->mazeData[x/100][y/100+1]==0){
+					unvisited.push_back(1);
+				}
+				if(maze->mazeData[x/100+1][y/100]==0){
+					unvisited.push_back(2);
+				}
+				if(maze->mazeData[x/100][y/100-1]==0){
+					unvisited.push_back(3);
+				}
+				srand(time(0));
+				int n = unvisited.size();
+				if(n==1){
+					nextDirection = unvisited[0];
+				}else{
+					while(true){
+						int k = rand()%n;
+						if(abs(unvisited[k]-prevDirection)!=2){
+							nextDirection = unvisited[k];
+							break;
+						}
+					}
+				}
+				if(collideEnemy(i)){
+					switch(nextDirection){
+						case 0:{enemies[i]->x_speed=(-1)*enemies[i]->speed;enemies[i]->y_speed=0;break;}
+						case 1:{enemies[i]->x_speed=0;enemies[i]->y_speed=enemies[i]->speed;break;}
+						case 2:{enemies[i]->x_speed=enemies[i]->speed;enemies[i]->y_speed=0;break;}
+						case 3:{enemies[i]->x_speed=0;enemies[i]->y_speed=(-1)*enemies[i]->speed;break;}
+					}
+				}else{
+					if(n>2){
+						switch(nextDirection){
+							case 0:{enemies[i]->x_speed=(-1)*enemies[i]->speed;enemies[i]->y_speed=0;break;}
+							case 1:{enemies[i]->x_speed=0;enemies[i]->y_speed=enemies[i]->speed;break;}
+							case 2:{enemies[i]->x_speed=enemies[i]->speed;enemies[i]->y_speed=0;break;}
+							case 3:{enemies[i]->x_speed=0;enemies[i]->y_speed=(-1)*enemies[i]->speed;break;}
+						}	
+					}
+				}
+			}
+			enemies[i]->updateEnemy();
+		}
+		
+		bool collideEnemy(int i){
+			int x = enemies[i]->x;
+			int y = enemies[i]->y;
+			int pw = enemies[i]->width;
+			int ph = enemies[i]->height;
+			int w = maze->mazeCell.w;
+			int h = maze->mazeCell.h;
+			if(enemies[i]->x_speed!=0){
+				if(enemies[i]->x_speed>0){
+					bool check1 = maze->mazeData[(x+pw)/w][y/h]==0;
+					bool check2 = maze->mazeData[(x+pw)/w][(y+ph-1)/h]==0;
+					if(check1 && check2){
+						return false;
+					}else{
+						return true;
+					}
+				}else{
+					if(x%w==0){
+						bool check1 = maze->mazeData[(x-1)/w][y/h]==0;
+						bool check2 = maze->mazeData[(x-1)/w][(y+ph-1)/h]==0;
+						if(check1 && check2){
+							return false;
+						}else{
+							return true;
+						}
+					}else{
+						return false;
+					}
+				}
+			}else{
+				if(enemies[i]->y_speed>0){
+					bool check1 = maze->mazeData[x/w][(y+ph)/h]==0;
+					bool check2 = maze->mazeData[(x+pw-1)/w][(y+ph)/h]==0;
+					if(check1 && check2){
+						return false;
+					}else{
+						return true;
+					}
+				}else{
+					if(y%h==0){
+						bool check1 = maze->mazeData[x/w][(y-1)/h]==0;
+						bool check2 = maze->mazeData[(x+pw-1)/w][(y-1)/h]==0;
 						if(check1 && check2){
 							return false;
 						}else{

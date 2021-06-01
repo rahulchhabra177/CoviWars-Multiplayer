@@ -32,17 +32,6 @@ void Enemy::updateEnemy(){
 	dstr.y=y;
 }
 
-void Enemy::changeSpeed(SDL_Event e){
-	if(e.type==SDL_KEYDOWN){
-		switch(e.key.keysym.sym){
-			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;break;}
-			case SDLK_DOWN:{y_speed=speed;x_speed=0;break;}
-			case SDLK_RIGHT:{y_speed=0;x_speed=speed;break;}
-			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;break;}
-		}
-	}
-}
-
 void Enemy::render(SDL_Renderer* renderer){
 	SDL_RenderCopy(renderer,texture[cur_texture],NULL,&dstr);
 	count = (count+1)%rot_speed;
