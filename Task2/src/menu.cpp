@@ -16,60 +16,59 @@ class Menu{
 		bool changed=true;
 		string cur_player="";
 		char* cplayer=&cur_player[0];
-		Menu(char* title, int menuType, SDL_Texture* poster, SDL_Renderer* localRenderer){
+		Menu(char* title, int menuType, SDL_Texture* poster, SDL_Renderer* localRenderer,int width,int height){
 			if (menu_debug)cout<<"menu.cpp::Menu\n";
 			name = title;
 			background = poster;
 			renderer = localRenderer;
 			
 			if(menuType==1){
-				Button* start_button=new Button("Start",renderer);
-				start_button->set_cor(589,286,174,49);
+				Button* start_button=new Button("Start",renderer,width,height);
+				start_button->set_cor(1700,900,500,170);
 				buttons.push_back(start_button);
 				
-				Button* options_button=new Button("Options",renderer);
-				options_button->set_cor(580,410,174,49);
+				Button* options_button=new Button("Options",renderer,width,height);
+				options_button->set_cor(1700,1200,500,170);
 				buttons.push_back(options_button);
 				
-				Button* exit_button=new Button("Exit",renderer);
-				exit_button->set_cor(589,508,174,49);
+				Button* exit_button=new Button("Exit",renderer,width,height);
+				exit_button->set_cor(1700,1500,500,170);
 				buttons.push_back(exit_button);
 				
-				Button* logo=new Button("COROMAN",renderer);
-				logo->set_rect(412,62,920,188);
+				Button* logo=new Button("COROMAN",renderer,width,height);
+				logo->set_cor(1250,250,1200,400);
 				buttons.push_back(logo);
-				input_box.x=949;
-				input_box.y=478;
-				input_box.h=100;
-				input_box.w=220;
-				playerName=Texture::LoadText("Enter Some Text",renderer);
-			}
-			else if(menuType==2){
-				Button* resume_button=new Button("Resume",renderer);
-				resume_button->set_cor(600,300,20,70);
+				
+				input_box.x=0/*2926*/;
+				input_box.y=0/*2034*/;
+				input_box.h=308;
+				input_box.w=660;
+				playerName=Texture::LoadText("Enter Your Name",renderer);
+				
+			}else if(menuType==2){
+				Button* resume_button=new Button("Resume",renderer,width,height);
+				resume_button->set_cor(1700,900,300,70);
 				buttons.push_back(resume_button);
 				
-				Button* exit_button=new Button("Exit",renderer);
-				exit_button->set_cor(600,400,20,70);
+				Button* exit_button=new Button("Exit",renderer,width,height);
+				exit_button->set_cor(1700,1100,300,70);
 				buttons.push_back(exit_button);
-			}
-			else if(menuType==4){
-				Button* playAgain=new Button("Play Again",renderer);
-				playAgain->set_cor(600,50,20,70);
+			}else if(menuType==4){
+				Button* playAgain=new Button("Play Again",renderer,width,height);
+				playAgain->set_cor(1700,1500,300,70);
 				buttons.push_back(playAgain);
 				
-				Button* exit_button=new Button("Exit",renderer);
-				exit_button->set_cor(600,600,20,70);
+				Button* exit_button=new Button("Exit",renderer,width,height);
+				exit_button->set_cor(1700,1800,300,70);
 				buttons.push_back(exit_button);
-			}
-			else if(menuType==3){
-				Button* Sounds=new Button("Sounds",renderer);
-				Sounds->set_cor(600,50,20,70);
-				buttons.push_back(Sounds);
+			}else if(menuType==5){
+				Button* playAgain=new Button("Play Again",renderer,width,height);
+				playAgain->set_cor(1700,1500,300,70);
+				buttons.push_back(playAgain);
 				
-				Button* back_button=new Button("Back",renderer);
-				back_button->set_cor(600,600,20,70);
-				buttons.push_back(back_button);
+				Button* exit_button=new Button("Exit",renderer,width,height);
+				exit_button->set_cor(1700,1800,300,70);
+				buttons.push_back(exit_button);
 			}
 		}
 		
@@ -93,6 +92,9 @@ class Menu{
 				if (cur_player!=""){
 				playerName=Texture::LoadText(&cur_player[0],renderer);
 			}
+			else{
+				playerName=Texture::LoadText("Eneter Your Name",renderer);
+			}
 			}
 			SDL_RenderCopy(renderer,playerName,NULL,&input_box);
 			for(int i=0;i<buttons.size();i++){
@@ -107,8 +109,9 @@ class Menu{
 		void handle_event(SDL_Event e,int* state,SoundClass *m,bool music_on){
 			if (menu_debug)cout<<"menu.cpp::handle_event\n";
 			// cout<<1;
-			if(e.type==SDL_QUIT){
-				*state=5;
+			// cout<<e.type<<"|"<<SDL_MOUSEBUTTONDOWN<<"\n";
+			if(e.type==SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE ){
+				*state=6;
 				// cout<<2;
 			}
 			else if (e.type==SDL_TEXTINPUT){
@@ -127,6 +130,7 @@ class Menu{
 				int a,b;
 				SDL_GetMouseState(&a,&b);
 				int i = locatePointer(a,b);
+				// cout<<i<<"::::"<<a<<":::"<<b<<"\n\n";
 				if(i>=0){
 // cout<<6;
 					buttons[i]->handle_event(state,m,music_on,e);
@@ -135,13 +139,15 @@ class Menu{
 					// cout<<7;
 					for(int i=0;i<buttons.size();i++){buttons[i]->set_original();}
 				}
-			}else if(e.type==SDL_KEYDOWN){
+			}
+			else if(e.type==SDL_KEYDOWN){
 				// cout<<9;
 				if(e.key.keysym.sym==SDLK_ESCAPE && *state==2){
 					// cout<<10;
 					*state=0;
 				}
 			}
+			// cout<<"menu.cpp::handle_Event...Comlpleted\n";
 		}
 	
 };

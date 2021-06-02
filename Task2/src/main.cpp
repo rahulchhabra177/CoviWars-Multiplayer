@@ -13,7 +13,9 @@ struct data{
 
 
 int main(int argc,char* args[]){
-		
+	int sw,sh;
+	cout<<"Enter your resolution: ";
+	cin>>sw>>sh;
 		SDL_Init(SDL_INIT_EVERYTHING);
 		// SDLNet_Init();
 		int player_id=0;
@@ -43,7 +45,7 @@ int main(int argc,char* args[]){
 		// SDL_Event event;
 		bool isServer=false;
 		if (stoi(args[1])==1){isServer=true;}
-	Game *game=new Game("COROMAN",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,isServer);
+	Game *game=new Game("COROMAN",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh,isServer);
 		// bool tempr=false;
 		// TCPsocket temp_soc;
 	while (game->isRunning()){

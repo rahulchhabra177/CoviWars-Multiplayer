@@ -9,10 +9,11 @@
 class Button{
 	
 	public:
-		Button(char* name, SDL_Renderer* renderer);
+		Button(char* name, SDL_Renderer* renderer,int width,int height);
 		char* label;
 		SDL_Rect dest;
 		SDL_Texture* texture;
+		int s_width,s_height;
 		std::vector<SDL_Texture*> colors;
 		int cur_color=0;
 		void handle_event(int*state,SoundClass* m,bool music_on,SDL_Event e);

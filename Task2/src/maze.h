@@ -11,8 +11,8 @@ class Maze{
 
 	public:
 		
-		int m_width=49;			
-		int m_height=33;
+		int m_width=27;			
+		int m_height=21;
 		int lvl=1;
 		SDL_Texture* wTexture = NULL;
 		SDL_Texture* sTexture = NULL;
@@ -27,7 +27,7 @@ class Maze{
 		
 		void constructMaze();
 		void removeDeadEnds();
-		int numWalls(int i,int j);
+		int openCell(int i,int j);
 		vector<int> neighbours(pair<int,int> coord);
 
 };

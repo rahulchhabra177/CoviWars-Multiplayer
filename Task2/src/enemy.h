@@ -6,19 +6,16 @@
 class Enemy{
 
 public:
-	int x,y,height=40,width=40;
-	int speed = 20;
-	int x_speed = 20;
+	int x,y,height=100,width=100;
+	int speed = 2;
+	int x_speed = 2;
 	int y_speed = 0;
 	int count = 0,cur_texture=0;
 	int rot_speed=50;
 	string name="player";
 	SDL_Rect dstr,src;
-	Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,bool isEnemy);
-	void changeSpeed(SDL_Event e);
-	void updatePlayer();
+	Enemy(SDL_Renderer* localRenderer,int init_x,int init_y);
+	void updateEnemy();
 	void render(SDL_Renderer* renderer);
 	SDL_Texture* texture[8]={NULL};
-	bool isEnemy;
-	bool collide(Enemy * enemy,SoundClass* m,bool music_on);
 };

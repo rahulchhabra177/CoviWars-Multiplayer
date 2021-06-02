@@ -8,12 +8,12 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 	wTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);
 	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);
 
-	mazeCell.h = 20;
-	mazeCell.w = 20;
+	mazeCell.h = 100;
+	mazeCell.w = 100;
 	mazeCell.x = 0;
 	mazeCell.y = 0;
-	mazeEgg.h = 5;
-	mazeEgg.w = 5;
+	mazeEgg.h = 20;
+	mazeEgg.w = 20;
 	mazeEgg.x = 0;
 	mazeEgg.y = 0;
 
@@ -55,15 +55,12 @@ void Maze::render(SDL_Renderer* renderer){
 			}
 		}
 	}
-	mazeCell.x=m_width*(mazeCell.h)-2;
-	for(int i=0;i<m_height;i++){
-		mazeCell.y = (mazeCell.h)*i;
-		SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
-	}
+	
 }
 
-int Maze::numWalls(int i,int j){
-	if (maze_debug)cout<<"Maze.cpp.cpp:numWalls\n";
+
+
+int Maze::openCell(int i,int j){
 	int n = -1;
 	if(mazeData[i-1][j]==0){
 		n=0;
@@ -92,12 +89,16 @@ int Maze::numWalls(int i,int j){
 	return n;	
 }
 
+
+
+
+
 void Maze::removeDeadEnds(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:removeDeadEnds\n";
 	for(int i=1;i<m_width-1;i++){
 		for(int j=1;j<m_height-1;j++){
 			if(mazeData[i][j]==0){
-				int n = numWalls(i,j);
+				int n = openCell(i,j);
 				if(n>=0){
 					switch(n){
 						case 0:  {
@@ -160,8 +161,8 @@ void Maze::constructMaze(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	stack<pair<int,int>> cells;
 	srand(time(0));
-	int x = 2*(rand()%18)+1;
-	int y = 2*(rand()%10)+1;
+	int x = 2*(rand()%(m_width/2))+1;
+	int y = 2*(rand()%(m_height/2))+1;
 	cells.push(make_pair(x,y));
 	while(!cells.empty()){
 		vector<int> unvisited = neighbours(cells.top());

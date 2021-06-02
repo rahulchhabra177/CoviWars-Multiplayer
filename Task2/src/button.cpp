@@ -2,10 +2,12 @@
 
 using namespace std;
 bool button_debug=true;
-Button::Button(char* name, SDL_Renderer* renderer){
+Button::Button(char* name, SDL_Renderer* renderer,int width,int height){
 	if (button_debug)cout<<"button.cpp::Button\n";
 	TTF_Init();
 	label = name;
+	s_height=height;
+	s_width=width;
 	TTF_Font * font;//=new TTFont();
 	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
 	// SDL_Color color={0,255,0,255};
@@ -41,17 +43,17 @@ void Button::set_rect(int a,int b,int q,int w){
 
 bool Button::isInside(int a,int b){
 	if (button_debug)cout<<"button.cpp::isInside\n";
-	if (a>=dest.x and a<=dest.x+dest.w and b>=dest.y and b<=dest.y+dest.h){return true;}
+	if (3700*a>=(dest.x*s_width) && 3700*a<=((dest.x+dest.w)*s_width) && 2100*b>=(dest.y*s_height) && b*2100<=((dest.y+dest.h)*s_height)){return true;}
 	return false;
 }
 
 void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
-	if (button_debug)cout<<"button.cpp::handle_event\n";
+	// /*if (button_debug)*/cout<<"button.cpp::h&&le_event:"<<label<<"\n";
 		if (e.type==SDL_MOUSEMOTION){
 		int x_c = e.motion.x;
         int y_c = e.motion.y;
         // cout<<(int)isInside(x_c,y_c)<<":"<<cur_color<<" is inside\n";
-		if (isInside(x_c,y_c) and cur_color!=1){
+		if (/*isInside(x_c,y_c) && */cur_color!=1){
 			cur_color=1;
 			texture=colors[1];
 			dest.x-=10;
@@ -66,7 +68,7 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 		if (music_on){
 			m->PlaySound("button");
 		}	
-		*state=5;	
+		*state=6;	
 	}else if(strcmp(label,"Start")==0){
 		if (music_on){
 			m->PlaySound("button");
@@ -82,7 +84,7 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 		if(music_on){
 			m->PlaySound("button");
 		}
-		*state=3;
+		// *state=3;
 	}else if(strcmp(label,"Pause")==0){
 		if(music_on){
 			m->PlaySound("button");
@@ -109,13 +111,14 @@ void Button::render(SDL_Renderer *renderer){
 }
 
 void Button::set_original(){
-if (cur_color!=0){
-	dest.x+=10;
-	dest.y+=10;
-	dest.h-=20;
-	dest.w-=20;
-}
+	// cout<<"set_original\n\n";
+	if (cur_color!=0){
+		dest.x+=10;
+		dest.y+=10;
+		dest.h-=20;
+		dest.w-=20;
+	}
 
 	cur_color=0;
-			texture=colors[cur_color];
+	texture=colors[cur_color];
 			}

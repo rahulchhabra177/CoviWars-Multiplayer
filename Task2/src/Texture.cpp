@@ -1,6 +1,6 @@
 #include "Texture.h";
 using namespace std;
-bool texture_debug=true;
+bool texture_debug=false;
 
 SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 if (texture_debug)cout<<"Texture.cpp::LoadT\n";
@@ -12,8 +12,16 @@ if (texture_debug)cout<<"Texture.cpp::LoadT\n";
 	}
 	else{	
 		returng=SDL_CreateTextureFromSurface(renderer,tmp);
+		if (returng==NULL){
+			cout<<"Error:"<<SDL_GetError()<<"\n";
+			exit(1);
+		}
+		else{
+			// cout<<"NO ERROR\n";
+		}
 		SDL_FreeSurface(tmp);
 	}
+	// cout<<"l\n";
 	return returng;
 
 }

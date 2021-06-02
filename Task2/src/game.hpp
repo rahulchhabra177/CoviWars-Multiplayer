@@ -11,7 +11,7 @@ using namespace std;
 class Game{
 
 	public:
-		Game(char* title, int x,int y,bool isServer);
+		Game(char* title, int x,int y,int h,int w,bool isServer);
 		void handle_event();
 		void process();
 		void render();
@@ -22,11 +22,12 @@ class Game{
 		int state;
 		int player_id;
 		bool connected=false;
+		int s_width,s_height;
 		
 	private:
 
 		SDL_Window *window;
-		SDL_Texture* menuback= NULL,*gameback=NULL,*overback=NULL;
+		SDL_Texture* menuback= NULL,*gameback=NULL,*overback=NULL,*winback=NULL;
 	
 };
 #endif

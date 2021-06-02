@@ -21,11 +21,11 @@ class play{
 		vector<Enemy*> enemies;
 		SDL_Rect* dst_hdng;
 		Menu* menu_n=nullptr;
+		bool winCondition=false;
+		vector<vector<int>> occupied;
 		play(char* title,int numEnemies,SDL_Texture* poster, SDL_Renderer* localRenderer,Menu* menu){
 			if (play_debug)cout<<"play.cpp:play\n";
 			menu_n=menu;
-
-			// cout<<1;
 			name = title;
 			background = poster;
 			renderer = localRenderer;
@@ -37,18 +37,35 @@ class play{
 			// cout<<2;
 			
 			for(int i=0;i<numEnemies;i++){
-				enemies[i]=new Enemy(renderer,161,41,false);
+				enemies[i]=new Enemy(renderer,161,41);
 			}
 			// cout<<3;
-			pacman = new Character("./../assets/corona.bmp",renderer,20,20,false);
+			pacman = new Character("./../assets/corona.bmp",renderer,110,110,false);
 			
 			maze = new Maze(1,renderer);
-			vector<Character*> temp;
-			temp.push_back(pacman);
-			// 
-			score=new ScoreBoard(temp,renderer);
-			// cout<<5;
-// 
+			score=new ScoreBoard(renderer);
+			for(int i=0;i<maze->m_width;i++){
+				vector<int> v;
+				for(int j=0;j<maze->m_height;j++){
+					v.push_back(0);
+				}
+				occupied.push_back(v);
+			}
+			
+			occupied[1][1]=1;
+			
+			for(int i=0;i<numEnemies;i++){
+				while(true){
+					srand(time(0));
+					int x = 2*(rand()%(maze->m_width/2))+1;
+					int y = 2*(rand()%(maze->m_height/2))+1;
+					if(maze->mazeData[x][y]==0 && occupied[x][y]==0){
+						enemies[i]=new Enemy(renderer,100*x,100*y);
+						occupied[x][y]=1;
+						break;
+					}
+				}
+			}
 
 
 
@@ -79,6 +96,9 @@ class play{
 		void update(int* state,bool doUpdate,SoundClass* m,bool music_on,network*nmanager){
 			if (play_debug)cout<<"play.cpp:update\n";
 			maze->update();
+			if (eatEgg()){
+				pacman->score++;
+			}
 			if (menu_n->cur_player!=""){
 			score->update(1,menu_n->cplayer,pacman->score,"",0);
 			}
@@ -86,20 +106,22 @@ class play{
 			score->update(1,"Player1",pacman->score,"",0);
 
 			}
-			if( (collidePlayer()) ){
+			if( (!collidePlayer())){
 				pacman->updatePlayer(nmanager,false);
 				if (pacman2!=nullptr){
 				pacman2->updatePlayer(nmanager,true);
 				}	
 
 			}
-			if (eatEgg()){
-				pacman->score++;
-			}
+
 			for(int i=0;i<enemies.size();i++){
 				if(pacman->collide(enemies[i],m,music_on)){
 					*state = 4;
 				}	
+				enemyAI(i);	
+			}
+			if(winCondition){
+				*state = 5;
 			}
 		}
 		
@@ -107,7 +129,7 @@ class play{
 			if (play_debug)cout<<"play.cpp:handle_event\n";
 			pacman->changeSpeed(e,nmanager);
 			if(e.type==SDL_QUIT){
-				*state=5;
+				*state=6;
 			}
 			else if(e.type==SDL_MOUSEBUTTONDOWN){
 				int a,b;
@@ -119,7 +141,7 @@ class play{
 			}
 			else if(e.type==SDL_KEYDOWN){
 				if(e.key.keysym.sym==SDLK_ESCAPE){
-					*state=5;
+					*state=6;
 				}
 				else if(e.key.keysym.sym==SDLK_p){
 					*state=2;
@@ -149,63 +171,74 @@ class play{
 		}
 		
 		bool collidePlayer(){
-			if (play_debug)cout<<"play.cpp:collidePlayer\n";
-			cout<<0<<"\n";
-			if (pacman==nullptr){cout<<"hehhehe\n";}
-			else{cout<<"ho"<<pacman->x_speed<<":"<<pacman->y_speed<<"\n";}
-
+			int x = pacman->x;
+			int y = pacman->y;
+			int pw = pacman->width;
+			int ph = pacman->height;
+			int w = maze->mazeCell.w;
+			int h = maze->mazeCell.h;
 			if(pacman->x_speed!=0){
-				cout<<1;
 				if(pacman->x_speed>0){
-					cout<<11;
-					if(maze->mazeData[(pacman->x+pacman->width+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==1){
-						cout<<111;
+					bool check1 = maze->mazeData[x/w+1][y/h]!=1;
+					bool check2 = maze->mazeData[x/w+1][(y+ph-1)/h]!=1;
+					if(check1 && check2){
 						return false;
-					}else{
-					cout<<112;
-						return true;
 					}
-				}else{
-					cout<<12;
-					if(maze->mazeData[(pacman->x-1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==1){
-						cout<<121;
-						return false;
-					}else{
-						cout<<122;
+					else{
 						return true;
 					}
 				}
-			}else{
-				cout<<2;
-				if(pacman->y_speed>0){
-					cout<<21;
-					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height+1)/(maze->mazeCell.h)]==1){
-						cout<<211;
-						return false;
-					}else{
-						cout<<212;
-						return true;
+					else{
+					if(x%w==0){
+						bool check1 = maze->mazeData[x/w-1][y/h]!=1;
+						bool check2 = maze->mazeData[x/w-1][(y+ph-1)/h]!=1;
+						if(check1 && check2){
+							return false;
+						}
+					else{
+							return true;
+						}
 					}
-				}else{
-					cout<<22;
-					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y-1)/(maze->mazeCell.h)]==1){
-						cout<<221;
+					else{
 						return false;
-					}else{
-						cout<<222;
-						return true;
 					}
 				}
 			}
-		return true;
-		} 
+					else{
+				if(pacman->y_speed>0){
+					bool check1 = maze->mazeData[x/w][y/h+1]!=1;
+					bool check2 = maze->mazeData[(x+pw-1)/w][y/h+1]!=1;
+					if(check1 && check2){
+						return false;
+					}
+					else{
+						return true;
+					}
+				}
+					else{
+					if(y%h==0){
+						bool check1 = maze->mazeData[x/w][y/h-1]!=1;
+						bool check2 = maze->mazeData[(x+pw-1)/w][y/h-1]!=1;
+						if(check1 && check2){
+							return false;
+						}
+					else{
+							return true;
+						}
+					}
+					else{
+						return false;
+					}
+				}
+			}
+		}
 bool eatEgg(){
 			if (play_debug)cout<<"play.cpp:collidePlayer\n";
 			
 			if(pacman->x_speed!=0){
-				cout<<1;
+				// cout<<1;
 				if(pacman->x_speed>0){
-					cout<<11;
+					// cout<<11;
 					if(maze->mazeData[(pacman->x+pacman->width/3+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==0){
 						maze->mazeData[(pacman->x+pacman->width/3+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]=2;
 						return true;
@@ -217,7 +250,8 @@ bool eatEgg(){
 						return true;
 					}
 			}
-		}else{
+		}
+else{
 				if(pacman->y_speed>0){
 					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height/3+1)/(maze->mazeCell.h)]==0){
 						maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height/3+1)/(maze->mazeCell.h)]=2;
@@ -234,6 +268,146 @@ bool eatEgg(){
 			}
 			return false;
 		} 
+
+
+		void enemyAI(int i){
+			Enemy* enemy = enemies[i];
+			if(enemy->x%100==0 && enemy->y%100==0){
+				int x = enemy->x;
+				int y = enemy->y;
+				int pw = enemy->width;
+				int ph = enemy->height;
+				int prevDirection;
+				int nextDirection;
+				if(enemy->x_speed>0){
+					prevDirection=2;	
+				}
+else if(enemy->x_speed<0){
+					prevDirection=0;
+				}
+else if(enemy->y_speed>0){
+					prevDirection=1;
+				}
+else{
+					prevDirection=3;
+				}
+				vector<int> unvisited;
+				if(maze->mazeData[x/100-1][y/100]!=1){
+					unvisited.push_back(0);
+				}
+				if(maze->mazeData[x/100][y/100+1]!=1){
+					unvisited.push_back(1);
+				}
+				if(maze->mazeData[x/100+1][y/100]!=1){
+					unvisited.push_back(2);
+				}
+				if(maze->mazeData[x/100][y/100-1]!=1){
+					unvisited.push_back(3);
+				}
+				srand(time(0));
+				int n = unvisited.size();
+				if(n==1){
+					nextDirection = unvisited[0];
+				}
+else{
+					while(true){
+						int k = rand()%n;
+						if(abs(unvisited[k]-prevDirection)!=2){
+							nextDirection = unvisited[k];
+							break;
+						}
+					}
+				}
+				if(collideEnemy(i)){
+					switch(nextDirection){
+						case 0:{enemies[i]->x_speed=(-1)*enemies[i]->speed;enemies[i]->y_speed=0;break;}
+						case 1:{enemies[i]->x_speed=0;enemies[i]->y_speed=enemies[i]->speed;break;}
+						case 2:{enemies[i]->x_speed=enemies[i]->speed;enemies[i]->y_speed=0;break;}
+						case 3:{enemies[i]->x_speed=0;enemies[i]->y_speed=(-1)*enemies[i]->speed;break;}
+					}
+				}
+else{
+					if(n>2){
+						switch(nextDirection){
+							case 0:{enemies[i]->x_speed=(-1)*enemies[i]->speed;enemies[i]->y_speed=0;break;}
+							case 1:{enemies[i]->x_speed=0;enemies[i]->y_speed=enemies[i]->speed;break;}
+							case 2:{enemies[i]->x_speed=enemies[i]->speed;enemies[i]->y_speed=0;break;}
+							case 3:{enemies[i]->x_speed=0;enemies[i]->y_speed=(-1)*enemies[i]->speed;break;}
+						}	
+					}
+				}
+			}
+			enemies[i]->updateEnemy();
+		}
+		
+		bool collideEnemy(int i){
+			int x = enemies[i]->x;
+			int y = enemies[i]->y;
+			int pw = enemies[i]->width;
+			int ph = enemies[i]->height;
+			int w = maze->mazeCell.w;
+			int h = maze->mazeCell.h;
+			if(enemies[i]->x_speed!=0){
+				if(enemies[i]->x_speed>0){
+					bool check1 = maze->mazeData[(x+pw)/w][y/h]!=1;
+					bool check2 = maze->mazeData[(x+pw)/w][(y+ph-1)/h]!=1;
+					if(check1 && check2){
+						return false;
+					}
+else{
+						return true;
+					}
+				}
+else{
+					if(x%w==0){
+						bool check1 = maze->mazeData[(x-1)/w][y/h]!=1;
+						bool check2 = maze->mazeData[(x-1)/w][(y+ph-1)/h]!=1;
+						if(check1 && check2){
+							return false;
+						}
+else{
+							return true;
+						}
+					}
+else{
+						return false;
+					}
+				}
+			}
+else{
+				if(enemies[i]->y_speed>0){
+					bool check1 = maze->mazeData[x/w][(y+ph)/h]!=1;
+					bool check2 = maze->mazeData[(x+pw-1)/w][(y+ph)/h]!=1;
+					if(check1 && check2){
+						return false;
+					}
+else{
+						return true;
+					}
+				}
+else{
+					if(y%h==0){
+						bool check1 = maze->mazeData[x/w][(y-1)/h]!=1;
+						bool check2 = maze->mazeData[(x+pw-1)/w][(y-1)/h]!=1;
+						if(check1 && check2){
+							return false;
+						}
+else{
+							return true;
+						}
+					}
+else{
+						return false;
+					}
+				}
+			}
+		} 
+
+
+
+
+
+
 
 
 };
