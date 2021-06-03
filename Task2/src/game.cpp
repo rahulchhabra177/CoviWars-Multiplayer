@@ -46,7 +46,10 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window){
 					cout<<IMG_GetError()<<"\n";
 				}
 				
-				playState = new play("Play",3,gameback,renderer,width_window,height_window);
+				int l;
+				cout<<"Select starting level: ";cin>>l;
+
+				playState = new play("Play",l,gameback,renderer,width_window,height_window);
 				
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
 				menuList.push_back(startMenu);
@@ -94,10 +97,15 @@ void Game::handle_event(){
 void Game::process(){
 	if (state==0){
 		playState->update(&state,true,MusicManager,music);
+		if(state==-2){
+			int l=playState->lvl;
+			playState = new play("Play",l+1,gameback,renderer,s_width,s_height);
+			state = 0;
+		}
 	}else if(state==6){
 		running = false;
 	}else if(state==-2){
-		playState = new play("Play",3,gameback,renderer,s_width,s_height);
+		playState = new play("Play",1,gameback,renderer,s_width,s_height);
 		state = 0;
 	}else{
 		menuList[state-1]->update();

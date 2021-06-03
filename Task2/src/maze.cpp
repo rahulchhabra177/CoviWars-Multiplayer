@@ -5,6 +5,7 @@ using namespace std;
 Maze::Maze(int l,SDL_Renderer* localRenderer){
 	lvl = l;
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
+	dTexture = Texture::LoadT("./../assets/door.png",localRenderer);
 	
 	mazeCell.h = 100;
 	mazeCell.w = 100;
@@ -21,6 +22,7 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 	
 	constructMaze();
 	removeDeadEnds();
+	setWinCondition();
 }
 
 void Maze::reinitialize(){
@@ -30,6 +32,8 @@ void Maze::reinitialize(){
 		}
 	}
 	constructMaze();
+	removeDeadEnds();
+	setWinCondition();
 }
 
 void Maze::render(SDL_Renderer* renderer){
@@ -39,13 +43,10 @@ void Maze::render(SDL_Renderer* renderer){
 			mazeCell.y = (mazeCell.h)*j;
 			if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+			}else if(mazeData[i][j]==3){
+				SDL_RenderCopy(renderer,dTexture,NULL,&mazeCell);
 			}
 		}
-	}
-	mazeCell.x=m_width*(mazeCell.h);
-	for(int i=0;i<m_height;i++){
-		mazeCell.y = (mazeCell.h)*i;
-		SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 	}
 }
 
@@ -138,14 +139,14 @@ void Maze::removeDeadEnds(){
 }
 
 void Maze::update(){
-
+	
 }
 
 void Maze::constructMaze(){
 	stack<pair<int,int>> cells;
 	srand(time(0));
-	int x = 2*(rand()%18)+1;
-	int y = 2*(rand()%10)+1;
+	int x = 2*(rand()%((m_width-1)/2))+1;
+	int y = 2*(rand()%((m_height-1)/2))+1;
 	cells.push(make_pair(x,y));
 	while(!cells.empty()){
 		vector<int> unvisited = neighbours(cells.top());
@@ -205,4 +206,16 @@ vector<int> Maze::neighbours(pair<int,int> p){
 		}
 	}
 	return unvisited;
+}
+
+void Maze::setWinCondition(){
+	srand(time(0));
+	while(true){
+		int x = 2*(rand()%((m_width-1)/2))+1;
+		int y = 2*(rand()%((m_height-1)/2))+1;
+		if(x>m_width/2 && y>m_height/2){
+			mazeData[x][y]=3;
+			break;
+		}
+	}
 }

@@ -11,6 +11,7 @@ class play{
 	public:
 	
 		char* name;
+		int lvl;
 		vector<Button*> buttons;
 		SDL_Texture* background;
 		SDL_Renderer* renderer;
@@ -27,21 +28,23 @@ class play{
 		//ScoreBoard* score=nullptr;
 		//SDL_Rect* dst_hdng;
 		
-		play(char* title,int numEnemies,SDL_Texture* poster, SDL_Renderer* localRenderer,int width,int height){
+		play(char* title,int level,SDL_Texture* poster, SDL_Renderer* localRenderer,int width,int height){
+			winCondition=false;
 			name = title;
 			background = poster;
 			renderer = localRenderer;
 			s_width = width;
 			s_height = height;
-			
-			for(int i=0;i<numEnemies;i++){
+			lvl = level;
+
+			for(int i=0;i<lvl;i++){
 				Enemy* enemy=nullptr;
 				enemies.push_back(enemy);
 			}
 			
 			pacman = new Character("./../assets/hero.bmp",renderer,110,110);
 			
-			maze = new Maze(1,renderer);
+			maze = new Maze(lvl,renderer);
 			players.push_back(pacman);
 			
 			for(int i=0;i<maze->m_width;i++){
@@ -54,11 +57,11 @@ class play{
 			
 			occupied[1][1]=1;
 			
-			for(int i=0;i<numEnemies;i++){
+			for(int i=0;i<lvl;i++){
 				while(true){
 					srand(time(0));
-					int x = 2*(rand()%18)+1;
-					int y = 2*(rand()%10)+1;
+					int x = 2*(rand()%((maze->m_width-1)/2))+1;
+					int y = 2*(rand()%((maze->m_height-1)/2))+1;
 					if(maze->mazeData[x][y]==0 && occupied[x][y]==0){
 						enemies[i]=new Enemy(renderer,100*x,100*y);
 						occupied[x][y]=1;
@@ -88,6 +91,9 @@ class play{
 			if(!collidePlayer()){
 				pacman->updatePlayer();
 			}
+			if(maze->mazeData[pacman->x/100][pacman->y/100]==3){
+				winCondition = true;
+			}
 			for(int i=0;i<enemies.size();i++){
 				if(pacman->collide(enemies[i],m,music_on)){
 					*state = 4;
@@ -95,14 +101,18 @@ class play{
 				enemyAI(i);	
 			}
 			if(winCondition){
-				*state = 5;
+				if(maze->lvl<5){
+					*state=-2;
+				}else{
+					*state=5;
+				}
 			}
 		}
 		
 		void handle_event(SDL_Event e,int* state,SoundClass* m,bool music_on){
 			pacman->changeSpeed(e);
 			if(e.type==SDL_QUIT){
-				*state=5;
+				*state=6;
 			}else if(e.type==SDL_MOUSEBUTTONDOWN){
 				int a,b;
 				SDL_GetMouseState(&a,&b);
@@ -112,7 +122,7 @@ class play{
 				}
 			}else if(e.type==SDL_KEYDOWN){
 				if(e.key.keysym.sym==SDLK_ESCAPE){
-					*state=5;
+					*state=6;
 				}else if(e.key.keysym.sym==SDLK_p){
 					*state=2;
 				}
@@ -139,8 +149,8 @@ class play{
 			int h = maze->mazeCell.h;
 			if(pacman->x_speed!=0){
 				if(pacman->x_speed>0){
-					bool check1 = maze->mazeData[x/w+1][y/h]==0;
-					bool check2 = maze->mazeData[x/w+1][(y+ph-1)/h]==0;
+					bool check1 = maze->mazeData[x/w+1][y/h]==0 || maze->mazeData[x/w+1][y/h]==3;
+					bool check2 = maze->mazeData[x/w+1][(y+ph-1)/h]==0 || maze->mazeData[x/w+1][(y+ph-1)/h]==3;
 					if(check1 && check2){
 						return false;
 					}else{
@@ -148,8 +158,8 @@ class play{
 					}
 				}else{
 					if(x%w==0){
-						bool check1 = maze->mazeData[x/w-1][y/h]==0;
-						bool check2 = maze->mazeData[x/w-1][(y+ph-1)/h]==0;
+						bool check1 = maze->mazeData[x/w-1][y/h]==0 || maze->mazeData[x/w-1][y/h]==3;
+						bool check2 = maze->mazeData[x/w-1][(y+ph-1)/h]==0 || maze->mazeData[x/w-1][(y+ph-1)/h]==3;
 						if(check1 && check2){
 							return false;
 						}else{
@@ -161,8 +171,8 @@ class play{
 				}
 			}else{
 				if(pacman->y_speed>0){
-					bool check1 = maze->mazeData[x/w][y/h+1]==0;
-					bool check2 = maze->mazeData[(x+pw-1)/w][y/h+1]==0;
+					bool check1 = maze->mazeData[x/w][y/h+1]==0 || maze->mazeData[x/w][y/h+1]==3;
+					bool check2 = maze->mazeData[(x+pw-1)/w][y/h+1]==0 || maze->mazeData[(x+pw-1)/w][y/h+1]==3;
 					if(check1 && check2){
 						return false;
 					}else{
@@ -170,8 +180,8 @@ class play{
 					}
 				}else{
 					if(y%h==0){
-						bool check1 = maze->mazeData[x/w][y/h-1]==0;
-						bool check2 = maze->mazeData[(x+pw-1)/w][y/h-1]==0;
+						bool check1 = maze->mazeData[x/w][y/h-1]==0 || maze->mazeData[x/w][y/h-1]==3;
+						bool check2 = maze->mazeData[(x+pw-1)/w][y/h-1]==0 || maze->mazeData[(x+pw-1)/w][y/h-1]==3;
 						if(check1 && check2){
 							return false;
 						}else{
@@ -248,7 +258,7 @@ class play{
 			}
 			enemies[i]->updateEnemy();
 		}
-		
+
 		bool collideEnemy(int i){
 			int x = enemies[i]->x;
 			int y = enemies[i]->y;

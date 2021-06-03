@@ -18,7 +18,7 @@ SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 
 }
 
-/*SDL_Texture* Texture::LoadText(char* label,SDL_Renderer* renderer){
+SDL_Texture* Texture::LoadText(char* label,SDL_Renderer* renderer){
 	TTF_Init();
 	TTF_Font* font;
 	font = TTF_OpenFont("./../fonts/batmfa.ttf",20);
@@ -33,4 +33,4 @@ SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 		SDL_FreeSurface(textSurface);
 	}
 	return text;
-}*/
+}

@@ -11,11 +11,12 @@ class Maze{
 
 	public:
 		
-		int m_width=37;			
+		int m_width=33;			
 		int m_height=21;
 		int lvl=1;
 		SDL_Texture* wTexture = NULL;
 		SDL_Texture* sTexture = NULL;
+		SDL_Texture* dTexture = NULL;
 		vector<vector<int>> mazeData;
 		void reinitialize();
 		Maze(int l,SDL_Renderer* localRenderer);
@@ -29,6 +30,7 @@ class Maze{
 		void removeDeadEnds();
 		int openCell(int i,int j);
 		vector<int> neighbours(pair<int,int> coord);
+		void setWinCondition();
 
 };
 
