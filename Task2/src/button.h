@@ -4,24 +4,24 @@
 #include <SDL2/SDL.h>
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include "sounds.h"
-
+#include <SDL2/SDL_ttf.h> 
 class Button{
 	
 	public:
-		Button(char* name, SDL_Renderer* renderer,int width,int height,char* path);
+		Button(char* name, SDL_Renderer* renderer,int width,int height);
 		char* label;
-		int s_width,s_height;
 		SDL_Rect dest;
 		SDL_Texture* texture;
-		//int cur_color = 0;
-		//std::vector<SDL_Texture*> colors;
-		void handle_event(int*state,SoundClass* m,bool music_on/*,SDL_Event*/);
+		int s_width,s_height;
+		std::vector<SDL_Texture*> colors;
+		int cur_color=0;
+		void handle_event(int*state,SoundClass* m,bool music_on,SDL_Event e);
 		bool isInside(int a,int b);
 		void render(SDL_Renderer *renderer);
 		void set_cor(int x,int y,int w,int h);
 		void set_rect(int x,int y,int w,int h);
-		//void set_original();
+		void set_original();
+
 };
 #endif

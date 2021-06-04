@@ -11,7 +11,7 @@ class Maze{
 
 	public:
 		
-		int m_width=33;			
+		int m_width=27;			
 		int m_height=21;
 		int lvl=1;
 		SDL_Texture* wTexture = NULL;
@@ -21,7 +21,7 @@ class Maze{
 		void reinitialize();
 		Maze(int l,SDL_Renderer* localRenderer);
 		void render(SDL_Renderer* renderer);
-		SDL_Rect mazeCell;
+		SDL_Rect mazeCell,mazeEgg;
 		void update();
 		
 	private:
@@ -35,4 +35,3 @@ class Maze{
 };
 
 #endif
-
