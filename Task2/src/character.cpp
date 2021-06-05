@@ -4,17 +4,16 @@
 using namespace std;
 bool character_debug=true;
 
-Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign){
+Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width){
 	if (character_debug)cout<<"character.cpp::Character\n";
 	for (int i=0;i<4;i++){
 		for (int j=0;j<8;j++){
-		string path="./../assets/pac"+to_string(i)+to_string(j%2+1)+".xcf";
-		// cout<<path<<"\n";
-		char* a=&path[0];
-
-		texture[i][j]=Texture::LoadT(a,localRenderer);
+			string path="./../assets/pac"+to_string(i)+to_string(j%2+1)+".xcf";
+			char* a=&path[0];
+			texture[i][j]=Texture::LoadT(a,localRenderer);
 		}
 	}
+	
 	x=init_x;
 	y=init_y;
 	dstr.h=height;
@@ -31,45 +30,11 @@ Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init
 void Character::updatePlayer(network*nmanager,bool isForeigner){
 	if (character_debug)cout<<"character.cpp::updatePlayer\n";
 	if (!isForeigner){
-		// if (count%8==0){
-			y+=y_speed;
-			x+=x_speed;
-			dstr.x=x;
-			dstr.y=y;
-// }
-
-}
-
-// else{
-
-// 	int debug=0;
-// 	string temp="";
-// 	while (debug<100 && temp==""){
-// 		temp=nmanager->recieve(2);
-// 		debug++;
-// 		// cout<<"debug\n";
-// 	}
-// 	string s=temp;
-// 	// cout<<s<<"\n\n";
-// 	if (s=="" || s=="$0"){
-// 		if (y+y_speed>0 && y+y_speed<700 && x+x_speed>0 && x+x_speed<1200){
-// 	y+=y_speed;
-// 	x+=x_speed;
-// 	dstr.x=x;
-// 	dstr.y=y;
-	
-// }
-// 	cout<<"Testing irrelevant values::"<<s<<"\n";
-// 	return;
-// }
-// 	if (s[0]=='$'){
-// 		cout<<"Errorcuser:"<<s<<"\n";
-// 	set_speed(stoi(s.substr(1,1)));
-// }
-
-
-// }
-	// cout<<"Player Coordinates::"<<x<<" "<<y<<"\n";
+		y+=y_speed;
+		x+=x_speed;
+		dstr.x=x;
+		dstr.y=y;
+	}
 }
 
 void Character::changeSpeed(SDL_Event e,network*nmanager){
@@ -82,35 +47,40 @@ void Character::changeSpeed(SDL_Event e,network*nmanager){
 			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;if (nmanager->connected){nmanager->send("$4");}break;}
 			default:{if (nmanager->connected){nmanager->send("$0");}break;}
 		}
-	}
-	else{
+	}else{
 		if (nmanager->connected){nmanager->send("$0");}
 	}
-
 }
 
 
 void Character::render(SDL_Renderer* renderer){
 	if (character_debug)cout<<"character.cpp::render\n";
-	
 	SDL_RenderCopy(renderer,texture[cur_dir][cur_texture],NULL,&dstr);
 	count=(count+1)%rot_speed;
 	if (count==0){
-	cur_texture=(cur_texture+1)%8;
-}
+		cur_texture=(cur_texture+1)%8;
+	}
 }
 
 bool Character::collide(Enemy * obj,SoundClass *m,bool music_on){
 	if (character_debug)cout<<"character.cpp::collide\n";
-	// return false;
 	int x1 = x + width;
 	int y1 = y + height;
+	if(obj==nullptr){
+		exit(1);
+	}
 	int x2 = obj->x + obj->width;
 	int y2 = obj->y + obj->height;
-	if(obj->x>=x && obj->x<=x1 && obj->y>=y && obj->y<=y1){
+	if(obj->x<=x && x<=x2 && obj->y<=y && y<=y2){
 		m->PlaySound("collision");
 		return true;
-	}else if(x2>=x && x2<=x1 && y2>=y && y2<=y1){
+	}else if(obj->x<=x && x<=x2 && obj->y<=y1 && y1<=y2){
+		m->PlaySound("collision");
+		return true;
+	}else if(obj->x<=x1 && x1<=x2 && obj->y<=y && y<=y2){
+		m->PlaySound("collision");
+		return true;
+	}else if(obj->x<=x1 && x1<=x2 && obj->y<=y1 && y1<=y2){
 		m->PlaySound("collision");
 		return true;
 	}else{
@@ -151,8 +121,5 @@ string Character::getPlayerState(){
 	while (y1.size()<4){
 		y1="0"+y1;
 	}
-// cout<<x1+y1<<"\n";
 	return x1+y1;
-
-
 }

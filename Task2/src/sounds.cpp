@@ -28,6 +28,19 @@ void SoundClass::LoadSound(char* path,string label){
 	size_it++;
 
 }
+void SoundClass::LoadMusic(char* path,string label){
+	if (sound_debug)cout<<"sounds.cpp:LoadSound\n";
+	Mix_Music * musicchunk=Mix_LoadMUS(path);
+	if (musicchunk==nullptr){
+		cout<<"Couldn't initialize sound at :"<<path<<"::"<<Mix_GetError()<<"\n";
+		exit(1);
+	}
+	LabelToInt1[label]=size_it1;
+
+	MusicVector.push_back(musicchunk);
+	size_it1++;
+
+}
 
 void SoundClass::InitializeAll(){
 	if (sound_debug)cout<<"sounds.cpp:InitializeAll\n";
@@ -36,10 +49,11 @@ void SoundClass::InitializeAll(){
 	LoadSound("./../Sounds/collision.wav","collision");
 	LoadSound("./../Sounds/windowstart.wav","gamestart");
 	LoadSound("./../Sounds/button.wav","button");
+	LoadMusic("./../Sounds/bMusic.mp3","bMusic");
 }
 
 void SoundClass::PlaySound(string label){
-	if (music_on){
+	if (sound_on){
 	if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
 	Mix_HaltChannel(-1);
 
@@ -50,7 +64,27 @@ void SoundClass::PlaySound(string label){
 }
 }
 
+void SoundClass::PlayMusic(string label){
+	if (music_on){
+	if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
+	// Mix_HaltChannel(-1);
 
-void SoundClass::changeMusicState(){
-	music_on=!music_on;
+	// cout<<size_it1<<"\n";
+	int loc=LabelToInt1[label];
+	cout<<loc<<" "<<label<<"\n";
+	Mix_PlayMusic(MusicVector.at(loc),-1);
+}
+}
+
+
+void SoundClass::changeMusicState(bool state){
+	if (!state){Mix_PauseMusic();}
+	else{Mix_ResumeMusic();}
+	music_on=state;
+}
+
+
+void SoundClass::changeSoundState(bool state){
+	if (!state){Mix_HaltChannel(-1);}
+	sound_on=state;
 }

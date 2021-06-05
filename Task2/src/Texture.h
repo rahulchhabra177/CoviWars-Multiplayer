@@ -11,7 +11,6 @@ class Texture{
 	public:
 		static SDL_Texture* LoadT(char * path,SDL_Renderer* renderer);
 		static SDL_Texture* LoadText(char* label,SDL_Renderer* renderer);
-
-
+		
 };
 #endif

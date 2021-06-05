@@ -1,3 +1,6 @@
+#ifndef SCORE_H
+
+#define SCORE_H
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<bits/stdc++.h>
@@ -7,7 +10,6 @@
 class ScoreBoard{
 
 public:
-	// vector<Character*>players;
 	SDL_Renderer* renderer;
 	int time_sec_u=0;
 	int time_sec_t=0;
@@ -17,9 +19,8 @@ public:
 	char * time_string="00:00";
 	ScoreBoard(SDL_Renderer* render);
 	SDL_Texture* heading,*timing,*pl1,*pl2;
-	// vector<SDL_Texture*> player_score;
 	SDL_Rect head_rect,time_rect,score_rect;
 	void render();
 	void update(int player,string p1,int s1,string p2,int s2);
-
 };
+#endif

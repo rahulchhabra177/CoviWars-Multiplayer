@@ -16,6 +16,5 @@ public:
 	SDLNet_SocketSet sockets;
 	bool check_new_players();
 	string getResponse(string res,int num);
-		
 
 };

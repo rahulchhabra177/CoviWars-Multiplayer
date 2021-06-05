@@ -5,8 +5,9 @@ bool maze_debug=true;
 Maze::Maze(int l,SDL_Renderer* localRenderer){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	lvl = l;
-	wTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);
+	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
 	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);
+	dTexture = Texture::LoadT("./../assets/door.png",localRenderer);
 
 	mazeCell.h = 100;
 	mazeCell.w = 100;
@@ -27,6 +28,19 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 	
 	constructMaze();
 	removeDeadEnds();
+	setWinCondition();
+	for (int i=0;i<m_width;i++){
+		mazeData[i][0]=1;
+		mazeData[i][m_height-1]=1;
+	}
+
+	for (int i=0;i<m_height;i++){
+		mazeData[0][i]=1;
+		mazeData[m_width-1][0]=1;
+	}
+
+
+	
 }
 
 void Maze::reinitialize(){
@@ -37,6 +51,8 @@ void Maze::reinitialize(){
 		}
 	}
 	constructMaze();
+	removeDeadEnds();
+	setWinCondition();
 }
 
 void Maze::render(SDL_Renderer* renderer){
@@ -47,18 +63,16 @@ void Maze::render(SDL_Renderer* renderer){
 		for(int j=0;j<m_height;j++){
 			mazeCell.y = (mazeCell.h)*j;
 			mazeEgg.y = (mazeCell.h)*j+(mazeCell.h)/2-mazeEgg.h/2;
-			if(mazeData[i][j]==1){
+			if(mazeData[i][j]==0){
+				SDL_RenderCopy(renderer,sTexture,NULL,&mazeEgg);			
+			}else if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
-			}
-			else if(mazeData[i][j]==0){
-				SDL_RenderCopy(renderer,sTexture,NULL,&mazeEgg);
+			}else if(mazeData[i][j]==3){
+				SDL_RenderCopy(renderer,dTexture,NULL,&mazeCell);
 			}
 		}
 	}
-	
 }
-
-
 
 int Maze::openCell(int i,int j){
 	int n = -1;
@@ -88,10 +102,6 @@ int Maze::openCell(int i,int j){
 	}
 	return n;	
 }
-
-
-
-
 
 void Maze::removeDeadEnds(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:removeDeadEnds\n";
@@ -223,4 +233,16 @@ vector<int> Maze::neighbours(pair<int,int> p){
 		}
 	}
 	return unvisited;
+}
+
+void Maze::setWinCondition(){
+	srand(time(0));
+	while(true){
+		int x = 2*(rand()%((m_width-1)/2))+1;
+		int y = 2*(rand()%((m_height-1)/2))+1;
+		if(x>m_width/2 && y>m_height/2){
+			mazeData[x][y]=3;
+			break;
+		}
+	}
 }

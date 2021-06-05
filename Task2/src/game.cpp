@@ -1,6 +1,5 @@
 #include "game.hpp"
-#include "sounds.h";
-
+#include "popup.h"
 bool music=true;
 
 using namespace std;
@@ -11,9 +10,8 @@ Menu* gameOver=nullptr;
 bool game_debug=true;
 SoundClass* MusicManager=nullptr;
 network* nmanager=nullptr;
-int SCREEN_WIDTH=1200;
-int SCREEN_HEIGHT=700;
 bool client_started=false;
+Popup* pmenu=nullptr;
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,bool isServer){
 	if (game_debug)cout<<"game.cpp::Game\n";
 	int flag=SDL_WINDOW_SHOWN;
@@ -39,8 +37,8 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 			else{
 				cout<<"Renderer initialized Successfully...\n";
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
-				menuback=Texture::LoadT("./../assets/menb.png",renderer);
-				gameback=Texture::LoadT("./../assets/back.png",renderer);
+				menuback=Texture::LoadT("./../assets/core_back.jpg",renderer);
+				gameback=Texture::LoadT("./../assets/redB.jpg",renderer);
 				overback=Texture::LoadT("./../assets/gameover.jpg",renderer);
 				winback=Texture::LoadT("./../assets/start.png",renderer);
 				
@@ -51,18 +49,10 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				}
 
 				nmanager=new network(isServer);
-				// connected=nmanager->check_new_players();
-				// cout<<"connected:"<<(int)connected<<"\n";
-				// if (connected){
-				// 			string s = nmanager->recieve();
-				// 	}
-				// if (isServer){
-					
-				// }
-				// else if (connected){
-
-					// playState = new play();
-				// }
+				pmenu=new Popup(renderer,1,true,s_width,s_height);
+				int l;
+				cout<<"Select starting level: ";cin>>l;
+				
 				cout<<"Initialising Menus\n";
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
 				menuList.push_back(startMenu);
@@ -82,14 +72,16 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				cout<<"Menus Initialised\n";
 				MusicManager = new SoundClass();
 				MusicManager->InitializeAll();
-				MusicManager->PlaySound("gamestart");
 				music = true;
+				MusicManager->PlayMusic("bMusic");
 				cout<<"Initialising PlayState\n";
-				playState = new play("Play",10,gameback,renderer,startMenu);
+				
+				playState = new play("Play",l,gameback,renderer,startMenu);
 				cout<<"PlayState Initialised\n";
+				MusicManager->PlaySound("gamestart");
 				state=1;
-			}
 
+			}
 		}
 	}
 	else{
@@ -104,86 +96,79 @@ void Game::handle_event(){
 	
 	SDL_Event event;
 	SDL_PollEvent(&event);
-	// cout<<event.type<<":"<<SDL_MOUSEMOTION<<":event\n";
 	if (event.type==SDL_MOUSEBUTTONDOWN){
 		int a,b;
 		SDL_GetMouseState(&a,&b);
-		cout<<"\n\nMouse Button Presssed:coordinates:"<<a<<" "<<b<<"\n\n";
-			}
-
-
+		cout<<"\n\nMouse Button Pressed:coordinates:"<<a<<" "<<b<<"\n\n";
+	}
 	if(state==0){
 		playState->handle_event(event,&state,MusicManager,music,nmanager);
 		string x=playState->getPlayerState();
-		// cout<<x<<"\n";
-	}
-	else if(state==-1){
+	}else if(state==-1){
 		gameOver->handle_event(event,&state,MusicManager,music);
+		}
+	else if (state==-3){
+		pmenu->handle_event(event,&state,MusicManager,music);
+		if(state==-2){
+
+			int l=playState->lvl;
+			playState = new play("Play",l+1,gameback,renderer,menuList[0]);
+			state = 0;
+		}
 	}
+
 	else{
 		menuList[state-1]->handle_event(event,&state,MusicManager,music);
 	}
-// 	connected=nmanager->check_new_players();
-// 	if (connected){
-// 		// if (isServer){
-
-// 			// nmanager->send("!"+maze->sendMazedata());
-// 		// }
-// 	// if (!client_started){
-// 	// cout<<"11111\n";	
-// 		string client_response="????????";
-// 		// nmanager->getResponse("?????????",9);
-// 	// 	cout<<client_response<<"\n\n\n\n\n";
-// 	// 	cout<<"2222\n\n";
-// 	// 	if (client_response==""){
-// 	// 		cout<<"unoble to connect\n";
-// 	// 		connected=false;}
-// 	// 	else{
-// 	// 		cout<<"connected\n";
-// 	// 		client_started=true;
-// 	playState->addPlayer(client_response);
-// // }
-// 	// }
-// 	// string packet=nmanager->recieve(9);
-// 	// if (packet!=""){
-// 	// 	if (packet[0]=='?'){
-// 	// 		cout<<"data sent\n\n\n\n";
-// 	// 		// nmanager->send("$"+playState->getPlayerState());
-// 	// 	}
-// 	// } 
-// }
-	
 }
 
 void Game::process(){
 	if (game_debug)cout<<"game.cpp::process\n";
-	if (state==6){running=false;return;}
 	if (state==0){
 		playState->update(&state,true,MusicManager,music,nmanager);
+		// if(state==-2){
+
+		// 	int l=playState->lvl;
+		// 	playState = new play("Play",l+1,gameback,renderer,menuList[0]);
+		// 	state = 0;
+		// }
+
+		//added
 	}
+	if (state==-3){
+		pmenu->update(&state);
+		if(state==-2){
+
+			int l=playState->lvl;
+			playState = new play("Play",l+1,gameback,renderer,menuList[0]);
+			state = 0;
+		}
+
+	}
+	if (state==6){running=false;return;}
 	else if(state==-2){
 		playState = new play("Play",5,gameback,renderer,menuList[0]);
 		state = 0;
-	}
-	
-	else{
+	}else{
 		menuList[state-1]->update();
 	}
 }
 
 void Game::render(){
-	if (game_debug)cout<<"game.cpp::render\n";
+	if (game_debug)cout<<"game.cpp::render:"<<state<<"\n";
 	if (state==6){running=false;return;}
 	SDL_RenderClear(renderer);
 	if(state==0){
 		playState->render();
 	}
+	else if (state==-3){
+		playState->render();
+		pmenu->render(renderer);
+	}
 	else{
 		menuList[state-1]->render();
-	}	
-	// cout<<5;
+	}
 	SDL_RenderPresent(renderer);
-	// cout<<6;
 }
 
 void Game::close(){
