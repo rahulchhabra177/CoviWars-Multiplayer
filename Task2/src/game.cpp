@@ -1,6 +1,5 @@
 #include "game.hpp"
-#include "sounds.h";
-
+#include "popup.h"
 bool music=true;
 
 using namespace std;
@@ -12,13 +11,13 @@ bool game_debug=true;
 SoundClass* MusicManager=nullptr;
 network* nmanager=nullptr;
 bool client_started=false;
-
+Popup* pmenu=nullptr;
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,bool isServer){
 	if (game_debug)cout<<"game.cpp::Game\n";
 	int flag=SDL_WINDOW_SHOWN;
 	running = true;
 	s_width = width_window;
-		s_height = height_window;
+	s_height = height_window;
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
 		cout<<"SDL Initialised succesfully....\n";
 		window=SDL_CreateWindow(title,xcor,ycor,width_window,height_window,flag);
@@ -38,8 +37,8 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 			else{
 				cout<<"Renderer initialized Successfully...\n";
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
-				menuback=Texture::LoadT("./../assets/menb.png",renderer);
-				gameback=Texture::LoadT("./../assets/back.png",renderer);
+				menuback=Texture::LoadT("./../assets/core_back.jpg",renderer);
+				gameback=Texture::LoadT("./../assets/redB.jpg",renderer);
 				overback=Texture::LoadT("./../assets/gameover.jpg",renderer);
 				winback=Texture::LoadT("./../assets/start.png",renderer);
 				
@@ -50,9 +49,7 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				}
 
 				nmanager=new network(isServer);
-				
-				int l;
-				cout<<"Select starting level: ";cin>>l;
+				pmenu=new Popup(renderer,1,true,s_width,s_height);
 				
 				cout<<"Initialising Menus\n";
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
@@ -73,17 +70,18 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				cout<<"Menus Initialised\n";
 				MusicManager = new SoundClass();
 				MusicManager->InitializeAll();
-				MusicManager->PlaySound("gamestart");
 				music = true;
+				MusicManager->PlayMusic("bMusic");
 				cout<<"Initialising PlayState\n";
 				
-				playState = new play("Play",l,gameback,renderer,startMenu);
+				playState = new play("Play",1,gameback,renderer,startMenu);
 				cout<<"PlayState Initialised\n";
+				MusicManager->PlaySound("gamestart");
 				state=1;
+
 			}
 		}
-	}
-	else{
+	}else{
 		cout<<"Initialisation unsuccesful...\n";
 		running=false;
 	}
@@ -105,36 +103,56 @@ void Game::handle_event(){
 		string x=playState->getPlayerState();
 	}else if(state==-1){
 		gameOver->handle_event(event,&state,MusicManager,music);
-	}else{
+	}else if (state==-3){
+		pmenu->handle_event(event,&state,MusicManager,music);
+		if(state==-2){
+			int l=playState->lvl;
+			playState = new play("Play",l+1,gameback,renderer,menuList[0]);
+			state = 0;
+		}
+	}
+	else{
 		menuList[state-1]->handle_event(event,&state,MusicManager,music);
 	}
 }
 
 void Game::process(){
 	if (game_debug)cout<<"game.cpp::process\n";
-	if (state==6){running=false;return;}
 	if (state==0){
 		playState->update(&state,true,MusicManager,music,nmanager);
+	}
+	if (state==-3){
+		pmenu->update(&state);
 		if(state==-2){
 			int l=playState->lvl;
 			playState = new play("Play",l+1,gameback,renderer,menuList[0]);
 			state = 0;
-		}//added
-	}else if(state==-2){
-		playState = new play("Play",5,gameback,renderer,menuList[0]);
-		state = 0;
+		}
+
+	}
+	if (state==6){running=false;return;}
+	else if(state==-2){
+		int a = playState->pacman->x;
+		int b = playState->pacman->y;
+	 	playState->reinitialize(a,b);
+	 	state = 0;
 	}else{
 		menuList[state-1]->update();
 	}
 }
 
 void Game::render(){
-	if (game_debug)cout<<"game.cpp::render\n";
+	if (game_debug)cout<<"game.cpp::render:"<<state<<"\n";
 	if (state==6){running=false;return;}
 	SDL_RenderClear(renderer);
 	if(state==0){
 		playState->render();
-	}else{
+	}
+	else if (state==-3){
+		playState->render();
+		pmenu->render(renderer);
+	}
+	else{
 		menuList[state-1]->render();
 	}
 	SDL_RenderPresent(renderer);

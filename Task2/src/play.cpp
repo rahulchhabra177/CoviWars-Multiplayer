@@ -34,16 +34,19 @@ class play{
 			background = poster;
 			renderer = localRenderer;
 			heading=Texture::LoadText("Scoreboard",renderer);
-			
+			SDL_Texture* waitback=Texture::LoadT("./../assets/please.jpg",renderer);
+				SDL_RenderClear(renderer);
+				SDL_RenderCopy(renderer,waitback,NULL,NULL);
+				SDL_RenderPresent(renderer);
 			for(int i=0;i<lvl;i++){
 				Enemy* enemy=nullptr;
 				enemies.push_back(enemy);
 			}
 			
-			pacman = new Character("./../assets/corona.bmp",renderer,110,110,false);
+			pacman = new Character("./../assets/corona.bmp",renderer,110,110,false,menu->s_width);
 			
 			maze = new Maze(lvl,renderer);
-			score=new ScoreBoard(renderer);
+			score = new ScoreBoard(renderer);
 			
 			for(int i=0;i<maze->m_width;i++){
 				vector<int> v;
@@ -65,7 +68,48 @@ class play{
 					int x = 2*(rand()%(maze->m_width/2))+1;
 					int y = 2*(rand()%(maze->m_height/2))+1;
 					if(maze->mazeData[x][y]==0 && occupied[x][y]==0){
-						enemies[i]=new Enemy(renderer,100*x,100*y);
+						enemies[i]=new Enemy(renderer,100*x,100*y,menu_n->s_width);
+						occupied[x][y]=1;
+						break;
+					}
+				}
+			}
+		}
+		
+		void reinitialize(int a,int b){
+			
+			pacman->x = 110;
+			pacman->y = 110;
+			pacman->score = 0;
+			score->time_string = "00:00";
+			maze->reinitialize();
+			enemyReinitialize(a,b);
+			
+		}
+		
+		void enemyReinitialize(int a,int b){
+			
+			for(int i=0;i<maze->m_width;i++){
+				for(int j=0;j<maze->m_height;j++){
+					if(i==0 || i==maze->m_width-1 || j==0 || j==maze->m_height-1){
+						occupied[i][j]=1;
+					}else{
+						occupied[i][j]=0;
+					}
+				}
+			}
+			
+			occupied[1][1]=1;
+			occupied[a][b]=1;
+			
+			for(int i=0;i<enemies.size();i++){
+				while(true){
+					srand(time(0));
+					int x = 2*(rand()%(maze->m_width/2))+1;
+					int y = 2*(rand()%(maze->m_height/2))+1;
+					if(maze->mazeData[x][y]==0 && occupied[x][y]==0){
+						enemies[i]->x = 100*x;
+						enemies[i]->y = 100*y;
 						occupied[x][y]=1;
 						break;
 					}
@@ -115,7 +159,7 @@ class play{
 			}
 			if(winCondition){
 				if(maze->lvl<5){
-					*state=-2;
+					*state=-3;
 				}else{
 					*state=5;
 				}
@@ -148,7 +192,7 @@ class play{
 		}
 		
 		void addPlayer(string s){
-			pacman2 = new Character("./../assets/corona.bmp",renderer,50,10,false);
+			pacman2 = new Character("./../assets/corona.bmp",renderer,50,10,false,menu_n->s_width);
 		}
 
 	private:
@@ -172,8 +216,8 @@ class play{
 			int h = maze->mazeCell.h;
 			if(pacman->x_speed!=0){
 				if(pacman->x_speed>0){
-					bool check1 = maze->mazeData[x/w+1][y/h]!=1;
-					bool check2 = maze->mazeData[x/w+1][(y+ph-1)/h]!=1;
+					bool check1 = maze->mazeData[(x+pw)/w][y/h]!=1;
+					bool check2 = maze->mazeData[(x+pw)/w][(y+ph-1)/h]!=1;
 					if(check1 && check2){
 						return false;
 					}else{
@@ -181,8 +225,8 @@ class play{
 					}
 				}else{
 					if(x%w==0){
-						bool check1 = maze->mazeData[x/w-1][y/h]!=1;
-						bool check2 = maze->mazeData[x/w-1][(y+ph-1)/h]!=1;
+						bool check1 = maze->mazeData[(x-1)/w][y/h]!=1;
+						bool check2 = maze->mazeData[(x-1)/w][(y+ph-1)/h]!=1;
 						if(check1 && check2){
 							return false;
 						}else{
@@ -194,8 +238,8 @@ class play{
 				}
 			}else{
 				if(pacman->y_speed>0){
-					bool check1 = maze->mazeData[x/w][y/h+1]!=1;
-					bool check2 = maze->mazeData[(x+pw-1)/w][y/h+1]!=1;
+					bool check1 = maze->mazeData[x/w][(y+ph)/h]!=1;
+					bool check2 = maze->mazeData[(x+pw-1)/w][(y+ph)/h]!=1;
 					if(check1 && check2){
 						return false;
 					}else{
@@ -203,8 +247,8 @@ class play{
 					}
 				}else{
 					if(y%h==0){
-						bool check1 = maze->mazeData[x/w][y/h-1]!=1;
-						bool check2 = maze->mazeData[(x+pw-1)/w][y/h-1]!=1;
+						bool check1 = maze->mazeData[x/w][(y-1)/h]!=1;
+						bool check2 = maze->mazeData[(x+pw-1)/w][(y-1)/h]!=1;
 						if(check1 && check2){
 							return false;
 						}else{

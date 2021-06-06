@@ -5,7 +5,7 @@ network::network(bool isserver){
 	SDLNet_Init();
 	IPaddress ip;	
 	isServer=isserver;
-	sockets=SDLNet_AllocSocketSet(1);
+	sockets=SDLNet_AllocSocketSet(1); //2-player game
 	if (isServer){
 		SDLNet_ResolveHost(&ip,NULL,1504);
 		server = SDLNet_TCP_Open(&ip);

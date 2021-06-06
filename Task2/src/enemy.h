@@ -14,10 +14,10 @@ public:
 	int x_speed = 10;
 	int y_speed = 0;
 	int count = 0,cur_texture=0;
-	int rot_speed=50;
+	int rot_speed=10;
 	string name="player";
 	SDL_Rect dstr,src;
-	Enemy(SDL_Renderer* localRenderer,int init_x,int init_y);
+	Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width);
 	void updateEnemy();
 	void render(SDL_Renderer* renderer);
 	SDL_Texture* texture[8]={NULL};

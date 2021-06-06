@@ -33,13 +33,15 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 
 void Maze::reinitialize(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:reinitialize\n";
+	
 	for(int i=0;i<m_width;i++){
 		for(int j=0;j<m_height;j++){
-			mazeData[i][j] = 1;
+			if(mazeData[i][j]==2){
+				mazeData[i][j]=0;
+			}
 		}
 	}
-	constructMaze();
-	removeDeadEnds();
+	
 	setWinCondition();
 }
 
@@ -100,7 +102,7 @@ void Maze::removeDeadEnds(){
 				if(n>=0){
 					switch(n){
 						case 0:  {
-							if(i==m_width-1){
+							if(i==m_width-2){
 								if(j==1){
 									mazeData[i][j+1]=0;
 								}else{
@@ -133,7 +135,7 @@ void Maze::removeDeadEnds(){
 							}
 							break;
 						}case 3: {
-							if(j==m_height-1){
+							if(j==m_height-2){
 								if(i==1){
 									mazeData[i+1][j]=0;
 								}else{

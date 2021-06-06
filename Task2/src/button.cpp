@@ -2,44 +2,76 @@
 
 using namespace std;
 bool button_debug=true;
-
 Button::Button(char* name, SDL_Renderer* renderer,int width,int height){
-	if(button_debug)cout<<"button.cpp::Button\n";
-	
+	if (button_debug)cout<<"button.cpp::Button\n";
 	TTF_Init();
 	label = name;
 	s_height=height;
 	s_width=width;
-	
-	TTF_Font * font;
+	TTF_Font * font;//=new TTFont();
 	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
-	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{226,88,34,255});
-	colors.push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
-	textSurface=TTF_RenderText_Solid(font,label,{255,255,255,255});
-	colors.push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	// SDL_Color color={0,255,0,255};
+	// SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
+	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{149,215,246,255});
+	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	textSurface=TTF_RenderText_Solid(font,label,{14,215,246,255});
+	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	
 
 	if (textSurface==NULL){
 		cout<<"Error:Couldn't initialize button:"<<label<<"\n";		//To manage exit condition
 	}
 	else{
-		texture=colors[cur_color];
+	texture=colors[(int)isSelected][cur_color];
 		SDL_FreeSurface(textSurface);
 	}
 } 
-void Button::set_cor(int x,int y,int w,int h){
+
+Button::Button(char* name,char* name2, SDL_Renderer* renderer,int width,int height){
+	if (button_debug)cout<<"button.cpp::Button\n";
+	TTF_Init();
+	label = name;
+	s_height=height;
+	s_width=width;
+	TTF_Font * font;//=new TTFont();
+	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
+	// SDL_Color color={0,255,0,255};
+	// SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
+	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{149,215,246,255});
+	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	textSurface=TTF_RenderText_Solid(font,label,{255,255,255,255});
+	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	
+	textSurface=TTF_RenderText_Solid(font,name2,{14,25,204,255});
+	colors[1].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	textSurface=TTF_RenderText_Solid(font,name2,{255,255,255,255});
+	colors[1].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
+	
+	if (textSurface==NULL){
+		cout<<"Error:Couldn't initialize button:"<<label<<"\n";		//To manage exit condition
+	}
+	else{
+	texture=colors[(int)isSelected][cur_color];
+		SDL_FreeSurface(textSurface);
+	}
+} 
+
+
+
+void Button::set_cor(int a,int b,int q,int w){
 	if (button_debug)cout<<"button.cpp::set_cor\n";
-	dest.x=x;
-	dest.y=y;
-	dest.w=w;
-	dest.h=h;
+	dest.x=a;
+	dest.y=b;
+	dest.w=q;
+	dest.h=w;
 }
 
-void Button::set_rect(int x,int y,int w,int h){
+void Button::set_rect(int a,int b,int q,int w){
 	if (button_debug)cout<<"button.cpp::set_rect\n";
-	dest.x=x;
-	dest.y=y;
-	dest.w=w-x;
-	dest.h=h-y;
+	dest.x=a;
+	dest.y=b;
+	dest.w=q-a;
+	dest.h=w-b;
 }
 
 bool Button::isInside(int a,int b){
@@ -49,38 +81,49 @@ bool Button::isInside(int a,int b){
 }
 
 void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
-	if (e.type==SDL_MOUSEMOTION){
+	if (button_debug)cout<<"button.cpp::handle_event:"<<label<<"\n";
+		if (e.type==SDL_MOUSEMOTION){
 		int x_c = e.motion.x;
-        	int y_c = e.motion.y;
-		if (cur_color!=1){
+        int y_c = e.motion.y;
+        // cout<<(int)isInside(x_c,y_c)<<":"<<cur_color<<" is inside\n";
+		if (/*isInside(x_c,y_c) && */cur_color!=1){
 			cur_color=1;
-			texture=colors[1];
+			texture=colors[(int)isSelected][1];
 			dest.x-=10;
 			dest.y-=10;
 			dest.h+=20;
 			dest.w+=20;
-		}		
-	}else if(strcmp(label,"Exit")==0){
+		}
+		
+	}
+	else{
+	if(strcmp(label,"Exit")==0){
 		if (music_on){
 			m->PlaySound("button");
 		}	
 		*state=6;	
-	}else if(strcmp(label,"Start")==0){
+	}else if(strcmp(label,"Single Player")==0){
 		if (music_on){
 			m->PlaySound("button");
 			m->PlaySound("start");
 		}
 		*state=0;	
-	}else if(strcmp(label,"Sounds")==0){
+	}else if(strcmp(label,"MultiPlayer")==0){
 		if (music_on){
 			m->PlaySound("button");
-			m->music_on=false;
+			m->PlaySound("start");
+		}
+		*state=0;	
+	}else if(strcmp(label,"Next Level")==0){
+		if (music_on){
+			m->PlaySound("button");
+			*state=-2;
 		}
 	}else if(strcmp(label,"Options")==0){
 		if(music_on){
 			m->PlaySound("button");
 		}
-		// *state=3;
+		*state=3;
 	}else if(strcmp(label,"Pause")==0){
 		if(music_on){
 			m->PlaySound("button");
@@ -96,7 +139,50 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 			m->PlaySound("button");
 		}
 		*state=-2;
+	}else if(strcmp(label,"Back")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
+		*state=1;
+	}else if(strcmp(label,"Music:  ON")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
+		label="Music:  OFF";
+		texture=colors[1][1];
+		isSelected=true;
+		m->changeMusicState(false);
+	
+	}else if(strcmp(label,"Music:  OFF")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
+		label="Music:  ON";
+		texture=colors[0][1];
+		isSelected=false;
+		m->changeMusicState(true);
+		
 	}
+	else if(strcmp(label,"Sounds:  ON")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
+		label="Sounds:  OFF";
+		texture=colors[1][1];
+		isSelected=true;
+		m->changeSoundState(false);
+	
+	}else if(strcmp(label,"Sounds:  OFF")==0){
+		if(music_on){
+			m->PlaySound("button");
+		}
+		label="Sounds:  ON";
+		texture=colors[0][1];
+		isSelected=false;
+		m->changeSoundState(true);
+		
+	}
+}
 }
 
 void Button::render(SDL_Renderer *renderer){
@@ -105,12 +191,14 @@ void Button::render(SDL_Renderer *renderer){
 }
 
 void Button::set_original(){
+	// cout<<"set_original\n\n";
 	if (cur_color!=0){
 		dest.x+=10;
 		dest.y+=10;
 		dest.h-=20;
 		dest.w-=20;
 	}
+
 	cur_color=0;
-	texture=colors[cur_color];
-}
+	texture=colors[isSelected][cur_color];
+			}

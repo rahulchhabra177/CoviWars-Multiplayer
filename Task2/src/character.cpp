@@ -4,7 +4,7 @@
 using namespace std;
 bool character_debug=true;
 
-Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign){
+Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width){
 	if (character_debug)cout<<"character.cpp::Character\n";
 	for (int i=0;i<4;i++){
 		for (int j=0;j<8;j++){

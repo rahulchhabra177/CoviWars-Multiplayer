@@ -3,7 +3,7 @@
 using namespace std;
 bool enemy_debug=true;
 
-Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y){
+Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width){
 	if (enemy_debug)cout<<"Enemy.cpp::Enemy\n";
 
 	for (int i=0;i<8;i++){
