@@ -35,20 +35,35 @@ void Character::updatePlayer(network*nmanager,bool isForeigner){
 		dstr.x=x;
 		dstr.y=y;
 	}
+
+	else{
+		//getResponse will always take a string of length 9
+		// string response=nmanager->getResponse("#position",8);
+		//recieved string="#position"
+		//position-> .... x ....y .dir
+		// if (response=="" || response[0]!='$'){return;}
+		// set_x_y(stoi(response.substr(0,4)),stoi(response.substr(4,4)));
+		// set_speed(stoi(response.substr(8,1)));
+
+	}
+
+
+
 }
 
 void Character::changeSpeed(SDL_Event e,network*nmanager){
 	if (character_debug)cout<<"character.cpp::changeSpeed\n";
+	
 	if(e.type==SDL_KEYDOWN){
 		switch(e.key.keysym.sym){
-			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;if (nmanager->connected){nmanager->send("$1");}break;}
-			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;if (nmanager->connected){nmanager->send("$2");}break;}
-			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;if (nmanager->connected){nmanager->send("$3");}break;}
-			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;if (nmanager->connected){nmanager->send("$4");}break;}
-			default:{if (nmanager->connected){nmanager->send("$0");}break;}
+			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;if (nmanager->connected && false){nmanager->send("$1");}break;}
+			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;if (nmanager->connected && false){nmanager->send("$2");}break;}
+			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;if (nmanager->connected && false){nmanager->send("$3");}break;}
+			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;if (nmanager->connected && false){nmanager->send("$4");}break;}
+			default:{if (nmanager->connected && false){nmanager->send("$0");}break;}
 		}
 	}else{
-		if (nmanager->connected){nmanager->send("$0");}
+		if (nmanager->connected && false){nmanager->send("$0");}
 	}
 }
 
@@ -121,5 +136,10 @@ string Character::getPlayerState(){
 	while (y1.size()<4){
 		y1="0"+y1;
 	}
+
+	// string dir;
+	// if ()
+
+
 	return x1+y1;
 }

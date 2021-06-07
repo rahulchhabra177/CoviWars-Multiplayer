@@ -9,7 +9,14 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	dst.w=1850;
 	dst.h=1050;
 	timed=isTimed;
-	background=Texture::LoadT("./../assets/wall.png",renderer);
+	background=Texture::LoadT("./../assets/pback.jpg",renderer);
+	SDL_Surface* sback=SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0xff);
+	
+
+
+	back=SDL_CreateTextureFromSurface(renderer,sback);
+	SDL_SetTextureAlphaMod(back, 150);
+
 	startTime=SDL_GetTicks();
 	if (type==1){
 
@@ -19,21 +26,91 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 				buttons.push_back(startmulti_button);
 				
 				Button* options_button=new Button("Options",renderer,width,height);
-				options_button->set_cor(1250,1200,500,150);
+				options_button->set_cor(1400,1200,500,150);
 				buttons.push_back(options_button);
 				
 				Button* exit_button=new Button("Exit",renderer,width,height);
-				exit_button->set_cor(1250,1400,500,150);
+				exit_button->set_cor(1400,1400,500,150);
 				buttons.push_back(exit_button);
 
 				Button* logo=new Button("CONGRATULATIONS",renderer,width,height);
-				logo->set_cor(1200,450,1000,400);
+				logo->set_cor(1320,450,1000,400);
 				buttons.push_back(logo);
 
 	}
 
+	else if (type==2){
 
 
+				timed=true;
+				Button* startmulti_button=new Button("Play Again",renderer,width,height);
+				startmulti_button->set_cor(1220,1000,540,150);
+				buttons.push_back(startmulti_button);
+				
+				Button* options_button=new Button("Options",renderer,width,height);
+				options_button->set_cor(1400,1200,500,150);
+				buttons.push_back(options_button);
+				
+				Button* exit_button=new Button("Exit",renderer,width,height);
+				exit_button->set_cor(1400,1400,500,150);
+				buttons.push_back(exit_button);
+
+				Button* logo=new Button("YOU LOSE!",renderer,width,height);
+				logo->set_cor(1320,450,1000,400);
+				buttons.push_back(logo);
+
+
+
+
+	}
+
+	else if (type==3){
+
+
+
+
+		Button* start_button=new Button("Music:  ON","Music:  OFF",renderer,width,height);
+				start_button->set_cor(1220,1000,540,150);
+				buttons.push_back(start_button);
+				
+				Button* options_button=new Button("Sounds:  ON","Sounds:  OFF",renderer,width,height);
+				options_button->set_cor(1400,1200,500,150);
+				buttons.push_back(options_button);
+				
+				Button* option_button=new Button("Back",renderer,width,height);
+				option_button->set_cor(1400,1400,500,150);
+				buttons.push_back(option_button);
+
+
+				Button* logo=new Button("Options",renderer,width,height);
+				logo->set_cor(1320,450,1000,400);
+				buttons.push_back(logo);
+	}
+
+	else if (type==4){
+
+
+				timed=true;
+				Button* startmulti_button=new Button("Resume",renderer,width,height);
+				startmulti_button->set_cor(1220,1000,540,150);
+				buttons.push_back(startmulti_button);
+				
+				Button* options_button=new Button("Options",renderer,width,height);
+				options_button->set_cor(1400,1200,500,150);
+				buttons.push_back(options_button);
+				
+				Button* exit_button=new Button("Exit",renderer,width,height);
+				exit_button->set_cor(1400,1400,500,150);
+				buttons.push_back(exit_button);
+
+				Button* logo=new Button("YOU LOSE!",renderer,width,height);
+				logo->set_cor(1320,450,1000,400);
+				buttons.push_back(logo);
+
+
+
+
+	}
 
 
 
@@ -63,13 +140,16 @@ int Popup::locatePointer(int a,int b){
 		
 
 void Popup::render(SDL_Renderer* renderer){
+	// SDL_RenderCopy(renderer,back,NULL,NULL);
+	// SDL_SetRenderDrawColor(renderer,25,25,25,25);
+	// SDL_RenderFillRect(renderer, NULL);
 	SDL_RenderCopy(renderer,background,NULL,&dst);
 	for(int i=0;i<buttons.size();i++){
 				buttons[i]->render(renderer);
 			}
 }
 
-void Popup::handle_event(SDL_Event e,int * state,SoundClass* m,bool music_on){
+void Popup::handle_event(SDL_Event e,int * state,SoundClass* m,int* prevstate){
 		if(e.type==SDL_QUIT){
 				*state=6;
 			}
@@ -77,8 +157,9 @@ void Popup::handle_event(SDL_Event e,int * state,SoundClass* m,bool music_on){
 				int a,b;
 				SDL_GetMouseState(&a,&b);
 				int i = locatePointer(a,b);
+
 				if(i>=0){
-					buttons[i]->handle_event(state,m,music_on,e);
+					buttons[i]->handle_event(state,m,prevstate,e);
 				}else{
 					for(int i=0;i<buttons.size();i++){buttons[i]->set_original();}
 				}

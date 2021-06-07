@@ -20,7 +20,7 @@ class Button{
 		int s_width,s_height;
 		std::vector<SDL_Texture*> colors[2];
 		int cur_color=0;
-		void handle_event(int*state,SoundClass* m,bool music_on,SDL_Event e);
+		void handle_event(int*state,SoundClass* m,int* prevstate,SDL_Event e);
 		bool isInside(int a,int b);
 		void render(SDL_Renderer *renderer);
 		void set_cor(int x,int y,int a ,int b);

@@ -18,11 +18,12 @@ ScoreBoard::ScoreBoard(SDL_Renderer* render){
 	score_rect.x=2887;
 	score_rect.y=596;
 	score_rect.h=150;
-	score_rect.w=308;
+	score_rect.w=378;
 }
 
 void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 	if (score_debug)cout<<"scoreboard.cpp::update\n";
+	if (p2!=""){
 	counter++;
 	if (counter==100){
 		counter=0;
@@ -37,6 +38,12 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 		string player1=p1+":"+to_string(s1);
 		char * sc=&player1[0];
 		pl1=Texture::LoadText(sc,renderer);
+		if (p2!=""){
+			string player2=p2+":"+to_string(s2);
+			char * sc2=&player2[0];
+			pl2=Texture::LoadText(sc2,renderer);
+		}
+	}
 	}
 }
 void ScoreBoard::render(){
@@ -45,7 +52,15 @@ void ScoreBoard::render(){
 	SDL_RenderCopy(renderer,timing,NULL,&time_rect);
 	if (pl1!=nullptr ){
 		SDL_RenderCopy(renderer,pl1,NULL,&score_rect);
-	}else{
+	}
+	if (pl2!=nullptr ){
+		score_rect.y+=200;
+		SDL_RenderCopy(renderer,pl2,NULL,&score_rect);
+		score_rect.y-=200;
+	}
+
+
+	else{
 		cout<<"Scoreboard issue found\n";
 	}
 }

@@ -47,8 +47,8 @@ void SoundClass::InitializeAll(){
 	LoadSound("./../Sounds/start.wav","start");
 	LoadSound("./../Sounds/pauseState.wav","pause");
 	LoadSound("./../Sounds/collision.wav","collision");
-	LoadSound("./../Sounds/windowstart.wav","gamestart");
-	LoadSound("./../Sounds/button.wav","button");
+	LoadSound("./../Sounds/menuStart.wav","gamestart");
+	LoadSound("./../Sounds/bPress.wav","button");
 	LoadMusic("./../Sounds/bMusic.mp3","bMusic");
 }
 

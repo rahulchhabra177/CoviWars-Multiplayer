@@ -130,10 +130,10 @@ class Menu{
 				if (cur_player!=""){
 				playerName=Texture::LoadText(&cur_player[0],renderer);
 				SDL_RenderCopy(renderer,playerName,NULL,&input_box);
-				input_box.w=40*cur_player.size();
+				input_box.w=50*cur_player.size();
 				}else{
 					playerName=Texture::LoadText("Enter Your Name",renderer);
-					input_box.w=600;
+					input_box.w=750;
 					SDL_RenderCopy(renderer,playerName,NULL,&input_box);
 				}
 			}
@@ -148,10 +148,10 @@ class Menu{
 			
 		}
 		
-		void handle_event(SDL_Event e,int* state,SoundClass *m,bool music_on){
+		void handle_event(SDL_Event e,int* state,SoundClass *m,int * prevstate){
 			if (menu_debug)cout<<"menu.cpp::handle_event\n";
 			if(e.type==SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE ){
-				*state=6;
+				*state=6;cout<<"SDL_QUIT\n";
 			}else if (e.type==SDL_TEXTINPUT){
 				changed=true;
 				cur_player+=e.text.text;
@@ -163,7 +163,7 @@ class Menu{
 				SDL_GetMouseState(&a,&b);
 				int i = locatePointer(a,b);
 				if(i>=0){
-					buttons[i]->handle_event(state,m,music_on,e);
+					buttons[i]->handle_event(state,m,prevstate,e);
 				}else{
 					for(int i=0;i<buttons.size();i++){buttons[i]->set_original();}
 				}

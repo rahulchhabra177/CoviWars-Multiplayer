@@ -80,7 +80,7 @@ bool Button::isInside(int a,int b){
 	return false;
 }
 
-void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
+void Button::handle_event(int* state,SoundClass *m,int* prevstate,SDL_Event e){
 	if (button_debug)cout<<"button.cpp::handle_event:"<<label<<"\n";
 		if (e.type==SDL_MOUSEMOTION){
 		int x_c = e.motion.x;
@@ -98,65 +98,57 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 	}
 	else{
 	if(strcmp(label,"Exit")==0){
-		if (music_on){
+		
 			m->PlaySound("button");
-		}	
+		
 		*state=6;	
 	}else if(strcmp(label,"Single Player")==0){
-		if (music_on){
+			
 			m->PlaySound("button");
 			m->PlaySound("start");
-		}
+	
 		*state=0;	
 	}else if(strcmp(label,"MultiPlayer")==0){
-		if (music_on){
 			m->PlaySound("button");
 			m->PlaySound("start");
-		}
 		*state=0;	
 	}else if(strcmp(label,"Next Level")==0){
-		if (music_on){
 			m->PlaySound("button");
 			*state=-2;
-		}
 	}else if(strcmp(label,"Options")==0){
-		if(music_on){
+			*prevstate=*state;
+
 			m->PlaySound("button");
-		}
+
 		*state=3;
 	}else if(strcmp(label,"Pause")==0){
-		if(music_on){
 			m->PlaySound("button");
-		}
+	
 		*state=2;
 	}else if(strcmp(label,"Resume")==0){
-		if(music_on){
+		
 			m->PlaySound("button");
-		}
+		
 		*state=0;
 	}else if(strcmp(label,"Play Again")==0){
-		if(music_on){
+		
 			m->PlaySound("button");
-		}
+		
 		*state=-2;
 	}else if(strcmp(label,"Back")==0){
-		if(music_on){
 			m->PlaySound("button");
-		}
-		*state=1;
+		*state=*prevstate;
 	}else if(strcmp(label,"Music:  ON")==0){
-		if(music_on){
+		
 			m->PlaySound("button");
-		}
+		
 		label="Music:  OFF";
 		texture=colors[1][1];
 		isSelected=true;
 		m->changeMusicState(false);
 	
 	}else if(strcmp(label,"Music:  OFF")==0){
-		if(music_on){
 			m->PlaySound("button");
-		}
 		label="Music:  ON";
 		texture=colors[0][1];
 		isSelected=false;
@@ -164,18 +156,14 @@ void Button::handle_event(int* state,SoundClass *m,bool music_on,SDL_Event e){
 		
 	}
 	else if(strcmp(label,"Sounds:  ON")==0){
-		if(music_on){
 			m->PlaySound("button");
-		}
 		label="Sounds:  OFF";
 		texture=colors[1][1];
 		isSelected=true;
 		m->changeSoundState(false);
 	
 	}else if(strcmp(label,"Sounds:  OFF")==0){
-		if(music_on){
 			m->PlaySound("button");
-		}
 		label="Sounds:  ON";
 		texture=colors[0][1];
 		isSelected=false;

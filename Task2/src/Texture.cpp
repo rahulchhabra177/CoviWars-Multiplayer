@@ -1,6 +1,6 @@
 #include "Texture.h";
 using namespace std;
-bool texture_debug=false;
+bool texture_debug=true;
 
 SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 if (texture_debug)cout<<"Texture.cpp::LoadT\n";

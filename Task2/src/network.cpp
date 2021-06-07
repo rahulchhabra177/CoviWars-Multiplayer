@@ -7,10 +7,10 @@ network::network(bool isserver){
 	isServer=isserver;
 	sockets=SDLNet_AllocSocketSet(1);
 	if (isServer){
-		SDLNet_ResolveHost(&ip,NULL,1504);
+		SDLNet_ResolveHost(&ip,NULL,1508);
 		server = SDLNet_TCP_Open(&ip);
 	}else{
-		SDLNet_ResolveHost(&ip,"127.0.0.1",1504);
+		SDLNet_ResolveHost(&ip,"127.0.0.1",1508);
 		server=SDLNet_TCP_Open(&ip);
 		connected=true;
 		SDLNet_TCP_AddSocket(sockets,server);	
@@ -18,13 +18,19 @@ network::network(bool isserver){
 }
 
 bool network::check_new_players(){
+	cout<<"Checking...\n";
 	if (isServer && !connected){
+		if (server==NULL){cout<<"No Server\n";exit(1);}
 		TCPsocket temp_soc=SDLNet_TCP_Accept(server);
+		cout<<1;
 		if (temp_soc){
+			cout<<2;
 			client=temp_soc;
 			if (!connected){
 				connected=true;
+				cout<<3;
 				SDLNet_TCP_AddSocket(sockets,client);
+				cout<<4;
 				
 				cout<<"New player joined:"<<"\n";
 			}else{ 
@@ -34,15 +40,18 @@ bool network::check_new_players(){
 			}	
 		}
     	}
+    	cout<<"Checked:)\n";
 	return connected;
 }
 
 void network::send(string s){
-	cout<<"send\n";
+	cout<<"sending..."<<s<<"\n";
 	const char* tmp=&s[0];
 	int size=0;
 	int len=strlen(tmp);
+	cout<<len<<":lrm\n";
 	if (isServer){
+		cout<<"isServer\n";
 		if (client==NULL){return;}
 		while (size<len){
 			size+=SDLNet_TCP_Send(client,tmp+size,len-size);
@@ -53,6 +62,7 @@ void network::send(string s){
 			size+=SDLNet_TCP_Send(server,tmp+size,len-size);
 		}
 	}
+	cout<<"Packet Sent\n";
 }
 
 
@@ -64,7 +74,9 @@ string network::recieve(int num){
 			char temp[num];
 			string result;
 			int offset_prv=-1;
-			while (offset<num){
+			int test=0;
+			while (offset<num and test<100){
+				test++;
 				cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 				offset_prv=offset;
 				offset+=SDLNet_TCP_Recv(client,temp,num-result.size());	
@@ -83,7 +95,9 @@ string network::recieve(int num){
 			char temp[num];
 			string result;
 			int offset_prv=-1;
-			while (offset<num){
+			int test=0;
+			while (offset<num and test<100){
+				test++;
 				cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 				offset_prv=offset;
 				offset+=SDLNet_TCP_Recv(server,temp,num-result.size());
@@ -112,6 +126,7 @@ string network::getResponse(string msg,int num){
 	string temp="";
 	while (debug<5 && temp==""){
 		temp=recieve(num);
+		//receive num
 		debug++;
 		cout<<"debug\n";
 	}

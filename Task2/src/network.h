@@ -13,6 +13,7 @@ public:
 	TCPsocket server,client;
 	char temp[30];
 	bool connected=false;
+	bool isPlaying=false,isStarted=false;
 	SDLNet_SocketSet sockets;
 	bool check_new_players();
 	string getResponse(string res,int num);

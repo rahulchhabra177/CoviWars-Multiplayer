@@ -2,7 +2,7 @@
 #include <time.h>
 using namespace std;
 bool maze_debug=true;
-Maze::Maze(int l,SDL_Renderer* localRenderer){
+Maze::Maze(int l,SDL_Renderer* localRenderer,string mzData){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	lvl = l;
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
@@ -17,31 +17,57 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 	mazeEgg.w = 20;
 	mazeEgg.x = 0;
 	mazeEgg.y = 0;
+	if (mzData==""){
+			for(int i=0;i<m_width;i++){
+				vector<int> v;
+				for(int j=0;j<m_height;j++){
+					v.push_back(1);
+				}
+				mazeData.push_back(v);
+			}
+			
+			constructMaze();
+			removeDeadEnds();
+			setWinCondition();
+	}	
+	else{
 
-	for(int i=0;i<m_width;i++){
-		vector<int> v;
-		for(int j=0;j<m_height;j++){
-			v.push_back(1);
+		int k=0;
+		if (mzData.size()<568){
+			cout<<mzData<<"\n";
+			cout<<"Data Insufficient\n";
+			exit(1);
 		}
-		mazeData.push_back(v);
-	}
-	
-	constructMaze();
-	removeDeadEnds();
-	setWinCondition();
-	for (int i=0;i<m_width;i++){
-		mazeData[i][0]=1;
-		mazeData[i][m_height-1]=1;
-	}
+		cout<<"mazeData->size:"<<mzData.size()<<"\n";
 
-	for (int i=0;i<m_height;i++){
-		mazeData[0][i]=1;
-		mazeData[m_width-1][0]=1;
-	}
+			for(int i=0;i<m_width;i++){
+				vector<int> v;
+				for(int j=0;j<m_height;j++){
+					// cout<<mzData[k];
+					v.push_back(stoi(mzData.substr(k+1,1)));
+					k++;
+				}
+				mazeData.push_back(v);
+			}
+			
 
+	}
 
 	
 }
+
+string Maze::getMazeState(){
+	cout<<"gettingMazeState\n";
+	string s="";
+	for (int i=0;i<m_width;i++){
+		for(int j=0;j<m_height;j++){
+			s+=to_string(mazeData[i][j]);
+		}
+	}
+	return s;
+}
+
+
 
 void Maze::reinitialize(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:reinitialize\n";
@@ -103,6 +129,10 @@ int Maze::openCell(int i,int j){
 	return n;	
 }
 
+
+
+
+
 void Maze::removeDeadEnds(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:removeDeadEnds\n";
 	for(int i=1;i<m_width-1;i++){
@@ -112,7 +142,7 @@ void Maze::removeDeadEnds(){
 				if(n>=0){
 					switch(n){
 						case 0:  {
-							if(i==m_width-1){
+							if(i==m_width-2){
 								if(j==1){
 									mazeData[i][j+1]=0;
 								}else{
@@ -145,7 +175,7 @@ void Maze::removeDeadEnds(){
 							}
 							break;
 						}case 3: {
-							if(j==m_height-1){
+							if(j==m_height-2){
 								if(i==1){
 									mazeData[i+1][j]=0;
 								}else{
