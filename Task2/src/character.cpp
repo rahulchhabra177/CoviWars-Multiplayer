@@ -41,14 +41,13 @@ void Character::changeSpeed(SDL_Event e,network*nmanager){
 	if (character_debug)cout<<"character.cpp::changeSpeed\n";
 	if(e.type==SDL_KEYDOWN){
 		switch(e.key.keysym.sym){
-			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;if (nmanager->connected){nmanager->send("$1");}break;}
-			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;if (nmanager->connected){nmanager->send("$2");}break;}
-			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;if (nmanager->connected){nmanager->send("$3");}break;}
-			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;if (nmanager->connected){nmanager->send("$4");}break;}
-			default:{if (nmanager->connected){nmanager->send("$0");}break;}
+			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;break;}
+			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;break;}
+			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;break;}
+			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;break;}
 		}
 	}else{
-		if (nmanager->connected){nmanager->send("$0");}
+		if (nmanager->connected && false){nmanager->send("$0");}
 	}
 }
 

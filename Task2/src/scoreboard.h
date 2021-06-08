@@ -16,9 +16,10 @@ public:
 	int time_min_u=0;
 	int time_min_t=0;
 	int counter=0;
+	bool multiplayer=false;
 	char * time_string="00:00";
-	ScoreBoard(SDL_Renderer* render);
-	SDL_Texture* heading,*timing,*pl1,*pl2;
+	ScoreBoard(SDL_Renderer* render,bool multi);
+	SDL_Texture* heading,*timing,*pl1=nullptr,*pl2=nullptr;
 	SDL_Rect head_rect,time_rect,score_rect;
 	void render();
 	void update(int player,string p1,int s1,string p2,int s2);

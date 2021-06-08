@@ -24,7 +24,6 @@ if (texture_debug)cout<<"Texture.cpp::LoadT\n";
 	}
 	// cout<<"l\n";
 	return returng;
-
 }
 
 

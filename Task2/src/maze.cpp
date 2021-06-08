@@ -2,12 +2,14 @@
 #include <time.h>
 using namespace std;
 bool maze_debug=true;
-Maze::Maze(int l,SDL_Renderer* localRenderer){
+
+Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	lvl = l;
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
 	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);
 	dTexture = Texture::LoadT("./../assets/door.png",localRenderer);
+	multiplayer = multi;
 
 	mazeCell.h = 100;
 	mazeCell.w = 100;
@@ -18,17 +20,51 @@ Maze::Maze(int l,SDL_Renderer* localRenderer){
 	mazeEgg.x = 0;
 	mazeEgg.y = 0;
 
-	for(int i=0;i<m_width;i++){
-		vector<int> v;
-		for(int j=0;j<m_height;j++){
-			v.push_back(1);
+	if(mzData=="" || !multiplayer){
+		for(int i=0;i<m_width;i++){
+			vector<int> v;
+			for(int j=0;j<m_height;j++){
+				v.push_back(1);
+			}
+			mazeData.push_back(v);
 		}
-		mazeData.push_back(v);
+		
+		constructMaze();
+		removeDeadEnds();
+
+		if(!multiplayer){
+			setWinCondition();
+		}
+	}else{
+		int k=0;
+		if (mzData.size()<568){
+			cout<<mzData<<"\n";
+			cout<<"Data Insufficient\n";
+			exit(1);
+		}
+		cout<<"mazeData->size:"<<mzData.size()<<"\n";
+
+		for(int i=0;i<m_width;i++){
+			vector<int> v;
+			for(int j=0;j<m_height;j++){
+				// cout<<mzData[k];
+				v.push_back(stoi(mzData.substr(k+1,1)));
+				k++;
+			}
+			mazeData.push_back(v);
+		}
 	}
-	
-	constructMaze();
-	removeDeadEnds();
-	setWinCondition();
+}
+
+string Maze::getMazeState(){
+	cout<<"gettingMazeState\n";
+	string s="";
+	for (int i=0;i<m_width;i++){
+		for(int j=0;j<m_height;j++){
+			s+=to_string(mazeData[i][j]);
+		}
+	}
+	return s;
 }
 
 void Maze::reinitialize(){

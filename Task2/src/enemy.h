@@ -10,8 +10,8 @@ class Enemy{
 
 public:
 	int x,y,height=100,width=100;
-	int speed = 10;
-	int x_speed = 10;
+	int speed = 1;
+	int x_speed = 1;
 	int y_speed = 0;
 	int count = 0,cur_texture=0;
 	int rot_speed=10;
@@ -21,5 +21,7 @@ public:
 	void updateEnemy();
 	void render(SDL_Renderer* renderer);
 	SDL_Texture* texture[8]={NULL};
+	string getEnemyState();
+	void set_x_y(int ax,int ay);
 };
 #endif

@@ -19,9 +19,9 @@ class Game{
 		bool isRunning();
 		bool running;
 		SDL_Renderer *renderer;
-		int state;
+		int state,prevstate;
 		int player_id;
-		bool connected=false;
+		bool isServer=false;
 		int s_width,s_height;
 		
 	private:

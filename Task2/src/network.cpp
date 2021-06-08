@@ -25,7 +25,6 @@ bool network::check_new_players(){
 			if (!connected){
 				connected=true;
 				SDLNet_TCP_AddSocket(sockets,client);
-				
 				cout<<"New player joined:"<<"\n";
 			}else{ 
 				cout<<"Entry denied:More players tried to connect\n";
@@ -33,7 +32,7 @@ bool network::check_new_players(){
 				SDLNet_TCP_Send(client,msg,strlen(msg));
 			}	
 		}
-    	}
+    }
 	return connected;
 }
 
@@ -55,16 +54,17 @@ void network::send(string s){
 	}
 }
 
-
-string network::recieve(int num){
-	cout<<"recieve\n";
-	if (isServer and connected){
+string network::receive(int num){
+	cout<<"receive\n";
+	if (isServer && connected){
 		if (SDLNet_CheckSockets(sockets,0)>0 && SDLNet_SocketReady(client)){
 			int offset=0;
 			char temp[num];
 			string result;
 			int offset_prv=-1;
-			while (offset<num){
+			int test=0;
+			while (offset<num && test<100){
+				test++;
 				cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 				offset_prv=offset;
 				offset+=SDLNet_TCP_Recv(client,temp,num-result.size());	
@@ -83,7 +83,9 @@ string network::recieve(int num){
 			char temp[num];
 			string result;
 			int offset_prv=-1;
-			while (offset<num){
+			int test=0;
+			while (offset<num && test<100){
+				test++;
 				cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 				offset_prv=offset;
 				offset+=SDLNet_TCP_Recv(server,temp,num-result.size());
@@ -103,18 +105,4 @@ string network::recieve(int num){
 	}
 	string x="";
 	return x;
-}
-
-string network::getResponse(string msg,int num){
-	cout<<"getREsponse\n";
-	send(msg);
-	int debug=0;
-	string temp="";
-	while (debug<5 && temp==""){
-		temp=recieve(num);
-		debug++;
-		cout<<"debug\n";
-	}
-	if (debug==4){return "";}	
-	return temp;
 }

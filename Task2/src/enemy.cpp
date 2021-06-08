@@ -38,3 +38,21 @@ void Enemy::render(SDL_Renderer* renderer){
 		cur_texture=(cur_texture+1)%8;
 	}
 }
+
+string Enemy::getEnemyState(){
+	string x1=to_string(x),y1=to_string(y);
+	while (x1.size()<4){
+		x1="0"+x1;
+	}
+	while (y1.size()<4){
+		y1="0"+y1;
+	}
+	return x1+y1;
+}
+
+void Enemy::set_x_y(int x_ax,int y_ax){
+	x=x_ax;
+	y=y_ax;
+	dstr.x=x;
+	dstr.y=y;
+}

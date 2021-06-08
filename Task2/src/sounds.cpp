@@ -54,26 +54,26 @@ void SoundClass::InitializeAll(){
 
 void SoundClass::PlaySound(string label){
 	if (sound_on){
-	if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
-	Mix_HaltChannel(-1);
+		if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
+		Mix_HaltChannel(-1);
 
-	// cout<<size_it<<"\n";
-	int loc=LabelToInt[label];
-	// cout<<loc<<" "<<label<<"\n";
-	Mix_PlayChannel(-1,SoundVector.at(loc),0);
-}
+		// cout<<size_it<<"\n";
+		int loc=LabelToInt[label];
+		// cout<<loc<<" "<<label<<"\n";
+		Mix_PlayChannel(-1,SoundVector.at(loc),0);
+	}
 }
 
 void SoundClass::PlayMusic(string label){
 	if (music_on){
-	if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
-	// Mix_HaltChannel(-1);
+		if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
+		// Mix_HaltChannel(-1);
 
-	// cout<<size_it1<<"\n";
-	int loc=LabelToInt1[label];
-	cout<<loc<<" "<<label<<"\n";
-	Mix_PlayMusic(MusicVector.at(loc),-1);
-}
+		// cout<<size_it1<<"\n";
+		int loc=LabelToInt1[label];
+		cout<<loc<<" "<<label<<"\n";
+		Mix_PlayMusic(MusicVector.at(loc),-1);
+	}
 }
 
 

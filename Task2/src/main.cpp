@@ -22,7 +22,9 @@ int main(int argc,char* args[]){
 	int player_id=0;
 	bool isServer=false;
 	if (stoi(args[1])==1){isServer=true;}
-	Game *game=new Game("COROMAN",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh,isServer);
+	string nm=(isServer?"Coroman-server":"Coroman-client");
+
+	Game *game=new Game(&nm[0],SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh,isServer);
 	while (game->isRunning()){
 		frameStart=SDL_GetTicks();
 		game->handle_event();
