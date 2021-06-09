@@ -25,42 +25,66 @@ bool network::check_new_players(){
 		TCPsocket temp_soc=SDLNet_TCP_Accept(server);
 		if (temp_soc){
 			client=temp_soc;
-			if (!connected){
-				connected=true;
-				SDLNet_TCP_AddSocket(sockets,client);
-				cout<<"New player joined:"<<"\n";
-			}else{ 
-				cout<<"Entry denied:More players tried to connect\n";
-				const char* msg="123456789";
-				SDLNet_TCP_Send(client,msg,strlen(msg));
-			}	
+			connected=true;
+			SDLNet_TCP_AddSocket(sockets,client);
+			cout<<"New player joined:"<<"\n";
+			
 		}
+    }
+    else if (connected){
+
+    			cout<<"Entry denied:More players tried to connect\n";
+				const char* msg="Access Denied";
+				SDLNet_TCP_Send(client,msg,strlen(msg));
+
     }
 	return connected;
 }
 
-void network::send(string s){
+void network::send(string s,int * state,int* prevstate){
 	cout<<"send\n";
+	if (SDL_GetTicks()-timeout>5000){
+		*prevstate=*state;
+		*state=101;
+	}
 	const char* tmp=&s[0];
 	int size=0;
 	int len=strlen(tmp);
 	if (isServer){
 		if (client==NULL){return;}
 		while (size<len){
+			if (SDL_GetTicks()-timeout>5000){
+				*prevstate=*state;
+				*state=101;
+			}
+			cout<<"size::\n";
 			size+=SDLNet_TCP_Send(client,tmp+size,len-size);
+			cout<<"size:\n";
 		}
 	}else{
 		if (server==NULL){cout<<"No server\n";exit(1);return;}
 		while (size<len){
+			if (SDL_GetTicks()-timeout>5000){
+				*prevstate=*state;
+				*state=101;
+			}
+
+			cout<<"size::\n";
 			size+=SDLNet_TCP_Send(server,tmp+size,len-size);
+			cout<<"size:\n";
 		}
 	}
 }
 
-string network::receive(int num){
+string network::receive(int num,int * state , int* prevstate){
 	cout<<"receive\n";
+	if (SDL_GetTicks()-timeout>5000){
+		*prevstate=*state;
+		*state=101;
+	}
 	if (isServer && connected){
 		if (SDLNet_CheckSockets(sockets,0)>0 && SDLNet_SocketReady(client)){
+			timeout=SDL_GetTicks();
 			int offset=0;
 			char temp[num];
 			string result;
@@ -82,6 +106,7 @@ string network::receive(int num){
 		}
 	}else if (connected){
 		if (SDLNet_CheckSockets(sockets,0)>0 && SDLNet_SocketReady(server)){
+			timeout=SDL_GetTicks();
 			int offset=0;
 			char temp[num];
 			string result;

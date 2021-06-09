@@ -49,7 +49,7 @@ class Menu{
 				input_box.x=0/*2926*/;
 				input_box.y=0/*2034*/;
 				input_box.h=308;
-				input_box.w=660;
+				input_box.w=810;
 				playerName=Texture::LoadText("Enter Your Name",renderer);
 				
 			}
@@ -129,10 +129,10 @@ class Menu{
 				if (cur_player!=""){
 				playerName=Texture::LoadText(&cur_player[0],renderer);
 				SDL_RenderCopy(renderer,playerName,NULL,&input_box);
-				input_box.w=40*cur_player.size();
+				input_box.w=55*cur_player.size();
 				}else{
 					playerName=Texture::LoadText("Enter Your Name",renderer);
-					input_box.w=600;
+					input_box.w=810;
 					SDL_RenderCopy(renderer,playerName,NULL,&input_box);
 				}
 			}

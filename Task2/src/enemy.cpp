@@ -7,7 +7,7 @@ Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width)
 	if (enemy_debug)cout<<"Enemy.cpp::Enemy\n";
 
 	for (int i=0;i<8;i++){
-		string path="./../assets/corona"+to_string(i)+".xcf";
+		string path="./../assets/corona"+to_string(i)+".png";
 		char* a=&path[0];
 		texture[i]=Texture::LoadT(a,localRenderer);
 	}

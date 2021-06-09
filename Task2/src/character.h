@@ -10,7 +10,7 @@
 class Character{
 
 public:
-	int x,y,height=80,width=80;
+	int x,y,height=60,width=60;
 	int speed = 10;
 	int x_speed = 10;
 	int y_speed = 0;
@@ -30,7 +30,7 @@ public:
 	void render(SDL_Renderer* renderer);
 	SDL_Texture* texture[4][8]={NULL};
 	bool isEnemy=false;
-	bool collide(Enemy * enemy,SoundClass* m,bool music_on);
+	bool collide(Enemy * enemy,SoundClass* m);
 	string getPlayerState();
 	void set_x_y(int x_ax,int y_ax);
 	void set_speed(int a);

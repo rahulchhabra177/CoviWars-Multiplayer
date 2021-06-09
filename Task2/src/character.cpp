@@ -46,8 +46,6 @@ void Character::changeSpeed(SDL_Event e,network*nmanager){
 			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;break;}
 			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;break;}
 		}
-	}else{
-		if (nmanager->connected && false){nmanager->send("$0");}
 	}
 }
 
@@ -61,7 +59,7 @@ void Character::render(SDL_Renderer* renderer){
 	}
 }
 
-bool Character::collide(Enemy * obj,SoundClass *m,bool music_on){
+bool Character::collide(Enemy * obj,SoundClass *m){
 	if (character_debug)cout<<"character.cpp::collide\n";
 	int x1 = x + width;
 	int y1 = y + height;

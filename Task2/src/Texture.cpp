@@ -38,7 +38,7 @@ SDL_Texture* Texture::LoadText(char* label,SDL_Renderer* renderer){
 		cout<<"Error:Couldn't initialize font\n";
 		exit(1);
 	}
-	SDL_Color color={255,255,255,255};
+	SDL_Color color={255,255,25,255};
 	SDL_Texture* text;
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
 

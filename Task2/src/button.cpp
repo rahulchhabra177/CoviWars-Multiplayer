@@ -9,12 +9,12 @@ Button::Button(char* name, SDL_Renderer* renderer,int width,int height){
 	s_height=height;
 	s_width=width;
 	TTF_Font * font;//=new TTFont();
-	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
+	font=TTF_OpenFont("./../fonts/orange.ttf",20);
 	// SDL_Color color={0,255,0,255};
 	// SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
-	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{149,215,246,255});
+	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{25,25,52,255});
 	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
-	textSurface=TTF_RenderText_Solid(font,label,{14,215,246,255});
+	textSurface=TTF_RenderText_Solid(font,label,{251,255,255,255});
 	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
 	
 

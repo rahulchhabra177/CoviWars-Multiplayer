@@ -39,8 +39,8 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 			else{
 				cout<<"Renderer initialized Successfully...\n";
 				SDL_SetRenderDrawColor(renderer,255,255,255,255);
-				menuback=Texture::LoadT("./../assets/core_back.jpg",renderer);
-				gameback=Texture::LoadT("./../assets/redB.jpg",renderer);
+				menuback=Texture::LoadT("./../assets/menub.jpg",renderer);
+				gameback=Texture::LoadT("./../assets/purple.jpeg",renderer);
 				overback=Texture::LoadT("./../assets/gameover.jpg",renderer);
 				winback=Texture::LoadT("./../assets/start.png",renderer);
 				
@@ -122,7 +122,7 @@ void Game::handle_event(){
 			nmanager->check_new_players();
 			if (nmanager->connected){
 				cout<<"connected\n";
-				nmanager->send("$"+playState->getPlayState());
+				nmanager->send("$"+playState->getPlayState(),&state,&prevstate);
 				playState->addPlayer();
 			}
 		}
@@ -132,16 +132,17 @@ void Game::handle_event(){
 void Game::process(){
 	if (game_debug)cout<<"game.cpp::process "<<state<<"\n";
 	if (state==0){
-		playState->update(&state,true,MusicManager,music,nmanager);
+		playState->update(&state,true,MusicManager,&prevstate,nmanager);
 	}else if(state==100){
 		playState = new play("Play",1,gameback,renderer,menuList[0],false);
 		state = 0;
 	}else if(state==101){
 		if (!isServer){
-			string mzData=nmanager->receive(585);
+			string mzData=nmanager->receive(585,&state,&prevstate);
 			if (mzData!=""){
 			playState = new play("Play",1,gameback,renderer,menuList[0],true,mzData);
-			nmanager->send("$000000000");
+			nmanager->timeout=SDL_GetTicks();
+			nmanager->send("$000000000",&state,&prevstate);
 			state=0;
 			nmanager->isPlaying=true;
 			}
@@ -150,7 +151,8 @@ void Game::process(){
 				playState = new play("Play",1,gameback,renderer,menuList[0],true);
 			}
 			if (!nmanager->isPlaying){
-				if (nmanager->receive(10)!=""){state=0;nmanager->isPlaying=true;}
+				nmanager->timeout=SDL_GetTicks();
+				if (nmanager->receive(10,&state,&prevstate)!=""){state=0;nmanager->isPlaying=true;}
 			}
 		}
 	}else if(state==-3){
@@ -188,6 +190,8 @@ void Game::render(){
 	}else if (state==3){
 		optionPopup->render(renderer);
 	}else if (state==101){
+		SDL_RenderClear(renderer);
+		menuList[0]->render();
 		lobby->render(renderer);
 	}else{
 		SDL_RenderClear(renderer);

@@ -27,6 +27,11 @@ class play{
 		bool isServer=false;
 		bool multiplayer=false;
 		vector<vector<int>> occupied;
+		bool keyPlaced=false;
+		bool fruitPlaced=false;
+		bool vaccinePlaced=false;
+		bool fruit2Placed=false;
+
 		
 		play(char* title,int level,SDL_Texture* poster, SDL_Renderer* localRenderer,Menu* menu,bool multi,string mzData=""){
 			if (play_debug)cout<<"play.cpp:play\n";
@@ -160,7 +165,7 @@ class play{
 			}
 		}
 		
-		void handle_request(string response){
+		void handle_request(string response,int* state,int* prevstate){
 			if (play_debug)cout<<"play.cpp:handle_request:"<<response<<"\n";
 			if (response==""){
 				return;
@@ -177,10 +182,15 @@ class play{
 				}
 				pacman2->set_x_y(stoi(response.substr(2,4)),stoi(response.substr(6,4)));
 				pacman2->set_speed(stoi(response.substr(1,1)));
-			}	
+			}
+			else{
+				*prevstate=*state;
+				*state=101;
+
+					}	
 		}
 
-		void update(int* state,bool doUpdate,SoundClass* m,bool music_on,network*nmanager){
+		void update(int* state,bool doUpdate,SoundClass* m,int* prevstate,network*nmanager){
 			if (play_debug)cout<<"play.cpp:update\n";
 			maze->update();
 			pacman->updateCounter(lvl);
@@ -195,6 +205,33 @@ class play{
 				pacman->isVaccinated=true;
 				pacman->counter=0;
 			}
+			if (!multiplayer && eatKey(pacman)){
+				maze->keyEaten=true;
+				if(!multiplayer){
+				maze->setWinCondition();
+		}
+			}
+
+			if(!multiplayer && pacman->score>(88*maze->numEggs)/100 && !keyPlaced){
+				maze->placeKey();
+				keyPlaced=true;
+
+			}
+			if(pacman->score>(2*maze->numEggs)/5 && !vaccinePlaced){
+				maze->placeVaccine();
+				vaccinePlaced=true;
+
+			}
+			if( pacman->score>(1*maze->numEggs)/4 && !fruitPlaced){
+				maze->placeFruits();
+				fruitPlaced=true;
+
+			}if(pacman->score>(5*maze->numEggs)/7 && !fruit2Placed){
+				maze->placeFruits();
+				fruit2Placed=true;
+
+			}
+			
 			if(pacman2!=nullptr){
 				pacman2->updateCounter(lvl);
 				if(eatEgg(pacman2)){
@@ -211,18 +248,18 @@ class play{
 			}
 			if(multiplayer){
 				if(nmanager->connected && nmanager->isPlaying && !isServer){
-					nmanager->send("!"+pacman->getPlayerState());
-					string response=nmanager->receive(11+8*(enemies.size()));
-					handle_request(response);
+					nmanager->send("!"+pacman->getPlayerState(),state,prevstate);
+					string response=nmanager->receive(11+8*(enemies.size()),state,prevstate);
+					handle_request(response,state,prevstate);
 				}else if (nmanager->connected && nmanager->isPlaying && isServer){
 					string enemyState="";
 					for (int i=0;i<enemies.size();i++){
 						enemyState+=enemies[i]->getEnemyState();
 					}
-					nmanager->send("$"+pacman->getPlayerState()+to_string(enemies.size())+enemyState);
-					string response=nmanager->receive(10);
+					nmanager->send("$"+pacman->getPlayerState()+to_string(enemies.size())+enemyState,state,prevstate);
+					string response=nmanager->receive(10,state,prevstate);
 					cout<<"handle\n";
-					handle_request(response);
+					handle_request(response,state,prevstate);
 					cout<<"request handled\n";
 				}
 			}
@@ -255,7 +292,7 @@ class play{
 			}
 			for(int i=0;i<enemies.size();i++){
 				if(enemies[i]->active){
-					if(pacman->collide(enemies[i],m,music_on)){
+					if(pacman->collide(enemies[i],m)){
 						if(pacman->isInvincible || pacman->isVaccinated){
 							if(pacman->isVaccinated){
 								enemies[i]->active=false;
@@ -267,7 +304,7 @@ class play{
 					}
 					if(pacman2!=nullptr){
 						if(enemies[i]->active){
-							if(pacman2->collide(enemies[i],m,music_on)){
+							if(pacman2->collide(enemies[i],m)){
 								if(pacman2->isInvincible || pacman2->isVaccinated){
 									if(pacman2->isVaccinated){
 										enemies[i]->active = false;
@@ -485,6 +522,40 @@ class play{
 			}
 			return false;
 		}
+
+
+
+		bool eatKey(Character* pacman){
+			if (play_debug)cout<<"play.cpp:collidePlayer\n";
+			
+			if(pacman->x_speed!=0){
+				if(pacman->x_speed>0){
+					if(maze->mazeData[(pacman->x+pacman->width/30+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==6){
+						maze->mazeData[(pacman->x+pacman->width/30+1)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]=2;
+						return true;
+					}
+				}else{
+					if(maze->mazeData[(pacman->x+(pacman->width)/30)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]==6){
+						maze->mazeData[(pacman->x+(pacman->width)/30)/(maze->mazeCell.h)][(pacman->y)/(maze->mazeCell.h)]=2;
+						return true;
+					}
+				}
+			}else{
+				if(pacman->y_speed>0){
+					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height/30+1)/(maze->mazeCell.h)]==6){
+						maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+pacman->height/30+1)/(maze->mazeCell.h)]=2;
+						return true;
+					}
+				}else{
+					if(maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+(pacman->height/30))/(maze->mazeCell.h)]==6){
+						maze->mazeData[(pacman->x)/(maze->mazeCell.h)][(pacman->y+(pacman->height/30))/(maze->mazeCell.h)]=2;
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
 
 		void enemyAI(int i){
 			Enemy* enemy = enemies[i];
