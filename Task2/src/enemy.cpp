@@ -12,6 +12,7 @@ Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width)
 		texture[i]=Texture::LoadT(a,localRenderer);
 	}
 	
+	active = true;
 	x=init_x;
 	y=init_y;
 	dstr.h=height;
@@ -38,6 +39,7 @@ void Enemy::render(SDL_Renderer* renderer){
 		cur_texture=(cur_texture+1)%8;
 	}
 }
+
 string Enemy::getEnemyState(){
 	string x1=to_string(x),y1=to_string(y);
 	while (x1.size()<4){
@@ -48,6 +50,7 @@ string Enemy::getEnemyState(){
 	}
 	return x1+y1;
 }
+
 void Enemy::set_x_y(int x_ax,int y_ax){
 	x=x_ax;
 	y=y_ax;

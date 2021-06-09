@@ -35,32 +35,16 @@ void Character::updatePlayer(network*nmanager,bool isForeigner){
 		dstr.x=x;
 		dstr.y=y;
 	}
-
-	else{
-		//getResponse will always take a string of length 9
-		// string response=nmanager->getResponse("#position",8);
-		//recieved string="#position"
-		//position-> .... x ....y .dir
-		// if (response=="" || response[0]!='$'){return;}
-		// set_x_y(stoi(response.substr(0,4)),stoi(response.substr(4,4)));
-		// set_speed(stoi(response.substr(8,1)));
-
-	}
-
-
-
 }
 
 void Character::changeSpeed(SDL_Event e,network*nmanager){
 	if (character_debug)cout<<"character.cpp::changeSpeed\n";
-	
 	if(e.type==SDL_KEYDOWN){
 		switch(e.key.keysym.sym){
-			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;if (nmanager->connected && false){nmanager->send("$1");}break;}
-			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;if (nmanager->connected && false){nmanager->send("$2");}break;}
-			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;if (nmanager->connected && false){nmanager->send("$3");}break;}
-			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;if (nmanager->connected && false){nmanager->send("$4");}break;}
-			default:{if (nmanager->connected && false){nmanager->send("$0");}break;}
+			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;break;}
+			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;break;}
+			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;break;}
+			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;break;}
 		}
 	}else{
 		if (nmanager->connected && false){nmanager->send("$0");}
@@ -87,16 +71,12 @@ bool Character::collide(Enemy * obj,SoundClass *m,bool music_on){
 	int x2 = obj->x + obj->width;
 	int y2 = obj->y + obj->height;
 	if(obj->x<=x && x<=x2 && obj->y<=y && y<=y2){
-		m->PlaySound("collision");
 		return true;
 	}else if(obj->x<=x && x<=x2 && obj->y<=y1 && y1<=y2){
-		m->PlaySound("collision");
 		return true;
 	}else if(obj->x<=x1 && x1<=x2 && obj->y<=y && y<=y2){
-		m->PlaySound("collision");
 		return true;
 	}else if(obj->x<=x1 && x1<=x2 && obj->y<=y1 && y1<=y2){
-		m->PlaySound("collision");
 		return true;
 	}else{
 		return false;
@@ -113,33 +93,54 @@ void Character::set_x_y(int x_ax,int y_ax){
 void Character::set_speed(int a){
 	if (a==1){
 		y_speed=(-1)*speed;x_speed=0;
+		cur_dir=1;
 	}
 	else if (a==2){
 		y_speed=speed;x_speed=0;
+		cur_dir=3;
 	}
 	else if (a==3){
 		y_speed=0;x_speed=speed;
+		cur_dir=0;
 	}
 	else if (a==4){
 		y_speed=0;x_speed=(-1)*speed;
+		cur_dir=2;
 	}
-
 }
 
-
+void Character::updateCounter(int lvl){
+	if(isVaccinated || isInvincible){
+		counter++;
+	}
+	if(counter==(9-lvl)*60){
+		counter=0;
+		isInvincible=false;
+		isVaccinated=false;
+	}
+}
 
 string Character::getPlayerState(){
 	string x1=to_string(x),y1=to_string(y);
+	int k;
+	if(x_speed!=0){
+		if(x_speed>0){
+			k=3;
+		}else{
+			k=4;
+		}
+	}else{
+		if(y_speed>0){
+			k=2;
+		}else{
+			k=1;
+		}
+	}
 	while (x1.size()<4){
 		x1="0"+x1;
 	}
 	while (y1.size()<4){
 		y1="0"+y1;
 	}
-
-	// string dir;
-	// if ()
-
-
-	return x1+y1;
+	return to_string(k)+x1+y1;
 }

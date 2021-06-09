@@ -7,7 +7,6 @@ class Popup{
 		int remaining_time=10;
 		long long startTime;
 		SDL_Texture* background,*congrats,*back;
-
 		vector<Button*> buttons;
 		Popup(SDL_Renderer * localRenderer,int type,bool isTimed,int width,int height);
 		void render(SDL_Renderer* renderer);
@@ -18,6 +17,4 @@ class Popup{
 		SDL_Renderer* renderer;
 		SDL_Rect dst;
 		int s_width,s_height;
-
-
 };

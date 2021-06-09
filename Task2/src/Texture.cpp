@@ -1,6 +1,6 @@
 #include "Texture.h";
 using namespace std;
-bool texture_debug=true;
+bool texture_debug=false;
 
 SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
 if (texture_debug)cout<<"Texture.cpp::LoadT\n";
@@ -24,7 +24,6 @@ if (texture_debug)cout<<"Texture.cpp::LoadT\n";
 	}
 	// cout<<"l\n";
 	return returng;
-
 }
 
 

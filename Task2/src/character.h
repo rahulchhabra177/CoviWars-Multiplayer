@@ -18,6 +18,9 @@ public:
 
 	int count = 0,cur_texture=0,cur_dir=0;
 	int score=0;
+	int counter=0;
+	bool isInvincible=false;
+	bool isVaccinated=false;
 	char* name="player";
 	bool isForeigner=false;
 	SDL_Rect dstr,src;
@@ -31,5 +34,6 @@ public:
 	string getPlayerState();
 	void set_x_y(int x_ax,int y_ax);
 	void set_speed(int a);
+	void updateCounter(int lvl);
 };
 #endif

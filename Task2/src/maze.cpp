@@ -2,12 +2,15 @@
 #include <time.h>
 using namespace std;
 bool maze_debug=true;
-Maze::Maze(int l,SDL_Renderer* localRenderer,string mzData){
+
+Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
-	lvl = l;
 	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
 	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);
 	dTexture = Texture::LoadT("./../assets/door.png",localRenderer);
+	fTexture = Texture::LoadT("./../assets/fruit.png",localRenderer);
+	vTexture = Texture::LoadT("./../assets/vaccine.jpeg",localRenderer);
+	multiplayer = multi;
 
 	mazeCell.h = 100;
 	mazeCell.w = 100;
@@ -17,21 +20,39 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,string mzData){
 	mazeEgg.w = 20;
 	mazeEgg.x = 0;
 	mazeEgg.y = 0;
-	if (mzData==""){
-			for(int i=0;i<m_width;i++){
-				vector<int> v;
-				for(int j=0;j<m_height;j++){
-					v.push_back(1);
-				}
-				mazeData.push_back(v);
-			}
-			
-			constructMaze();
-			removeDeadEnds();
-			setWinCondition();
-	}	
-	else{
+	fruitCell.h = 30;
+	fruitCell.w = 0;
+	fruitCell.x = 0;
+	fruitCell.y = 0;
+	vacCell.h = 30;
+	vacCell.w = 30;
+	vacCell.x = 0;
+	vacCell.y = 0;
 
+	lvl = l;
+	setParams();
+
+	numEggs = numEggs - numFruits - numVaccines;
+
+	if(mzData=="" || !multiplayer){
+		for(int i=0;i<m_width;i++){
+			vector<int> v;
+			for(int j=0;j<m_height;j++){
+				v.push_back(1);
+			}
+			mazeData.push_back(v);
+		}
+		
+		srand(time(0));
+		constructMaze();
+		removeDeadEnds();
+		placeFruits();
+		placeVaccine();
+
+		if(!multiplayer){
+			setWinCondition();
+		}
+	}else{
 		int k=0;
 		if (mzData.size()<568){
 			cout<<mzData<<"\n";
@@ -40,20 +61,16 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,string mzData){
 		}
 		cout<<"mazeData->size:"<<mzData.size()<<"\n";
 
-			for(int i=0;i<m_width;i++){
-				vector<int> v;
-				for(int j=0;j<m_height;j++){
-					// cout<<mzData[k];
-					v.push_back(stoi(mzData.substr(k+1,1)));
-					k++;
-				}
-				mazeData.push_back(v);
+		for(int i=0;i<m_width;i++){
+			vector<int> v;
+			for(int j=0;j<m_height;j++){
+				// cout<<mzData[k];
+				v.push_back(stoi(mzData.substr(k+1,1)));
+				k++;
 			}
-			
-
+			mazeData.push_back(v);
+		}
 	}
-
-	
 }
 
 string Maze::getMazeState(){
@@ -67,17 +84,17 @@ string Maze::getMazeState(){
 	return s;
 }
 
-
-
 void Maze::reinitialize(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:reinitialize\n";
+	
 	for(int i=0;i<m_width;i++){
 		for(int j=0;j<m_height;j++){
-			mazeData[i][j] = 1;
+			if(mazeData[i][j]==2){
+				mazeData[i][j]=0;
+			}
 		}
 	}
-	constructMaze();
-	removeDeadEnds();
+	
 	setWinCondition();
 }
 
@@ -86,15 +103,23 @@ void Maze::render(SDL_Renderer* renderer){
 	for(int i=0;i<m_width;i++){
 		mazeCell.x = (mazeCell.h)*i;
 		mazeEgg.x = (mazeCell.h)*i+(mazeCell.h)/2-mazeEgg.h/2;
+		fruitCell.x = (mazeCell.h)*i+(mazeCell.h)/2-fruitCell.h/2;
+		vacCell.x = (mazeCell.h)*i+(mazeCell.h)/2-vacCell.h/2;
 		for(int j=0;j<m_height;j++){
 			mazeCell.y = (mazeCell.h)*j;
 			mazeEgg.y = (mazeCell.h)*j+(mazeCell.h)/2-mazeEgg.h/2;
+			fruitCell.y = (mazeCell.h)*j+(mazeCell.h)/2-fruitCell.h/2;
+			vacCell.y = (mazeCell.h)*j+(mazeCell.h)/2-vacCell.h/2;
 			if(mazeData[i][j]==0){
 				SDL_RenderCopy(renderer,sTexture,NULL,&mazeEgg);			
 			}else if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 			}else if(mazeData[i][j]==3){
 				SDL_RenderCopy(renderer,dTexture,NULL,&mazeCell);
+			}else if(mazeData[i][j]==4){
+				SDL_RenderCopy(renderer,fTexture,NULL,&fruitCell);
+			}else if(mazeData[i][j]==5){
+				SDL_RenderCopy(renderer,vTexture,NULL,&vacCell);
 			}
 		}
 	}
@@ -128,10 +153,6 @@ int Maze::openCell(int i,int j){
 	}
 	return n;	
 }
-
-
-
-
 
 void Maze::removeDeadEnds(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:removeDeadEnds\n";
@@ -200,10 +221,10 @@ void Maze::update(){
 void Maze::constructMaze(){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	stack<pair<int,int>> cells;
-	srand(time(0));
 	int x = 2*(rand()%(m_width/2))+1;
 	int y = 2*(rand()%(m_height/2))+1;
 	cells.push(make_pair(x,y));
+	numEggs++;
 	while(!cells.empty()){
 		vector<int> unvisited = neighbours(cells.top());
 		int x = cells.top().first;
@@ -233,6 +254,7 @@ void Maze::constructMaze(){
 			}
 			mazeData[x][y] = 0;
 			cells.push(make_pair(x,y));
+			numEggs+=2;
 		}
 	}
 }
@@ -274,5 +296,41 @@ void Maze::setWinCondition(){
 			mazeData[x][y]=3;
 			break;
 		}
+	}
+}
+
+void Maze::placeFruits(){
+	for(int i=0;i<numFruits;i++){
+		while(true){
+			int x = 2*(rand()%((m_width-1)/2))+1;
+			int y = 2*(rand()%((m_height-1)/2))+1;
+			if(mazeData[x][y]==0){
+				mazeData[x][y]=4;
+				break;
+			}
+		}
+	}
+}
+
+void Maze::placeVaccine(){
+	for(int i=0;i<numVaccines;i++){
+		while(true){
+			int x = 2*(rand()%((m_width-1)/2))+1;
+			int y = 2*(rand()%((m_height-1)/2))+1;
+			if(mazeData[x][y]==0){
+				mazeData[x][y]=5;
+				break;
+			}
+		}
+	}
+}
+
+void Maze::setParams(){
+	switch(lvl){
+		case 1:{numFruits=7;numVaccines=3;break;}
+		case 2:{numFruits=6;numVaccines=2;break;}
+		case 3:{numFruits=5;numVaccines=2;break;}
+		case 4:{numFruits=4;numVaccines=1;break;}
+		case 5:{numFruits=3;numVaccines=1;break;}
 	}
 }
