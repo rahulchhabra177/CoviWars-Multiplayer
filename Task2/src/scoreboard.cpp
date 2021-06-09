@@ -27,7 +27,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 	if(multiplayer){
 		if(p2!=""){
 			counter++;
-			if (counter==100){
+			if (counter==50){
 				counter=0;
 				time_sec_u++;
 				if (time_sec_u==10){time_sec_t++;time_sec_u=0;}
@@ -47,7 +47,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 		}
 	}else{
 		counter++;
-		if (counter==100){
+		if (counter==50){
 			counter=0;
 			time_sec_u++;
 			if (time_sec_u==10){time_sec_t++;time_sec_u=0;}

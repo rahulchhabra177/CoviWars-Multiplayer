@@ -12,6 +12,9 @@ network::network(bool isserver){
 	}else{
 		SDLNet_ResolveHost(&ip,"127.0.0.1",1504);
 		server=SDLNet_TCP_Open(&ip);
+		if(server==NULL){
+			cout<<"Unable to connect to server\n";
+		}
 		connected=true;
 		SDLNet_TCP_AddSocket(sockets,server);	
 	}
@@ -47,7 +50,7 @@ void network::send(string s){
 			size+=SDLNet_TCP_Send(client,tmp+size,len-size);
 		}
 	}else{
-		if (server==NULL){return;}
+		if (server==NULL){cout<<"No server\n";exit(1);return;}
 		while (size<len){
 			size+=SDLNet_TCP_Send(server,tmp+size,len-size);
 		}

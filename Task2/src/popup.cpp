@@ -84,6 +84,22 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		Button* logo=new Button("YOU LOSE!",renderer,width,height);
 		logo->set_cor(1320,450,1000,400);
 		buttons.push_back(logo);
+	}else if (type==-1){
+		Button* startmulti_button=new Button("Back",renderer,width,height);
+		startmulti_button->set_cor(1400,1000,540,150);
+		buttons.push_back(startmulti_button);
+		
+		Button* options_button=new Button("Options",renderer,width,height);
+		options_button->set_cor(1400,1200,500,150);
+		buttons.push_back(options_button);
+		
+		Button* exit_button=new Button("Exit",renderer,width,height);
+		exit_button->set_cor(1400,1400,500,150);
+		buttons.push_back(exit_button);
+
+		Button* logo=new Button("Waiting for other player to join",renderer,width,height);
+		logo->set_cor(1220,450,1200,400);
+		buttons.push_back(logo);
 	}
 }
 

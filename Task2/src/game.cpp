@@ -11,7 +11,7 @@ bool game_debug=true;
 SoundClass* MusicManager=nullptr;
 network* nmanager=nullptr;
 bool client_started=false;
-Popup* pmenu=nullptr,*optionPopup=nullptr;
+Popup* pmenu=nullptr,*optionPopup=nullptr,*lobby=nullptr;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,bool isserver){
 	if (game_debug)cout<<"game.cpp::Game\n";
@@ -53,7 +53,8 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				nmanager = new network(isServer);
 				pmenu = new Popup(renderer,1,true,s_width,s_height);
 				optionPopup = new Popup(renderer,3,false,s_width,s_height);
-				
+				lobby=new Popup(renderer,-1,false,s_width,s_height);
+
 				cout<<"Initialising Menus\n";
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
 				menuList.push_back(startMenu);
@@ -102,6 +103,8 @@ void Game::handle_event(){
 		playState->handle_event(event,&state,MusicManager,prevstate,nmanager);
 	}else if(state==3){
 		optionPopup->handle_event(event,&state,MusicManager,&prevstate);
+	}else if (state==101){
+		lobby->handle_event(event,&state,MusicManager,&prevstate);
 	}else if(state==-1){
 		gameOver->handle_event(event,&state,MusicManager,&prevstate);
 	}else if (state==-3){
@@ -115,10 +118,6 @@ void Game::handle_event(){
 		menuList[state-1]->handle_event(event,&state,MusicManager,&prevstate);
 	}
 	if(playState!=nullptr && playState->multiplayer){
-		if(state==0 && nmanager->connected){
-			nmanager->isPlaying = true;
-		}
-
 		if (isServer and !nmanager->connected){
 			nmanager->check_new_players();
 			if (nmanager->connected){
@@ -139,13 +138,21 @@ void Game::process(){
 		state = 0;
 	}else if(state==101){
 		if (!isServer){
-			string mzData=nmanager->receive(577);
+			string mzData=nmanager->receive(585);
+			if (mzData!=""){
 			playState = new play("Play",1,gameback,renderer,menuList[0],true,mzData);
+			nmanager->send("$000000000");
+			state=0;
+			nmanager->isPlaying=true;
+			}
+		}else{
+			if (playState==nullptr){
+				playState = new play("Play",1,gameback,renderer,menuList[0],true);
+			}
+			if (!nmanager->isPlaying){
+				if (nmanager->receive(10)!=""){state=0;nmanager->isPlaying=true;}
+			}
 		}
-		else{
-			playState = new play("Play",1,gameback,renderer,menuList[0],true);
-		}
-		state = 0;
 	}else if(state==-3){
 		pmenu->update(&state);
 		if(state==-2){
@@ -180,6 +187,8 @@ void Game::render(){
 		pmenu->render(renderer);
 	}else if (state==3){
 		optionPopup->render(renderer);
+	}else if (state==101){
+		lobby->render(renderer);
 	}else{
 		SDL_RenderClear(renderer);
 		menuList[state-1]->render();

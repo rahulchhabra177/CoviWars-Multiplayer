@@ -12,6 +12,7 @@ Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width)
 		texture[i]=Texture::LoadT(a,localRenderer);
 	}
 	
+	active = true;
 	x=init_x;
 	y=init_y;
 	dstr.h=height;
