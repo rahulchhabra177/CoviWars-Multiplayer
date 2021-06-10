@@ -10,8 +10,8 @@ class Enemy{
 
 public:
 	int x,y,height=100,width=100;
-	int speed = 1;
-	int x_speed = 1;
+	int speed = 5;
+	int x_speed = 5;
 	int y_speed = 0;
 	int count = 0,cur_texture=0;
 	int rot_speed=10;

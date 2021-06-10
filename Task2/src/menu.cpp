@@ -10,7 +10,7 @@ class Menu{
 		vector<Button*> buttons;
 		SDL_Texture* background,*playerName;
 		SDL_Renderer* renderer;
-		bool menu_debug=true;
+		bool menu_debug=false;
 		SDL_Rect input_box;
 		bool changed=true;
 		string cur_player="";

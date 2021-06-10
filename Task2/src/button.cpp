@@ -1,15 +1,19 @@
 #include "button.h";
 
 using namespace std;
-bool button_debug=true;
+bool button_debug=false;
 Button::Button(char* name, SDL_Renderer* renderer,int width,int height){
-	if (button_debug)cout<<"button.cpp::Button\n";
+	if (button_debug)cout<<"button.cpp::Button1\n";
 	TTF_Init();
 	label = name;
 	s_height=height;
 	s_width=width;
 	TTF_Font * font;//=new TTFont();
-	font=TTF_OpenFont("./../fonts/orange.ttf",20);
+	font=TTF_OpenFont("./../fonts/batmfa1.ttf",20);
+	if (font==NULL){
+		cout<<"Error:Couldn't initialize font"<<TTF_GetError()<<"\n";
+		exit(1);
+	}
 	// SDL_Color color={0,255,0,255};
 	// SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{25,25,52,255});
@@ -34,7 +38,11 @@ Button::Button(char* name,char* name2, SDL_Renderer* renderer,int width,int heig
 	s_height=height;
 	s_width=width;
 	TTF_Font * font;//=new TTFont();
-	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
+	font=TTF_OpenFont("./../fonts/batmfa2.ttf",20);
+	if (font==NULL){
+		cout<<"Error:Couldn't initialize font"<<TTF_GetError()<<"\n";
+		exit(1);
+	}
 	// SDL_Color color={0,255,0,255};
 	// SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{149,215,246,255});

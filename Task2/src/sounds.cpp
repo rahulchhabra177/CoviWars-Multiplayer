@@ -1,7 +1,7 @@
 #include "sounds.h";
 
 using namespace std;
-bool sound_debug=true;
+bool sound_debug=false;
 
 SoundClass::SoundClass(){
 	if (sound_debug)cout<<"sounds.cpp:SoundClass\n";

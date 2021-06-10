@@ -32,7 +32,7 @@ int main(int argc,char* args[]){
 		game->render();
 		frameTime=SDL_GetTicks()-frameStart;
 		if (frameTime<frameDelay){
-			cout<<"Delaying...\n";
+			// cout<<"Delaying...\n";
 			SDL_Delay(frameDelay-frameTime);
 		}
 	}

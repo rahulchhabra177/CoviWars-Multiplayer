@@ -16,7 +16,7 @@ class play{
 		SDL_Texture* background;
 		SDL_Renderer* renderer;
 		SDL_Texture *heading=nullptr;
-		bool play_debug=true;
+		bool play_debug=false;
 		Maze* maze=nullptr;
 		Character* pacman=nullptr,*pacman2=nullptr;
 		ScoreBoard *score=nullptr;
@@ -272,7 +272,16 @@ class play{
 					score->update(1,"Player1",pacman->score,"",0);
 				}
 			}
-			if(!collidePlayer()){
+			cout<<(int)(!collidePlayer(last_key_x(pacman),last_key_y(pacman)))<<"\n";
+
+			if(!collidePlayer(last_key_x(pacman),last_key_y(pacman))){
+				pacman->x_speed=last_key_x(pacman);
+				pacman->y_speed=last_key_y(pacman);
+				cout<<pacman->x_speed<<":"<<pacman->y_speed<<":"<<pacman->lastKey<<"\n";
+				pacman->cur_dir=pacman->lastKey;
+			}
+
+			if(!collidePlayer(pacman->x_speed,pacman->y_speed)){
 				pacman->updatePlayer(nmanager,false);
 			}
 			if(pacman2!=nullptr){
@@ -323,9 +332,35 @@ class play{
 			}
 		}
 		
+		int last_key_x(Character* pacman){
+			if (pacman->lastKey==1 || pacman->lastKey==3){
+				return 0;
+			}
+			else if (pacman->lastKey==2){
+				return (-1)*pacman->speed;
+			}
+			else{
+				return pacman->speed;
+			}
+		}
+
+		int last_key_y(Character* pacman){
+			if (pacman->lastKey==2 || pacman->lastKey==0){
+				return 0;
+			}
+			else if (pacman->lastKey==1){
+				return (-1)*pacman->speed;
+			}
+			else{
+				return pacman->speed;
+			}
+		}
+
+
+
 		void handle_event(SDL_Event e,int* state,SoundClass* m,bool music_on,network* nmanager){
 			if (play_debug)cout<<"play.cpp:handle_event\n";
-			pacman->changeSpeed(e,nmanager);
+			
 			if(e.type==SDL_QUIT){
 				*state=6;				//TODO:Change here for synchronised exit in multiplayer
 			}else if(e.type==SDL_MOUSEBUTTONDOWN){
@@ -336,6 +371,7 @@ class play{
 					//buttons[i]->handle_event(state,m,prevstate,e);
 				}
 			}else if(e.type==SDL_KEYDOWN && !multiplayer){
+				changeSpeed(pacman,e);
 				if(e.key.keysym.sym==SDLK_ESCAPE){
 					*state=6;
 				}else if(e.key.keysym.sym==SDLK_p){
@@ -376,15 +412,73 @@ class play{
 			return -1;
 		}
 		
-		bool collidePlayer(){
-			int x = pacman->x;
-			int y = pacman->y;
+void changeSpeed(Character* pacman,SDL_Event e){
+	if (play_debug)cout<<"play.cpp::changeSpeed\n";
+	if(e.type==SDL_KEYDOWN){
+		switch(e.key.keysym.sym){
+			case SDLK_UP:{
+				cout<<"UP"<<":"<<pacman->lastKey<<"\n";
+				if (pacman->cur_dir!=1){pacman->lastKey=1;}
+				if (!collidePlayer(0,(-1)*pacman->speed)){
+					pacman->y_speed=(-1)*pacman->speed;
+					pacman->x_speed=0;
+					pacman->cur_dir=1;
+				}
+					cout<<"UP"<<":"<<pacman->lastKey<<"\n";
+					break;
+			}
+			case SDLK_DOWN:{
+				cout<<"Down"<<":"<<pacman->lastKey<<"\n";
+				if (pacman->cur_dir!=3){pacman->lastKey=3;}
+				if (!collidePlayer(0,pacman->speed)){
+					pacman->y_speed=pacman->speed;
+					pacman->x_speed=0;
+					pacman->cur_dir=3;
+					cout<<"Down"<<":"<<pacman->lastKey<<"\n";
+					
+				}
+				break;
+			}
+			case SDLK_RIGHT:{
+				cout<<"Right"<<":"<<pacman->lastKey<<"\n";
+				if (pacman->cur_dir!=0){pacman->lastKey=0;}
+				if (!collidePlayer(pacman->speed,0)){
+					pacman->y_speed=0;
+					pacman->x_speed=pacman->speed;
+					pacman->cur_dir=0;
+					cout<<"Right"<<":"<<pacman->lastKey<<"\n";
+					
+				}
+				break;
+			}
+			case SDLK_LEFT:{
+				cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";
+				if (pacman->cur_dir!=2){pacman->lastKey=2;}
+				if (!collidePlayer((-1)*pacman->speed,0)){
+					pacman->y_speed=0;
+					pacman->x_speed=(-1)*pacman->speed;
+					pacman->cur_dir=2;
+					cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";
+					
+				}
+				break;
+			}
+		}
+	}
+}
+
+
+
+		bool collidePlayer(int x_speed,int y_speed){
+			int x=pacman->x;
+			int y=pacman->y;
 			int pw = pacman->width;
 			int ph = pacman->height;
 			int w = maze->mazeCell.w;
 			int h = maze->mazeCell.h;
-			if(pacman->x_speed!=0){
-				if(pacman->x_speed>0){
+			
+			if(x_speed!=0){
+				if(x_speed>0){
 					bool check1 = maze->mazeData[(x+pw)/w][y/h]!=1;
 					bool check2 = maze->mazeData[(x+pw)/w][(y+ph-1)/h]!=1;
 					if(check1 && check2){
@@ -406,7 +500,7 @@ class play{
 					}
 				}
 			}else{
-				if(pacman->y_speed>0){
+				if(y_speed>0){
 					bool check1 = maze->mazeData[x/w][(y+ph)/h]!=1;
 					bool check2 = maze->mazeData[(x+pw-1)/w][(y+ph)/h]!=1;
 					if(check1 && check2){

@@ -10,12 +10,13 @@
 class Character{
 
 public:
-	int x,y,height=60,width=60;
+	int x,y,height=100,width=100;
 	int speed = 10;
 	int x_speed = 10;
 	int y_speed = 0;
 	int rot_speed=10;
-
+	int lastKey=0;
+	bool openSpace(int lastKey);
 	int count = 0,cur_texture=0,cur_dir=0;
 	int score=0;
 	int counter=0;

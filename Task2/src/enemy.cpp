@@ -1,7 +1,7 @@
 #include "Texture.h";
 #include "enemy.h";
 using namespace std;
-bool enemy_debug=true;
+bool enemy_debug=false;
 
 Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width){
 	if (enemy_debug)cout<<"Enemy.cpp::Enemy\n";

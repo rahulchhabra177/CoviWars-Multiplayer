@@ -2,8 +2,7 @@
 #include "character.h";
 
 using namespace std;
-bool character_debug=true;
-
+bool character_debug=false;
 Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width){
 	if (character_debug)cout<<"character.cpp::Character\n";
 	for (int i=0;i<4;i++){
@@ -34,18 +33,6 @@ void Character::updatePlayer(network*nmanager,bool isForeigner){
 		x+=x_speed;
 		dstr.x=x;
 		dstr.y=y;
-	}
-}
-
-void Character::changeSpeed(SDL_Event e,network*nmanager){
-	if (character_debug)cout<<"character.cpp::changeSpeed\n";
-	if(e.type==SDL_KEYDOWN){
-		switch(e.key.keysym.sym){
-			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;break;}
-			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;break;}
-			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;break;}
-			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;break;}
-		}
 	}
 }
 
@@ -98,7 +85,8 @@ void Character::set_speed(int a){
 		cur_dir=3;
 	}
 	else if (a==3){
-		y_speed=0;x_speed=speed;
+		y_speed=0;
+		x_speed=speed;
 		cur_dir=0;
 	}
 	else if (a==4){

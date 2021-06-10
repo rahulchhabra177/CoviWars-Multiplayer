@@ -1,7 +1,7 @@
 #include "maze.h"
 #include <time.h>
 using namespace std;
-bool maze_debug=true;
+bool maze_debug=false;
 queue<pair<int,int>> hiddenWalls; 
 
 Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){

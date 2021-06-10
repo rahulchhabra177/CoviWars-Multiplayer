@@ -1,5 +1,5 @@
 #include "scoreboard.h"
-bool score_debug=true;
+bool score_debug=false;
 
 ScoreBoard::ScoreBoard(SDL_Renderer* render,bool multi){
 	if (score_debug)cout<<"scoreboard.cpp::Score\n";

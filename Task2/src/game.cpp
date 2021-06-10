@@ -7,7 +7,7 @@ using namespace std;
 vector<Menu*> menuList;
 play* playState=nullptr;
 Menu* gameOver=nullptr;
-bool game_debug=true;
+bool game_debug=false;
 SoundClass* MusicManager=nullptr;
 network* nmanager=nullptr;
 bool client_started=false;
@@ -188,12 +188,23 @@ void Game::render(){
 		playState->render();
 		pmenu->render(renderer);
 	}else if (state==3){
+		if (prevstate==1){
+		SDL_RenderClear(renderer);
+		menuList[0]->render();
 		optionPopup->render(renderer);
-	}else if (state==101){
+		}
+		else{
+			SDL_RenderClear(renderer);
+		playState->render();
+		optionPopup->render(renderer);
+		}
+	}
+	else if (state==101){
 		SDL_RenderClear(renderer);
 		menuList[0]->render();
 		lobby->render(renderer);
-	}else{
+	}
+	else{
 		SDL_RenderClear(renderer);
 		menuList[state-1]->render();
 	}

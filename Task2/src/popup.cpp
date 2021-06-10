@@ -11,8 +11,8 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	timed=isTimed;
 	background=Texture::LoadT("./../assets/pop.jpg",renderer);
 
-	SDL_Surface* sback=SDL_CreateRGBSurface(0,width,height, 32, 0, 0, 0, 0xff);
-	back = SDL_CreateTextureFromSurface(renderer,sback);
+	back=Texture::LoadT("./../assets/redblur.png",renderer);
+	// back = SDL_CreateTextureFromSurface(renderer,sback);
 
 	startTime=SDL_GetTicks();
 	if (type==1){
@@ -127,6 +127,8 @@ int Popup::locatePointer(int a,int b){
 		
 
 void Popup::render(SDL_Renderer* renderer){
+
+	SDL_RenderCopy(renderer,back,NULL,NULL);
 	SDL_RenderCopy(renderer,background,NULL,&dst);
 	for(int i=0;i<buttons.size();i++){
 		buttons[i]->render(renderer);
