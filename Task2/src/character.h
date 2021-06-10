@@ -20,6 +20,7 @@ public:
 	int count = 0,cur_texture=0,cur_dir=0;
 	int score=0;
 	int counter=0;
+	int lives=3;
 	bool isInvincible=false;
 	bool isVaccinated=false;
 	char* name="player";

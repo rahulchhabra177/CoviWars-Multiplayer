@@ -60,6 +60,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 			string player1=p1+":"+to_string(s1);
 			char * sc=&player1[0];
 			pl1=Texture::LoadText(sc,renderer);
+			score_rect.w=max(200,player1.size()*30);
 		}
 	}
 }

@@ -11,7 +11,7 @@ bool game_debug=false;
 SoundClass* MusicManager=nullptr;
 network* nmanager=nullptr;
 bool client_started=false;
-Popup* pmenu=nullptr,*optionPopup=nullptr,*lobby=nullptr;
+Popup* pmenu=nullptr,*optionPopup=nullptr,*lobby=nullptr,*playAgain=nullptr,*pause=nullptr,*win=nullptr;
 
 Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,bool isserver){
 	if (game_debug)cout<<"game.cpp::Game\n";
@@ -51,9 +51,11 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				}
 
 				nmanager = new network(isServer);
-				pmenu = new Popup(renderer,1,true,s_width,s_height);
+				pmenu = new Popup(renderer,1,false,s_width,s_height);
 				optionPopup = new Popup(renderer,3,false,s_width,s_height);
 				lobby=new Popup(renderer,-1,false,s_width,s_height);
+				playAgain=new Popup(renderer,2,false,s_width,s_height);
+				pause=new Popup(renderer,4,false,s_width,s_height);
 
 				cout<<"Initialising Menus\n";
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
@@ -106,7 +108,7 @@ void Game::handle_event(){
 	}else if (state==101){
 		lobby->handle_event(event,&state,MusicManager,&prevstate);
 	}else if(state==-1){
-		gameOver->handle_event(event,&state,MusicManager,&prevstate);
+		playAgain->handle_event(event,&state,MusicManager,&prevstate);
 	}else if (state==-3){
 		pmenu->handle_event(event,&state,MusicManager,&prevstate);
 		if(state==-2){
@@ -114,7 +116,15 @@ void Game::handle_event(){
 			playState = new play("Play",l+1,gameback,renderer,menuList[0],false);
 			state = 0;
 		}
-	}else{	
+	}
+	else if (state==4){
+		playAgain->handle_event(event,&state,MusicManager,&prevstate);
+
+	}else if (state==2){
+		pause->handle_event(event,&state,MusicManager,&prevstate);
+
+	}
+	else{	
 		menuList[state-1]->handle_event(event,&state,MusicManager,&prevstate);
 	}
 	if(playState!=nullptr && playState->multiplayer){
@@ -167,7 +177,16 @@ void Game::process(){
 		return;
 	}else if (state==3){
 		optionPopup->update(&state);
-	}else if(state==-2){
+	}else if (state==2){
+		pause->update(&state);
+	}
+	else if (state==4){
+		playAgain->update(&state);
+	}else if (state==5){
+		win->update(&state);
+	}
+
+	else if(state==-2){
 		int a = playState->pacman->x;
 		int b = playState->pacman->y;
 	 	playState->reinitialize(a,b);
@@ -198,6 +217,19 @@ void Game::render(){
 		playState->render();
 		optionPopup->render(renderer);
 		}
+	}
+	else if (state==4){
+		SDL_RenderClear(renderer);
+		playState->render();
+		playAgain->render(renderer);
+	}else if (state==2){
+		SDL_RenderClear(renderer);
+		playState->render();
+		pause->render(renderer);
+	}else if (state==5){
+		SDL_RenderClear(renderer);
+		playState->render();
+		win->render(renderer);
 	}
 	else if (state==101){
 		SDL_RenderClear(renderer);

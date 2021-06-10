@@ -8,7 +8,7 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 	wTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);
 	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);
-	dTexture = Texture::LoadT("./../assets/Door_close.png",localRenderer);
+	dTexture = Texture::LoadT("./../assets/wall.png",localRenderer);
 	doTexture = Texture::LoadT("./../assets/door.png",localRenderer);
 	fTexture = Texture::LoadT("./../assets/apple.png",localRenderer);
 	vTexture = Texture::LoadT("./../assets/vaccine.png",localRenderer);
@@ -40,7 +40,18 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 
 	if(mzData=="" || !multiplayer){
 		for(int i=0;i<m_width;i++){
-			vector<int> v;
+			vector<int> v;else if(mazeData[i][j]==7){
+				SDL_RenderCopy(renderer,dTexture,NULL,&vacCell);
+				mazeData[i][j]=0;
+			}
+			else if(mazeData[i][j]==8){
+				SDL_RenderCopy(renderer,dTexture,NULL,&vacCell);
+				mazeData[i][j]=1;
+			}
+			else if (mazeData[i][j]>7){
+				SDL_RenderCopy(renderer,dTexture,NULL,&vacCell);
+				mazeData[i][j]-=2;
+			}
 			for(int j=0;j<m_height;j++){
 				v.push_back(1);
 			}
@@ -115,12 +126,9 @@ void Maze::render(SDL_Renderer* renderer){
 			}else if(mazeData[i][j]==1){
 				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 			}else if(mazeData[i][j]==3){
-				if (!keyEaten){
-				SDL_RenderCopy(renderer,dTexture,NULL,&mazeCell);
-				}
-				else{
+				
 					SDL_RenderCopy(renderer,doTexture,NULL,&mazeCell);	
-				}
+				
 			}else if(mazeData[i][j]==4){
 				SDL_RenderCopy(renderer,fTexture,NULL,&fruitCell);
 			}else if(mazeData[i][j]==5){
@@ -128,6 +136,18 @@ void Maze::render(SDL_Renderer* renderer){
 			}
 			else if(mazeData[i][j]==6){
 				SDL_RenderCopy(renderer,kTexture,NULL,&vacCell);
+			}
+			else if(mazeData[i][j]==7){
+				SDL_RenderCopy(renderer,dTexture,NULL,&vacCell);
+				mazeData[i][j]=0;
+			}
+			else if(mazeData[i][j]==8){
+				SDL_RenderCopy(renderer,dTexture,NULL,&vacCell);
+				mazeData[i][j]=1;
+			}
+			else if (mazeData[i][j]>7){
+				SDL_RenderCopy(renderer,dTexture,NULL,&vacCell);
+				mazeData[i][j]-=2;
 			}
 
 		}
@@ -283,7 +303,7 @@ void Maze::update(){
 			pair<int,int> p = hiddenWalls.front();
 			hiddenWalls.pop();
 			hiddenWalls.push(p);
-			mazeData[p.first][p.second] = (mazeData[p.first][p.second]==0)?1:0;
+			mazeData[p.first][p.second] = (mazeData[p.first][p.second]==0)?120:119;
 		}
 	}
 }

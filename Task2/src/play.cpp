@@ -200,15 +200,18 @@ class play{
 			if(eatFruit(pacman)){
 				pacman->isInvincible=true;
 				pacman->counter=0;
+				m->PlaySound("eatFruit");
 			}
 			if(eatVaccine(pacman)){
 				pacman->isVaccinated=true;
 				pacman->counter=0;
+				m->PlaySound("eatVaccine");
 			}
 			if (!multiplayer && eatKey(pacman)){
 				maze->keyEaten=true;
 				if(!multiplayer){
 				maze->setWinCondition();
+				m->PlaySound("pause");
 		}
 			}
 
