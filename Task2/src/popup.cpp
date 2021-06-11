@@ -1,24 +1,43 @@
 #include "popup.h"
 
+//The main difference between normal menus and pop-up menus is that a menu
+//signifies a completely different state of the game, and therefore occupies
+//the whole screen, while a pop-up menu object is simply another object on the 
+//screen in the same state of the game, and when it is rendered, it doesn't
+//occupy the whole screen, and also doesn't cause any state transitions in
+//the game. Consequently, the game feels less cluttered, more connected and
+//more convenient to use as having a large number of menus partitions the game into a large number of 
+//states which makes the transitions between a menu and play state significantly 
+//slower as compared to that between a pop up menu and the play state
 
+//Constructor
 Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int height){
 
 	renderer=localRenderer;
+	
+	//Position and dimensions of popup menu
 	dst.x=925;
 	dst.y=500;
 	dst.w=1850;
 	dst.h=1050;
-	timed=isTimed;
-	background=Texture::LoadT("./../assets/pback.jpg",renderer);
 
-	SDL_Surface* sback=SDL_CreateRGBSurface(0,width,height, 32, 0, 0, 0, 0xff);
-	back = SDL_CreateTextureFromSurface(renderer,sback);
+	//This checks if the pop-up is timed, i.e. if the pop-up automatically
+	//disappears after some time
+	timed=isTimed;
+
+	//Background textures
+	background=Texture::LoadT("./../assets/pback.jpg",renderer);
+	back = Texture::LoadT("./../assets/redblur.png",renderer);
 
 	startTime=SDL_GetTicks();
+
+	//Different types of pop-up menus
+
+	//Pop-up menu in the transition between levels
 	if (type==1){
 		timed=true;
 		Button* startmulti_button=new Button("Next Level",renderer,width,height);
-		startmulti_button->set_cor(1220,1000,540,150);
+		startmulti_button->set_cor(1400,1000,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Options",renderer,width,height);
@@ -33,6 +52,8 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		logo->set_cor(1320,450,1000,400);
 		buttons.push_back(logo);
 	}
+
+	//Game over pop-up menu
 	else if (type==2){
 		timed=true;
 		Button* startmulti_button=new Button("Play Again",renderer,width,height);
@@ -50,9 +71,11 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		Button* logo=new Button("YOU LOSE!",renderer,width,height);
 		logo->set_cor(1320,450,1000,400);
 		buttons.push_back(logo);
+
+	//Options pop-menu
 	}else if (type==3){
 		Button* start_button=new Button("Music:  ON","Music:  OFF",renderer,width,height);
-		start_button->set_cor(1220,1000,540,150);
+		start_button->set_cor(1400,1000,540,150);
 		buttons.push_back(start_button);
 		
 		Button* options_button=new Button("Sounds:  ON","Sounds:  OFF",renderer,width,height);
@@ -67,10 +90,12 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		Button* logo=new Button("Options",renderer,width,height);
 		logo->set_cor(1320,450,1000,400);
 		buttons.push_back(logo);
+
+	//Pause pop-up menu
 	}else if (type==4){
 		timed=true;
 		Button* startmulti_button=new Button("Resume",renderer,width,height);
-		startmulti_button->set_cor(1220,1000,540,150);
+		startmulti_button->set_cor(1400,1000,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Options",renderer,width,height);
@@ -84,6 +109,8 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		Button* logo=new Button("YOU LOSE!",renderer,width,height);
 		logo->set_cor(1320,450,1000,400);
 		buttons.push_back(logo);
+
+	//Lobby pop-up menu
 	}else if (type==-1){
 		Button* startmulti_button=new Button("Back",renderer,width,height);
 		startmulti_button->set_cor(1400,1000,540,150);
@@ -103,12 +130,12 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	}
 }
 
+//To check whether the pop-up menu has timed out, if it is timed
 void Popup::update(int * state){
 	
 	if (remaining_time==0 && timed){
 		*state=-2;
 	}
-	// cout<<startTime<<":"<<SDL_GetTicks()<<"::"<<remaining_time<<"\n";
 	if (SDL_GetTicks()-startTime>=1000){
 		startTime=SDL_GetTicks();
 		if (timed)remaining_time--;
@@ -116,6 +143,7 @@ void Popup::update(int * state){
 
 }
 
+//Same as button and menu classes, to track the location of the mouse pointer 
 int Popup::locatePointer(int a,int b){
 	for(int i=0;i<buttons.size();i++){
 		if(buttons[i]->isInside(a,b)){
@@ -124,8 +152,9 @@ int Popup::locatePointer(int a,int b){
 	}
 	return -1;
 }
-		
 
+//Local renderer, where the rendering is deferred to the buttons, just like
+//the menu class		
 void Popup::render(SDL_Renderer* renderer){
 	SDL_RenderCopy(renderer,background,NULL,&dst);
 	for(int i=0;i<buttons.size();i++){
@@ -133,6 +162,7 @@ void Popup::render(SDL_Renderer* renderer){
 	}
 }
 
+//Local event handler, again similar to menu state
 void Popup::handle_event(SDL_Event e,int * state,SoundClass* m,int* prevstate){
 	if(e.type==SDL_QUIT){
 		*state=6;

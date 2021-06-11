@@ -2,10 +2,16 @@
 #include "character.h";
 
 using namespace std;
-bool character_debug=true;
+bool character_debug=false;
 
 Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width){
+	
 	if (character_debug)cout<<"character.cpp::Character\n";
+	
+	//Initialising textures for our main character(pacman), one for each 
+	//direction in which it will be moving. We have also animated the pacman
+	//so each direction will also have several textures(here 8), for a total
+	//of 32 textures. 
 	for (int i=0;i<4;i++){
 		for (int j=0;j<8;j++){
 			string path="./../assets/pac"+to_string(i)+to_string(j%2+1)+".xcf";
@@ -14,6 +20,7 @@ Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init
 		}
 	}
 	
+	//Initial position and size of the pacman
 	x=init_x;
 	y=init_y;
 	dstr.h=height;
@@ -27,8 +34,15 @@ Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init
 	isForeigner=isForeign;
 }
 
-void Character::updatePlayer(network*nmanager,bool isForeigner){
+//Updating the pacman's position with time depending upon different constraints in the game
+void Character::updatePlayer(bool isForeigner){
 	if (character_debug)cout<<"character.cpp::updatePlayer\n";
+	
+	//The boolean isForeigner checks whether the current character actually
+	//belongs to the current instance of the game, i.e. in multiplayer mode,
+	//the other pacman(controlled by the opponent) will not be in control 
+	//by the current player, so that character's position should not be 
+	//updated in current instance of the game.
 	if (!isForeigner){
 		y+=y_speed;
 		x+=x_speed;
@@ -37,39 +51,39 @@ void Character::updatePlayer(network*nmanager,bool isForeigner){
 	}
 }
 
-void Character::changeSpeed(SDL_Event e,network*nmanager){
-	if (character_debug)cout<<"character.cpp::changeSpeed\n";
-	if(e.type==SDL_KEYDOWN){
-		switch(e.key.keysym.sym){
-			case SDLK_UP:{y_speed=(-1)*speed;x_speed=0;cur_dir=1;break;}
-			case SDLK_DOWN:{y_speed=speed;x_speed=0;cur_dir=3;break;}
-			case SDLK_RIGHT:{y_speed=0;x_speed=speed;cur_dir=0;break;}
-			case SDLK_LEFT:{y_speed=0;x_speed=(-1)*speed;cur_dir=2;break;}
-		}
-	}else{
-		if (nmanager->connected && false){nmanager->send("$0");}
-	}
-}
-
-
+//To render the pacman on the screen
 void Character::render(SDL_Renderer* renderer){
 	if (character_debug)cout<<"character.cpp::render\n";
+	
 	SDL_RenderCopy(renderer,texture[cur_dir][cur_texture],NULL,&dstr);
+	
+	//The animation of the pacman is implemented here. For a particular
+	//direction, the pacman will change its texture after some fixed numbr 
+	//of frames, denoted by rotation speed (rot_speed).
 	count=(count+1)%rot_speed;
 	if (count==0){
 		cur_texture=(cur_texture+1)%8;
 	}
 }
 
-bool Character::collide(Enemy * obj,SoundClass *m,bool music_on){
+//To check collision between pacman and an enemy
+bool Character::collide(Enemy * obj,SoundClass *m){
 	if (character_debug)cout<<"character.cpp::collide\n";
+	
+	//Pacman's constraints
 	int x1 = x + width;
 	int y1 = y + height;
+	
+	//Enemy's constraints
 	if(obj==nullptr){
 		exit(1);
 	}
 	int x2 = obj->x + obj->width;
 	int y2 = obj->y + obj->height;
+	
+	//The collision checking is done by simply comparing the constraints of 
+	//the bounding boxes of pacman and the enemy. If both the boxes overlap
+	//from any direction, then collision has occured.
 	if(obj->x<=x && x<=x2 && obj->y<=y && y<=y2){
 		return true;
 	}else if(obj->x<=x && x<=x2 && obj->y<=y1 && y1<=y2){
@@ -83,6 +97,9 @@ bool Character::collide(Enemy * obj,SoundClass *m,bool music_on){
 	}
 }
 
+//To set the position of the character, when the co-ordinates are provided 
+//externally. This is particularly useful in multiplayer mode, for setting the 
+//position of the non-local pacman.
 void Character::set_x_y(int x_ax,int y_ax){
 	x=x_ax;
 	y=y_ax;
@@ -90,6 +107,8 @@ void Character::set_x_y(int x_ax,int y_ax){
 	dstr.y=y;
 }
 
+//To set the speed of the non-local pacman, for use in multiplayer mode, similar
+//to the above function.
 void Character::set_speed(int a){
 	if (a==1){
 		y_speed=(-1)*speed;x_speed=0;
@@ -100,7 +119,8 @@ void Character::set_speed(int a){
 		cur_dir=3;
 	}
 	else if (a==3){
-		y_speed=0;x_speed=speed;
+		y_speed=0;
+		x_speed=speed;
 		cur_dir=0;
 	}
 	else if (a==4){
@@ -109,17 +129,26 @@ void Character::set_speed(int a){
 	}
 }
 
+//For updating the time counter for various powerups 
 void Character::updateCounter(int lvl){
+	
+	//Normal update
 	if(isVaccinated || isInvincible){
 		counter++;
 	}
-	if(counter==(9-lvl)*60){
+	
+	//If the counter reaches a particular upper limit, for a given level,
+	//then the power-up runs out.
+	if(counter==(7-lvl)*60){
 		counter=0;
 		isInvincible=false;
 		isVaccinated=false;
 	}
 }
 
+//Obtaining the current state of the player in string form to send over the 
+//network, for updating the position and speed of its non-local copy on another
+//instance of the game.
 string Character::getPlayerState(){
 	string x1=to_string(x),y1=to_string(y);
 	int k;

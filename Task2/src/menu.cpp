@@ -6,24 +6,32 @@ class Menu{
 	
 	public:
 		
-		char* name;
-		vector<Button*> buttons;
+		//Basic parameters which are common to all menus
+		char* name;								//Name of menu
+		vector<Button*> buttons;				//List of buttons in the menu
 		SDL_Texture* background,*playerName;
 		SDL_Renderer* renderer;
 		bool menu_debug=true;
-		SDL_Rect input_box;
-		bool changed=true;
-		string cur_player="";
+		SDL_Rect input_box;						//For taking in the name of the player as input
+		bool changed=true;						//To check if the player inputs any characters
+		string cur_player="";					//The name of the current player
 		char* cplayer=&cur_player[0];
 		int s_width,s_height;
+
+		//Menu constructor
 		Menu(char* title, int menuType, SDL_Texture* poster, SDL_Renderer* localRenderer,int width,int height){
 			if (menu_debug)cout<<"menu.cpp::Menu\n";
+			
+			//Initialising common parameters
 			name = title;
 			background = poster;
 			s_width=width;
 			s_height=height;
 			renderer = localRenderer;
 			
+			//Initialising buttons in different menus
+
+			//Start Menu
 			if(menuType==1){
 
 				Button* startsingle_button=new Button("Single Player",renderer,width,height);
@@ -54,6 +62,7 @@ class Menu{
 				
 			}
 
+			//Pause Menu
 			else if(menuType==2){
 
 				Button* resume_button=new Button("Resume",renderer,width,height);
@@ -64,8 +73,9 @@ class Menu{
 				exit_button->set_cor(1700,1100,300,70);
 				buttons.push_back(exit_button);
 
-			}//
+			}
 
+			//Options Menu
 			else if(menuType==3){
 
 				Button* start_button=new Button("Music:  ON","Music:  OFF",renderer,width,height);
@@ -86,6 +96,7 @@ class Menu{
 
 			}
 
+			//Game Over Menu
 			else if(menuType==4){
 
 				Button* playAgain=new Button("Play Again",renderer,width,height);
@@ -97,6 +108,7 @@ class Menu{
 				buttons.push_back(exit_button);
 			}
 
+			//Winner Screen
 			else if(menuType==5){
 
 				Button* playAgain=new Button("Play Again",renderer,width,height);
@@ -120,6 +132,7 @@ class Menu{
 			return -1;
 		}
 		
+		//Local render function
 		void render(){
 			if (menu_debug)cout<<"menu.cpp::render\n";
 
@@ -147,6 +160,9 @@ class Menu{
 			
 		}
 		
+		//Local event handler. Again notice that the event handling is further
+		//deferred to the button class to take care of the function of each 
+		//button separately
 		void handle_event(SDL_Event e,int* state,SoundClass *m,int* prevstate){
 			if (menu_debug)cout<<"menu.cpp::handle_event\n";
 			if(e.type==SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE ){

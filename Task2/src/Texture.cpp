@@ -17,45 +17,37 @@ if (texture_debug)cout<<"Texture.cpp::LoadT\n";
 			cout<<"Error:"<<SDL_GetError()<<"\n";
 			exit(1);
 		}
-		else{
-			// cout<<"NO ERROR\n";
-		}
 		SDL_FreeSurface(tmp);
 	}
-	// cout<<"l\n";
 	return returng;
 }
-
-
 
 SDL_Texture* Texture::LoadText(char* label,SDL_Renderer* renderer){
 
 	if (texture_debug)cout<<"Texture.cpp::LoadText\n";
 	TTF_Init();
-	TTF_Font * font=nullptr;//=new TTFont();
+	TTF_Font * font=nullptr;
 	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
 	if (font==NULL){
 		cout<<"Error:Couldn't initialize font\n";
 		exit(1);
 	}
+	
 	SDL_Color color={255,255,255,255};
 	SDL_Texture* text;
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,color);
 
 	if (textSurface==NULL){
 		cout<<"Error:Couldn't initialize text surface for:"<<label<<"\n";	
-		exit(1);	//To manage exit condition
-	}
-	else{
-	text=SDL_CreateTextureFromSurface(renderer,textSurface);
-	if (text==NULL){
-		cout<<"Error:Couldn't initialize text Texture for:"<<label<<":::"<<SDL_GetError()<<"\n";	
-		exit(1);	//To manage exit condition
-	}
-	else{
-	SDL_FreeSurface(textSurface);
-}
-
+		exit(1);
+	}else{
+		text=SDL_CreateTextureFromSurface(renderer,textSurface);
+		if (text==NULL){
+			cout<<"Error:Couldn't initialize text Texture for:"<<label<<":::"<<SDL_GetError()<<"\n";	
+			exit(1);
+		}else{
+			SDL_FreeSurface(textSurface);
+		}
 	}
 	return text;
 }
