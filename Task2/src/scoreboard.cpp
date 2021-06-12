@@ -1,5 +1,6 @@
 #include "scoreboard.h"
 bool score_debug=true;
+using namespace std;
 
 //Constructor
 ScoreBoard::ScoreBoard(SDL_Renderer* render,bool multi){
@@ -90,6 +91,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 			string player1=p1+":"+to_string(s1);
 			char * sc=&player1[0];
 			pl1=Texture::LoadText(sc,renderer);
+			score_rect.w=max(200,(int)player1.size()*30);
 		}
 	}
 }
@@ -101,9 +103,7 @@ void ScoreBoard::render(){
 	SDL_RenderCopy(renderer,timing,NULL,&time_rect);
 	
 	//Player 1 scoreboard
-	if (pl1!=nullptr ){
-		SDL_RenderCopy(renderer,pl1,NULL,&score_rect);
-	}
+	SDL_RenderCopy(renderer,pl1,NULL,&score_rect);
 
 	//Player 2 scoreboard in case of multiplayer
 	if (pl2!=nullptr ){

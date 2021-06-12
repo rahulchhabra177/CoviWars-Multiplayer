@@ -55,6 +55,10 @@ void SoundClass::InitializeAll(){
 	LoadSound("./../Sounds/collision.wav","collision");
 	LoadSound("./../Sounds/windowstart.wav","gamestart");
 	LoadSound("./../Sounds/button.wav","button");
+	LoadSound("./../Sounds/pacman_eatghost.wav","eatCorona");
+	LoadSound("./../Sounds/pacman_eatfruit.wav","eatFruit");
+	LoadSound("./../Sounds/pacman_extrapac.wav","eatVaccine");
+	LoadSound("./../Sounds/pacman_chomp.wav","wallAdded");
 	LoadMusic("./../Sounds/bMusic.mp3","bMusic");
 }
 

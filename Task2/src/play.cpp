@@ -244,11 +244,16 @@ class play{
 			}
 			if(eatPowerUp(pacman,4)){
 				pacman->isInvincible=true;
-				pacman->counter=0;
+				if(!pacman->isVaccinated){
+					pacman->counter=0;
+				}
+				m->PlaySound("eatFruit");
 			}
 			if(eatPowerUp(pacman,5)){
 				pacman->isVaccinated=true;
+				pacman->isInvincible=false;
 				pacman->counter=0;
+				m->PlaySound("eatVaccine");
 			}
 			if(eatPowerUp(pacman,6)){
 				pacman->isMasked=true;
@@ -259,10 +264,11 @@ class play{
 			if (!multiplayer && eatPowerUp(pacman,8)){
 				maze->keyEaten=true;
 				maze->setWinCondition();
+				m->PlaySound("pause");
 			}
 
 			//The key appears only after the player has reached a minimum score
-			if(!multiplayer && pacman->score>(60*maze->numEggs)/100 && !keyPlaced){
+			if(!multiplayer && (pacman->score*100)>(60*maze->numEggs) && !keyPlaced){
 				maze->placeKey();
 				keyPlaced=true;
 			}
@@ -504,8 +510,8 @@ class play{
 			if(maze->mazeData[x][y]==7){
 				if(pacman->inQuarantine){
 					pacman->hazardCounter++;
-					if(pacman->hazardCounter%30==0 || !pacman->isMasked){
-						pacman->score=pacman->score-pacman->hazardCounter/30;
+					if(pacman->hazardCounter%60==0 && !pacman->isMasked){
+						pacman->score=pacman->score-pacman->hazardCounter/60;
 					}
 				}else{
 					pacman->inQuarantine = true;

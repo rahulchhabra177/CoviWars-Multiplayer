@@ -18,12 +18,12 @@ class Maze{
 		SDL_Texture* wTexture = NULL;
 		SDL_Texture* sTexture = NULL;
 		SDL_Texture* dTexture = NULL;
-		SDL_Texture* doTexture = NULL;
 		SDL_Texture* fTexture = NULL;
 		SDL_Texture* vTexture = NULL;
 		SDL_Texture* qTexture = NULL;
 		SDL_Texture* mTexture = NULL;
 		SDL_Texture* kTexture = NULL;
+		SDL_Texture* orangeWall = NULL;
 		bool multiplayer=false;
 		vector<vector<int>> mazeData;
 		void reinitialize();

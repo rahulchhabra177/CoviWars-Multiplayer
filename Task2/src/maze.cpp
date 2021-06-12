@@ -26,22 +26,23 @@ queue<pair<int,int>> hiddenWalls;
 // 7: Quarantine cell. A hazardous cell which incrementally decreases the 
 //    health points of pacman, if it stands on it for too long without a mask.
 // 8: A key, which is required to pass through the door to the next level.
+// >8: For animation of hidden walls
 
 //Maze constructor
 Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 	if (maze_debug)cout<<"Maze.cpp.cpp:Maze\n";
 
 	//Initialising the textures of different parts of the maze
-	wTexture = Texture::LoadT("./../assets/wall.png",localRenderer);			//Wall
+	wTexture = Texture::LoadT("./../assets/wall.jpeg",localRenderer);			//Wall
 	sTexture= Texture::LoadT("./../assets/tab.xcf",localRenderer);				//Egg/Tablet
-	dTexture = Texture::LoadT("./../assets/Door_close.png",localRenderer);		//Closed Door
-	doTexture = Texture::LoadT("./../assets/door.png",localRenderer);			//Open Door
+	dTexture = Texture::LoadT("./../assets/door.png",localRenderer);			//Door
 	fTexture = Texture::LoadT("./../assets/apple.png",localRenderer);			//Fruit
-	vTexture = Texture::LoadT("./../assets/vaccine.png",localRenderer);		//Vaccine
+	vTexture = Texture::LoadT("./../assets/vaccine.png",localRenderer);			//Vaccine
 	mTexture = Texture::LoadT("./../assets/mask.jpeg",localRenderer);			//Mask
 	kTexture = Texture::LoadT("./../assets/key.png",localRenderer);				//Key
 	qTexture = Texture::LoadT("./../assets/quarantine.jpeg",localRenderer);		//Quarantine/Hazardous cell
-	
+	orangeWall = Texture::LoadT("./../assets/wall.png",localRenderer);			//For animation of hidden wall
+
 	//Checking if the current play state is single player or multi player
 	multiplayer = multi;
 
@@ -117,6 +118,7 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 		setQuarantine();
 		placeFruits();
 		placeVaccine();
+		placeMasks();
 
 	}else{
 
@@ -168,11 +170,16 @@ void Maze::reinitialize(){
 	
 	for(int i=0;i<m_width;i++){
 		for(int j=0;j<m_height;j++){
-			if(mazeData[i][j]==2){
+			if(mazeData[i][j]!=1){
 				mazeData[i][j]=0;
 			}
 		}
 	}
+
+	setQuarantine();
+	placeVaccine();
+	placeFruits();
+	placeMasks();
 
 }
 
@@ -211,6 +218,15 @@ void Maze::render(SDL_Renderer* renderer){
 				SDL_RenderCopy(renderer,qTexture,NULL,&quarCell);
 			}else if(mazeData[i][j]==8){
 				SDL_RenderCopy(renderer,kTexture,NULL,&keyCell);
+			}else if(mazeData[i][j]==9){
+				SDL_RenderCopy(renderer,orangeWall,NULL,&mazeCell);
+				mazeData[i][j]=0;
+			}else if(mazeData[i][j]==10){
+				SDL_RenderCopy(renderer,orangeWall,NULL,&mazeCell);
+				mazeData[i][j]=1;
+			}else if(mazeData[i][j]>10){
+				SDL_RenderCopy(renderer,orangeWall,NULL,&mazeCell);
+				mazeData[i][j]-=2;
 			}
 		}
 	}
@@ -362,7 +378,7 @@ void Maze::update(){
 			pair<int,int> p = hiddenWalls.front();
 			hiddenWalls.pop();
 			hiddenWalls.push(p);
-			mazeData[p.first][p.second] = (mazeData[p.first][p.second]==0)?1:0;
+			mazeData[p.first][p.second] = (mazeData[p.first][p.second]==0 || mazeData[p.first][p.second]==2)?60:59;
 		}
 	}
 }
