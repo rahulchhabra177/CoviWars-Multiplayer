@@ -34,7 +34,7 @@ public:
 	bool isVaccinated=false;
 	bool isForeigner=false;
 
-	char* name="player";
+	string name="player";
 	SDL_Rect dstr,src;
 	Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width,SDL_Texture* texture_p[4][8],SDL_Texture* texture_pv[4][8],SDL_Texture* texture_pa[4][8]);
 	void updatePlayer(bool isForeigner);

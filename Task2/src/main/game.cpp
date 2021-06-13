@@ -256,11 +256,20 @@ void Game::process(){
 			//The new clients receive the data regarding the maze,
 			//the enemies and the initial position of the pacman
 			//from the server through the network manager 
-			string mzData=nmanager->receive(585,&state,&prevstate);
+			string mzData=nmanager->receive(595,&state,&prevstate);
 			if (mzData!=""){
 				playState = new play("Play",1,gameback,renderer,menuList[0],true,mzData);
 				nmanager->timeout=SDL_GetTicks();
-				nmanager->send("$000000000",&state,&prevstate);
+				string plname=playState->pacman->name;
+				if (plname.size()>10){
+					plname=plname.substr(0,10);
+				}
+				else{
+					while (plname.size()!=10){
+						plname.push_back(' ');
+					}
+				}
+				nmanager->send(plname,&state,&prevstate);
 				state=0;
 				nmanager->isPlaying=true;
 			}
@@ -271,7 +280,8 @@ void Game::process(){
 			}
 			if (!nmanager->isPlaying){
 				nmanager->timeout=SDL_GetTicks();
-				if (nmanager->receive(10,&state,&prevstate)!=""){state=0;nmanager->isPlaying=true;}
+				string plname=nmanager->receive(10,&state,&prevstate);
+				if (plname!=""){state=0;nmanager->isPlaying=true;playState->pacman2->name=plname;}
 			}
 		}
 	}

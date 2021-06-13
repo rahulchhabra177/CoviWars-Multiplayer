@@ -207,7 +207,11 @@ void Maze::render(SDL_Renderer* renderer){
 			if(mazeData[i][j]==0){
 				SDL_RenderCopy(renderer,sTexture,NULL,&mazeEgg);			
 			}else if(mazeData[i][j]==1){
-				if (i!=m_width-1 || j!=m_height-2){
+				if (multiplayer){
+					SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+				}
+				else if ((i!=m_width-1 || j!=m_height-2)){
+					
 					SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
 				}
 			}else if(mazeData[i][j]==3){
@@ -235,16 +239,16 @@ void Maze::render(SDL_Renderer* renderer){
 			
 		}
 	}
-	
-	mazeLab.y=100*(m_height-4);
-	mazeLab.x=100*(m_width);
-	mazeLab.h=400;
-	SDL_RenderCopy(renderer,wTexture,NULL,&mazeLab);
-	mazeLab.y=100*(m_height-4);
-	mazeLab.x=100*(m_width-1);
-	mazeLab.h=300;
-	SDL_RenderCopy(renderer,lTexture,NULL,&mazeLab);
-
+	if (!multiplayer){
+		mazeLab.y=100*(m_height-4);
+		mazeLab.x=100*(m_width);
+		mazeLab.h=400;
+		SDL_RenderCopy(renderer,wTexture,NULL,&mazeLab);
+		mazeLab.y=100*(m_height-4);
+		mazeLab.x=100*(m_width-1);
+		mazeLab.h=300;
+		SDL_RenderCopy(renderer,lTexture,NULL,&mazeLab);
+	}
 	// SDL_RenderCopy(renderer,lTexture,NULL,&mazeLab);
 
 }

@@ -41,6 +41,7 @@ class play{
 		SDL_Texture* texture_p[4][8]={NULL};
 		SDL_Texture* texture_pv[4][8]={NULL};
 		SDL_Texture* texture_pa[4][8]={NULL};
+		string pl2name="Client";
 		play(char* title,int level,SDL_Texture* poster, SDL_Renderer* localRenderer,Menu* menu,bool multi,string mzData=""){
 			if (play_debug)cout<<"play.cpp:play\n";
 			menu_n=menu;
@@ -98,9 +99,9 @@ class play{
 	
 			maze = new Maze(lvl,renderer,multi,mzData);
 			score = new ScoreBoard(renderer,multi);
-
+			
 			if(mzData=="" || !multiplayer){
-
+				
 				//In case of a single player game or server in a multiplayer
 				//game, the enemies are randomly initialised on the empty 
 				//cells of the maze.
@@ -139,6 +140,14 @@ class play{
 				//are rendered only after they have joined the network hosted
 				//by the server
 				pacman = new Character("./../assets/corona.bmp",renderer,100,100,false,menu->s_width,texture_p,texture_pv,texture_pa);
+				pacman->name=menu_n->cplayer;
+
+				while (pacman->name.size()!=0 && pacman->name[pacman->name.size()-1]==' '){
+					pacman->name.pop_back();
+				}
+				if (pacman->name==""){
+					pacman->name="Player 1 ";
+				}
 				for (int i=0;i<maze->numFruits;i++){
 					fruits.push_back(false);
 				}
@@ -163,8 +172,21 @@ class play{
 				
 				//Creating both the local and non-local pacman(created by server)
 				pacman = new Character("./../assets/corona.bmp",renderer,(maze->m_width-2)*100-100,100,false,menu->s_width,texture_p,texture_pv,texture_pa);
+				pacman->name=menu_n->cplayer;
+				while (pacman->name.size()!=0 && pacman->name[pacman->name.size()-1]==' '){
+					pacman->name.pop_back();
+				}
+				if (pacman->name==""){
+					pacman->name="Player 1 ";
+				}
 				pacman2 = new Character("./../assets/corona.bmp",renderer,100,100,true,menu_n->s_width,texture_p,texture_pv,texture_pa);
-
+				pacman2->name=mzData.substr(585,10);
+				while (pacman2->name.size()!=0 && pacman2->name[pacman2->name.size()-1]==' '){
+					pacman2->name.pop_back();
+				}
+				if (pacman2->name==""){
+					pacman2->name="Player 2 ";
+				}
 				//Importing the location of enemies
 				int index = 569;
 				for(int i=0;i<stoi(mzData.substr(568,1));i++){
@@ -268,6 +290,12 @@ class play{
 			for(int i=0;i<buttons.size();i++){
 				buttons[i]->render(renderer);
 			}
+			while (pacman2->name.size()!=0 && pacman2->name[pacman2->name.size()-1]==' '){
+				pacman2->name.pop_back();
+			}
+			if (pacman2->name==""){
+				pacman2->name="Player 2";
+			}
 		}
 		
 		//This helper function manages the requests and responses for 
@@ -281,7 +309,9 @@ class play{
 
 			//A string starting with '$' means a response to a request which
 			//demands the data of non-local pacman and the enemies
-			}else if(response[0]=='$'){
+			}
+			*prevstate=0;
+			if(response[0]=='$'){
 				pacman2->set_x_y(stoi(response.substr(2,4)),stoi(response.substr(6,4)));
 				pacman2->set_speed(stoi(response.substr(1,1)));
 				for(int i=0;i<stoi(response.substr(10,1));i++){
@@ -390,7 +420,9 @@ class play{
 			//and the client in multiplayer mode 
 			if(multiplayer){
 				if(nmanager->connected && nmanager->isPlaying && !isServer){
-					nmanager->send("!"+pacman->getPlayerState(),state,prevstate);
+					if (*prevstate!=-1){
+						nmanager->send("!"+pacman->getPlayerState(),state,prevstate);
+					}
 					string response=nmanager->receive(11+8*(enemies.size()),state,prevstate);
 					handle_request(response,state,prevstate);
 				}else if (nmanager->connected && nmanager->isPlaying && isServer){
@@ -398,7 +430,9 @@ class play{
 					for (int i=0;i<enemies.size();i++){
 						enemyState+=enemies[i]->getEnemyState();
 					}
-					nmanager->send("$"+pacman->getPlayerState()+to_string(enemies.size())+enemyState,state,prevstate);
+					if (*prevstate!=-1){
+						nmanager->send("$"+pacman->getPlayerState()+to_string(enemies.size())+enemyState,state,prevstate);
+					}
 					string response=nmanager->receive(10,state,prevstate);
 					cout<<"handle\n";
 					handle_request(response,state,prevstate);
@@ -407,13 +441,11 @@ class play{
 			}
 
 			//Scoreboard and timer updates
-			if (menu_n->cur_player!=""){
+			if (!multiplayer){
 				score->update(1,menu_n->cplayer,pacman->score,"",0);
 			}else{
 				if(pacman2!=nullptr){
-					score->update(1,"Player1",pacman->score,"Player2",0);
-				}else{
-					score->update(1,"Player1",pacman->score,"",0);
+					score->update(1,pacman->name,pacman->score,pacman2->name,pacman2->score);
 				}
 			}
 
@@ -503,6 +535,7 @@ class play{
 						}else{
 							m->PlaySound("collision");
 							*state=4;
+							// pacman->updatePlayer(false);
 						}
 					}
 
@@ -572,21 +605,22 @@ class play{
 				if(i>=0){
 					//buttons[i]->handle_event(state,m,prevstate,e);
 				}
-			}else if(e.type==SDL_KEYDOWN && !multiplayer){
+			}else if(e.type==SDL_KEYDOWN){
 				changeSpeed(pacman,e);
-				if(e.key.keysym.sym==SDLK_ESCAPE){
+
+				if(e.key.keysym.sym==SDLK_ESCAPE && !multiplayer){
 					*state=2;
 				}else if(e.key.keysym.sym==SDLK_p){
 					*state=2;
 				}
-				else if(e.key.keysym.sym==SDLK_a){
+				else if(e.key.keysym.sym==SDLK_a && !multiplayer){
 					maze->placeFruits();
 				}
-				else if(e.key.keysym.sym==SDLK_v){
+				else if(e.key.keysym.sym==SDLK_v && !multiplayer){
 					maze->placeVaccine();
 				}
-				else if(e.key.keysym.sym==SDLK_e){
-					placeEnemy();
+				else if(e.key.keysym.sym==SDLK_e && !multiplayer){
+					placeEnemy(); 
 				}
 			}
 		}
@@ -604,13 +638,24 @@ class play{
 		
 		//Combination of maze data and enemy data in string form
 		string getPlayState(){
-			string result= maze->getMazeState()+to_string(enemies.size())+getEnemiesPos();
+			string name=menu_n->cplayer;
+			if (name.size()>10){
+				name=name.substr(0,10);
+			}
+			else{
+				while (name.size()!=10){
+					name.push_back(' ');
+				}
+			}
+			string result= maze->getMazeState()+to_string(enemies.size())+getEnemiesPos()+name;
 			return result;
 		}
 		
 		//Function to add a client to the server
 		void addPlayer(){
 			pacman2 = new Character("./../assets/corona.bmp",renderer,(maze->m_width-2)*100-90,110,true,menu_n->s_width,texture_p,texture_pv,texture_pa);
+			pacman2->name=pl2name;
+			
 		}
 
 	private:
@@ -784,7 +829,7 @@ class play{
 		//The following function manage the collision between the pacman
 		//and different power-ups
 		bool eatPowerUp(Character* pacman,int powerup){
-			if (play_debug)cout<<"play.cpp:collidePlayer\n";
+			if (play_debug)cout<<"play.cpp:EatPowerUP\n";
 			
 			if(pacman->x_speed!=0){
 				if(pacman->x_speed>0){

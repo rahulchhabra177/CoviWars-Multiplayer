@@ -55,10 +55,9 @@ void network::send(string s,int* state,int* prevstate){
 	cout<<"send\n";
 
 	//For disconnecting a client/server if it's connection times out 
-	// if (SDL_GetTicks()-timeout>5000){
-	// 	*prevstate=*state;
-	// 	*state=101;
-	// }
+	if (SDL_GetTicks()-timeout>5000){
+		*prevstate=-1;
+	}
 
 	const char* tmp=&s[0];
 	int size=0;
@@ -66,10 +65,10 @@ void network::send(string s,int* state,int* prevstate){
 	if (isServer){
 		if (client==NULL){return;}
 		while (size<len){
-			// if (SDL_GetTicks()-timeout>5000){
-			// 	*prevstate=*state;
-			// 	*state=101;
-			// }
+			if (SDL_GetTicks()-timeout>5000){
+				*prevstate=-1;
+		
+			}
 			cout<<"size::\n";
 			size+=SDLNet_TCP_Send(client,tmp+size,len-size);
 			cout<<"size:\n";
@@ -77,10 +76,10 @@ void network::send(string s,int* state,int* prevstate){
 	}else{
 		if (server==NULL){cout<<"No server\n";exit(1);return;}
 		while (size<len){
-			// if (SDL_GetTicks()-timeout>5000){
-			// 	*prevstate=*state;
-			// 	*state=101;
-			// }
+			if (SDL_GetTicks()-timeout>5000){
+				*prevstate=-1;
+				// *state=101;
+			}
 			cout<<"size::\n";
 			size+=SDLNet_TCP_Send(server,tmp+size,len-size);
 			cout<<"size:\n";
@@ -94,10 +93,9 @@ string network::receive(int num,int* state,int* prevstate){
 	cout<<"receive\n";
 
 	//For disconnecting a client/server if it's connection times out 
-	// if (SDL_GetTicks()-timeout>5000){
-	// 	*prevstate=*state;
-	// 	*state=101;
-	// }
+	if (SDL_GetTicks()-timeout>5000){
+		*prevstate=-1;
+	}
 
 	if (isServer && connected){
 		if (SDLNet_CheckSockets(sockets,0)>0 && SDLNet_SocketReady(client)){
