@@ -35,6 +35,12 @@ class play{
 		vector<bool> vaccines;
 		int numMasksPlaced=0;
 		vector<bool> masks;
+		int numEnemiesPlaced=0;
+		vector<bool> extra_enemies;
+		SDL_Texture* texture_e[8]={NULL};
+		SDL_Texture* texture_p[4][8]={NULL};
+		SDL_Texture* texture_pv[4][8]={NULL};
+		SDL_Texture* texture_pa[4][8]={NULL};
 		play(char* title,int level,SDL_Texture* poster, SDL_Renderer* localRenderer,Menu* menu,bool multi,string mzData=""){
 			if (play_debug)cout<<"play.cpp:play\n";
 			menu_n=menu;
@@ -51,6 +57,39 @@ class play{
 			SDL_RenderPresent(renderer);
 
 			int numEnemies = f(lvl);
+			//Multiple textures(here 8) of the enemy for animation effect
+			for (int i=0;i<8;i++){
+				string path="./../assets/enemy/corona"+to_string(i)+".png";
+				char* a=&path[0];
+				texture_e[i]=Texture::LoadT(a,localRenderer);
+			}
+
+			//Initialising textures for our main character(pacman), one for each 
+			//direction in which it will be moving. We have also animated the pacman
+			//so each direction will also have several textures(here 8), for a total
+			//of 32 textures. 
+			for (int i=0;i<4;i++){
+				for (int j=0;j<8;j++){
+					string path="./../assets/coroman/normal/pac"+to_string(i)+to_string(j%2+1)+".png";
+					char* a=&path[0];
+					texture_p[i][j]=Texture::LoadT(a,localRenderer);
+				}
+			}
+			for (int i=0;i<4;i++){
+				for (int j=0;j<8;j++){
+					string path="./../assets/coroman/vaccinated/pacvac"+to_string(i)+to_string(j%2+1)+".png";
+					char* a=&path[0];
+					texture_pv[i][j]=Texture::LoadT(a,localRenderer);
+				}
+			}
+			for (int i=0;i<4;i++){
+				for (int j=0;j<8;j++){
+					string path="./../assets/coroman/invincible/pacapp"+to_string(i)+to_string(j%2+1)+".png";
+					char* a=&path[0];
+					texture_pa[i][j]=Texture::LoadT(a,localRenderer);
+				}
+			}
+
 
 			for(int i=0;i<numEnemies;i++){
 				Enemy* enemy=nullptr;
@@ -88,7 +127,7 @@ class play{
 						int x = 2*(rand()%(maze->m_width/2))+1;
 						int y = 2*(rand()%(maze->m_height/2))+1;
 						if(maze->mazeData[x][y]==0 && occupied[x][y]==0 && (!x<menu_n->s_width/3 && !y<menu_n->s_height/3)){
-							enemies[i]=new Enemy(renderer,100*x,100*y,menu_n->s_width);
+							enemies[i]=new Enemy(renderer,100*x,100*y,menu_n->s_width,texture_e);
 							occupied[x][y]=1;
 							break;
 						}
@@ -99,7 +138,7 @@ class play{
 				//pacman is rendered initially, and in server, other players
 				//are rendered only after they have joined the network hosted
 				//by the server
-				pacman = new Character("./../assets/corona.bmp",renderer,100,100,false,menu->s_width);
+				pacman = new Character("./../assets/corona.bmp",renderer,100,100,false,menu->s_width,texture_p,texture_pv,texture_pa);
 				for (int i=0;i<maze->numFruits;i++){
 					fruits.push_back(false);
 				}
@@ -108,6 +147,9 @@ class play{
 				}
 				for (int i=0;i<maze->numMasks;i++){
 					masks.push_back(false);
+				}
+				for (int i=0;i<maze->extra_enemies;i++){
+					extra_enemies.push_back(false);
 				}
 			}else{
 
@@ -120,13 +162,13 @@ class play{
 				//speed to other players so that the game state is synchronised
 				
 				//Creating both the local and non-local pacman(created by server)
-				pacman = new Character("./../assets/corona.bmp",renderer,(maze->m_width-2)*100-100,100,false,menu->s_width);
-				pacman2 = new Character("./../assets/corona.bmp",renderer,100,100,true,menu_n->s_width);
+				pacman = new Character("./../assets/corona.bmp",renderer,(maze->m_width-2)*100-100,100,false,menu->s_width,texture_p,texture_pv,texture_pa);
+				pacman2 = new Character("./../assets/corona.bmp",renderer,100,100,true,menu_n->s_width,texture_p,texture_pv,texture_pa);
 
 				//Importing the location of enemies
 				int index = 569;
 				for(int i=0;i<stoi(mzData.substr(568,1));i++){
-					enemies[i] = new Enemy(renderer,stoi(mzData.substr(index,4)),stoi(mzData.substr(index+4,4)),menu_n->s_width);
+					enemies[i] = new Enemy(renderer,stoi(mzData.substr(index,4)),stoi(mzData.substr(index+4,4)),menu_n->s_width,texture_e);
 					index+=8;
 				}
 			}
@@ -152,7 +194,12 @@ class play{
 			for (int i=0;i<maze->numMasks;i++){
 				masks[i]=false;
 			}
+			for (int i=0;i<maze->extra_enemies;i++){
+				extra_enemies[i]=false;
+			}
 			enemyReinitialize(a,b);
+			
+			numEnemiesPlaced=0;
 			
 		}
 		
@@ -168,7 +215,7 @@ class play{
 					}
 				}
 			}
-			
+			for(int i=0;i<numEnemiesPlaced;i++){enemies.pop_back();}
 			//This part makes sure that when the play state is recreated, the 
 			//enemies are not rendered in close proximity to the player, to give
 			//the player a fair chance of survival
@@ -280,6 +327,11 @@ class play{
 				maze->placeMasks();
 				masks[numMasksPlaced]=true;
 				numMasksPlaced++;
+			}
+			if (!multiplayer && numEnemiesPlaced<maze->extra_enemies && pacman->score > ((numEnemiesPlaced+1)*maze->numEggs)/maze->extra_enemies && !extra_enemies[numMasksPlaced]){
+				
+				extra_enemies[numEnemiesPlaced]=true;
+				placeEnemy();
 			}
 
 			if(eatPowerUp(pacman,0)){
@@ -477,6 +529,11 @@ class play{
 				}	
 			}
 		}
+
+		void placeEnemy(){
+			enemies.push_back(new Enemy(renderer,(maze->m_width-2)*100,(maze->m_height-2)*100,menu_n->s_width,texture_e));
+			numEnemiesPlaced++;
+		}
 		
 		//To keep track of the last key pressed
 		int last_key_x(Character* pacman){
@@ -528,6 +585,9 @@ class play{
 				else if(e.key.keysym.sym==SDLK_v){
 					maze->placeVaccine();
 				}
+				else if(e.key.keysym.sym==SDLK_e){
+					placeEnemy();
+				}
 			}
 		}
 
@@ -544,12 +604,13 @@ class play{
 		
 		//Combination of maze data and enemy data in string form
 		string getPlayState(){
-			return maze->getMazeState()+to_string(enemies.size())+getEnemiesPos();
+			string result= maze->getMazeState()+to_string(enemies.size())+getEnemiesPos();
+			return result;
 		}
 		
 		//Function to add a client to the server
 		void addPlayer(){
-			pacman2 = new Character("./../assets/corona.bmp",renderer,(maze->m_width-2)*100-90,110,true,menu_n->s_width);
+			pacman2 = new Character("./../assets/corona.bmp",renderer,(maze->m_width-2)*100-90,110,true,menu_n->s_width,texture_p,texture_pv,texture_pa);
 		}
 
 	private:
@@ -578,7 +639,7 @@ class play{
 
 		//This function return the number of enemies as a function of the current level of the game
 		int f(int n){
-			return 2*n;
+			return 2;
 		}
 
 		//To track the current location of the mouse pointer

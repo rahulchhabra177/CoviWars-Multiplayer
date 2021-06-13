@@ -3,14 +3,13 @@
 using namespace std;
 bool enemy_debug=true;
 
-Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width){
+Enemy::Enemy(SDL_Renderer* localRenderer,int init_x,int init_y,int screen_width,SDL_Texture* texture_e[]){
 	if (enemy_debug)cout<<"Enemy.cpp::Enemy\n";
 
 	//Multiple textures(here 8) of the enemy for animation effect
 	for (int i=0;i<8;i++){
-		string path="./../assets/enemy/corona"+to_string(i)+".png";
-		char* a=&path[0];
-		texture[i]=Texture::LoadT(a,localRenderer);
+
+		texture[i]=texture_e[i];
 	}
 	
 	//This checks whether this instance of the enemy is in play or not.

@@ -90,7 +90,8 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				playAgain=new Popup(renderer,2,false,s_width,s_height);
 				pause=new Popup(renderer,4,false,s_width,s_height);
 				credits=new Popup(renderer,-2,false,s_width,s_height);
-
+				win=new Popup(renderer,5,false,s_width,s_height);
+				
 				cout<<"Initialising Menus\n";
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
 				menuList.push_back(startMenu);
@@ -132,7 +133,7 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 //keyboard and uses the input for manipulating objects in a state or in changing 
 //states
 void Game::handle_event(){	
-	if (game_debug)cout<<"game.cpp::handle_event\n";
+	if (game_debug)cout<<"game.cpp::handle_event:"<<state<<":"<<prevstate<<"\n";
 	
 	SDL_Event event;
 	SDL_PollEvent(&event);
@@ -201,7 +202,7 @@ void Game::handle_event(){
 //other classes, depending on current state for maintaining clarity and the 
 //ease of debugging.
 void Game::process(){
-	if (game_debug)cout<<"game.cpp::process "<<state<<"\n";
+	if (game_debug)cout<<"game.cpp::process "<<state<<":"<<prevstate<<"\n";
 	
 	
 	if (state==0){
@@ -286,7 +287,7 @@ void Game::process(){
 //like previous methods, rendering is also transferred to objects of other 
 //classes depending upon the current state of the game
 void Game::render(){
-	if (game_debug)cout<<"game.cpp::render:"<<state<<"\n";
+	if (game_debug)cout<<"game.cpp::render:"<<state<<":"<<prevstate<<"\n";
 	if (state==6){running=false;return;}
 	if(state==0){
 		SDL_RenderClear(renderer);

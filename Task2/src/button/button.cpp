@@ -194,6 +194,7 @@ void Button::handle_event(int* state,SoundClass *m,int* prevstate,SDL_Event e){
 	else if(strcmp(label,"MultiPlayer")==0){
 			m->PlaySound("button");
 			m->PlaySound("start");
+			*prevstate=0;
 			*state=101;	
 		}
 	else if(strcmp(label,"Next Level")==0){

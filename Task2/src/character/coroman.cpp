@@ -4,7 +4,7 @@
 using namespace std;
 bool character_debug=true;
 
-Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width){
+Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width,SDL_Texture* texture_p[4][8],SDL_Texture* texture_pv[4][8],SDL_Texture* texture_pa[4][8]){
 	
 	if (character_debug)cout<<"character.cpp::Character\n";
 	
@@ -14,23 +14,20 @@ Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init
 	//of 32 textures. 
 	for (int i=0;i<4;i++){
 		for (int j=0;j<8;j++){
-			string path="./../assets/coroman/normal/pac"+to_string(i)+to_string(j%2+1)+".png";
-			char* a=&path[0];
-			texture[i][j]=Texture::LoadT(a,localRenderer);
+			
+			texture[i][j]=texture_p[i][j];
 		}
 	}
 	for (int i=0;i<4;i++){
 		for (int j=0;j<8;j++){
-			string path="./../assets/coroman/vaccinated/pacvac"+to_string(i)+to_string(j%2+1)+".png";
-			char* a=&path[0];
-			texture_v[i][j]=Texture::LoadT(a,localRenderer);
+			
+			texture_v[i][j]=texture_pv[i][j];
 		}
 	}
 	for (int i=0;i<4;i++){
 		for (int j=0;j<8;j++){
-			string path="./../assets/coroman/invincible/pacapp"+to_string(i)+to_string(j%2+1)+".png";
-			char* a=&path[0];
-			texture_a[i][j]=Texture::LoadT(a,localRenderer);
+			
+			texture_a[i][j]=texture_pa[i][j];
 		}
 	}
 	//Initial position and size of the pacman
@@ -66,7 +63,7 @@ void Character::updatePlayer(bool isForeigner){
 
 //To render the pacman on the screen
 void Character::render(SDL_Renderer* renderer){
-	if (character_debug)cout<<"character.cpp::render\n";
+	if (character_debug)cout<<"character.cpp::render:"<<cur_dir<<":"<<cur_texture<<"\n";
 	if (isVaccinated){
 		SDL_RenderCopy(renderer,texture_v[cur_dir][cur_texture],NULL,&dstr);	
 	}

@@ -42,7 +42,7 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 	kTexture = Texture::LoadT("./../assets/maze_items/key.png",localRenderer);				//Key
 	qTexture = Texture::LoadT("./../assets/maze_items/redBlur.png",localRenderer);		//Quarantine/Hazardous cell
 	orangeWall = Texture::LoadT("./../assets/maze_items/wall.png",localRenderer);			//For animation of hidden wall
-
+	lTexture = Texture::LoadT("./../assets/maze_items/lab.xcf",localRenderer);	
 	//Checking if the current play state is single player or multi player
 	multiplayer = multi;
 
@@ -54,6 +54,12 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 	mazeCell.w = 100;
 	mazeCell.x = 0;
 	mazeCell.y = 0;
+
+	//Lab cell
+	mazeLab.h = 300;
+	mazeLab.w = 300;
+	mazeLab.x = 100*(m_width-1);
+	mazeLab.y = 100*(m_height-4);
 
 	//Quarantine Cell
 	quarCell.h = 100;
@@ -201,7 +207,9 @@ void Maze::render(SDL_Renderer* renderer){
 			if(mazeData[i][j]==0){
 				SDL_RenderCopy(renderer,sTexture,NULL,&mazeEgg);			
 			}else if(mazeData[i][j]==1){
-				SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+				if (i!=m_width-1 || j!=m_height-2){
+					SDL_RenderCopy(renderer,wTexture,NULL,&mazeCell);
+				}
 			}else if(mazeData[i][j]==3){
 				SDL_RenderCopy(renderer,dTexture,NULL,&mazeCell);
 			}else if(mazeData[i][j]==4){
@@ -224,8 +232,21 @@ void Maze::render(SDL_Renderer* renderer){
 				SDL_RenderCopy(renderer,orangeWall,NULL,&mazeCell);
 				mazeData[i][j]-=2;
 			}
+			
 		}
 	}
+	
+	mazeLab.y=100*(m_height-4);
+	mazeLab.x=100*(m_width);
+	mazeLab.h=400;
+	SDL_RenderCopy(renderer,wTexture,NULL,&mazeLab);
+	mazeLab.y=100*(m_height-4);
+	mazeLab.x=100*(m_width-1);
+	mazeLab.h=300;
+	SDL_RenderCopy(renderer,lTexture,NULL,&mazeLab);
+
+	// SDL_RenderCopy(renderer,lTexture,NULL,&mazeLab);
+
 }
 
 //This function checks whether the (i,j)th cell is a dead end or not. A dead
@@ -235,6 +256,7 @@ void Maze::render(SDL_Renderer* renderer){
 //  1: If only the bottom cell (i,j+1) is open
 //  2: If only the right cell (i+1,j) is open
 //  3: If only the top cell (i,j-1) is open
+
 int Maze::openCell(int i,int j){
 	int n = -1;
 	if(mazeData[i-1][j]==0){
@@ -519,11 +541,11 @@ void Maze::placeKey(){
 
 void Maze::setParams(){
 	switch(lvl){
-		case 1:{numFruits=7;numVaccines=3;numMasks=2;qSize=5;break;}
-		case 2:{numFruits=6;numVaccines=2;numMasks=2;qSize=5;break;}
-		case 3:{numFruits=5;numVaccines=2;numMasks=2;qSize=6;break;}
-		case 4:{numFruits=4;numVaccines=1;numMasks=1;qSize=6;break;}
-		case 5:{numFruits=3;numVaccines=1;numMasks=1;qSize=7;break;}
+		case 1:{numFruits=7;numVaccines=3;numMasks=2;qSize=5;extra_enemies=20;break;}
+		case 2:{numFruits=6;numVaccines=2;numMasks=2;qSize=5;extra_enemies=3;break;}
+		case 3:{numFruits=5;numVaccines=2;numMasks=2;qSize=6;extra_enemies=4;break;}
+		case 4:{numFruits=4;numVaccines=1;numMasks=1;qSize=6;extra_enemies=6;break;}
+		case 5:{numFruits=3;numVaccines=1;numMasks=1;qSize=7;extra_enemies=8;break;}
 	}
 	numEggs = numEggs - numFruits - numVaccines - numMasks;
 }

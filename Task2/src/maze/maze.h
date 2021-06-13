@@ -24,15 +24,16 @@ class Maze{
 		SDL_Texture* mTexture = NULL;
 		SDL_Texture* kTexture = NULL;
 		SDL_Texture* orangeWall = NULL;
+		SDL_Texture* lTexture = NULL;
 		bool multiplayer=false;
 		vector<vector<int>> mazeData;
 		void reinitialize();
 		Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData);
 		void render(SDL_Renderer* renderer);
-		SDL_Rect mazeCell,mazeEgg,fruitCell,vacCell,quarCell,maskCell,keyCell;
+		SDL_Rect mazeCell,mazeEgg,fruitCell,vacCell,quarCell,maskCell,keyCell,mazeLab;
 		void update();
 		string getMazeState();
-		int numFruits=0, numVaccines=0, numEggs=0, numDeadends=0, numMasks=0, qSize=0; 
+		int numFruits=0, numVaccines=0, numEggs=0, numDeadends=0, numMasks=0, qSize=0 , extra_enemies=0; 
 		void setWinCondition();
 		void placeFruits();
 		void placeVaccine();
