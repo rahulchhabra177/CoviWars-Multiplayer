@@ -76,7 +76,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 			if (time_sec_t==6){time_sec_t=0;time_min_u++;}
 			if (time_min_u==10){time_min_u=0;time_min_t++;}
 			if (time_min_t==6){time_min_t=0;}	
-			string temp_s="Time:"+to_string(time_min_t)+to_string(time_min_u)+":"+to_string(time_sec_t)+to_string(time_sec_u);
+			string temp_s="Time : "+to_string(time_min_t)+to_string(time_min_u)+":"+to_string(time_sec_t)+to_string(time_sec_u);
 			timing->changeLabel(temp_s,"",255,255,25);
 			
 		}
