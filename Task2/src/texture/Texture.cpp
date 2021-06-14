@@ -3,7 +3,7 @@ using namespace std;
 bool texture_debug=true;
 
 SDL_Texture* Texture::LoadT(char * path,SDL_Renderer* renderer){
-if (texture_debug)cout<<"Texture.cpp::LoadT\n";
+if (texture_debug)cout<<"Texture.cpp::LoadT"<<path<<"\n";
 	SDL_Surface* tmp;
 	tmp=IMG_Load(path);
 	SDL_Texture* returng=NULL;

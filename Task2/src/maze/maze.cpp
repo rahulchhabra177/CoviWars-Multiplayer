@@ -151,7 +151,21 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 			}
 		}
 	}
+	if (multiplayer){
 
+		for (int i=0;i<5;i++){
+			placeFruits();
+		}	
+		for (int i=0;i<3;i++){
+			placeVaccine();
+		}
+		for (int i=0;i<4;i++){
+			placeMasks();
+		}
+
+
+
+	}
 }
 
 //Converting the structure of the maze into a string to be sent to other

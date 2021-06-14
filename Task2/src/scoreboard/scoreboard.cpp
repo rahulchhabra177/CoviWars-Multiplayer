@@ -33,12 +33,12 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 		//once all the players have joined, and until then it waits
 		if(p2!=""){
 			counter++;
-			if (counter%20==0){
+			if (counter%30==0){
 				//Player1
-				string player1=p1+":"+to_string(s1);
+				string player1=p1+" : "+to_string(s1);
 				pl1->changeLabel(player1,"",255,255,25);
 				//Player2
-				string player2=p2+":"+to_string(s2);
+				string player2=p2+" : "+to_string(s2);
 				pl2->changeLabel(player2,"",255,255,25);
 			}
 			if (counter==60){
@@ -64,7 +64,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 		counter++;
 		if (counter%20==0){
 				//Player1
-				string player1=p1+":"+to_string(s1);
+				string player1=p1+" : "+to_string(s1);
 				pl1->changeLabel(player1,"",255,255,25);
 			}
 		if (counter==60){

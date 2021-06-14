@@ -7,7 +7,7 @@ bool character_debug=true;
 Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width,SDL_Texture* texture_p[4][8],SDL_Texture* texture_pv[4][8],SDL_Texture* texture_pa[4][8]){
 	
 	if (character_debug)cout<<"character.cpp::Character\n";
-	
+	isfireball=false;
 	//Initialising textures for our main character(pacman), one for each 
 	//direction in which it will be moving. We have also animated the pacman
 	//so each direction will also have several textures(here 8), for a total
@@ -44,6 +44,37 @@ Character::Character(char * path,SDL_Renderer* localRenderer,int init_x,int init
 	isForeigner=isForeign;
 }
 
+
+
+Character::Character(SDL_Renderer* localRenderer,int init_x,int init_y,int speedx,int speedy,SDL_Texture* texture_p[]){
+	
+	if (character_debug)cout<<"character.cpp::Character\n";
+	isfireball=true;
+	isVaccinated=true;
+	texture_ball[0]=texture_p[0];
+	texture_ball[1]=texture_p[1];
+	
+	x=init_x;
+	y=init_y;
+
+	dstr.h=height;
+	dstr.w=width;
+	dstr.x=x+75;
+	dstr.y=y+75;
+	dstr.h=50;
+	dstr.w=50;
+	src.x=0;
+	src.y=350;
+	src.h=350;
+	src.w=500;
+	x_speed=speedx;
+	y_speed=speedy;
+	isForeigner=false;
+
+}
+
+
+
 //Updating the pacman's position with time depending upon different constraints in the game
 void Character::updatePlayer(bool isForeigner){
 	if (character_debug)cout<<"character.cpp::updatePlayer\n";
@@ -58,12 +89,24 @@ void Character::updatePlayer(bool isForeigner){
 		x+=x_speed;
 		dstr.x=x;
 		dstr.y=y;
+		if (isfireball){
+			dstr.x+=25;
+			dstr.y+=25;
+		}
 	}
 }
 
 //To render the pacman on the screen
 void Character::render(SDL_Renderer* renderer){
-	if (character_debug)cout<<"character.cpp::render:"<<cur_dir<<":"<<cur_texture<<"\n";
+	if (character_debug)cout<<"Character.cpp::render:"<<cur_dir<<":"<<cur_texture<<"\n";
+	if (isfireball){
+		SDL_RenderCopy(renderer,texture_ball[cur_texture%2],NULL,&dstr);
+		cur_texture++;
+		if (cur_texture==200){
+			cur_texture=0;
+		}
+		return;
+	}
 	if (isVaccinated){
 		SDL_RenderCopy(renderer,texture_v[cur_dir][cur_texture],NULL,&dstr);	
 	}
@@ -81,6 +124,8 @@ void Character::render(SDL_Renderer* renderer){
 	if (count==0){
 		cur_texture=(cur_texture+1)%8;
 	}
+	if (character_debug)cout<<"character.cpp::render:"<<cur_dir<<":"<<cur_texture<<"\n";
+
 }
 
 //To check collision between pacman and an enemy

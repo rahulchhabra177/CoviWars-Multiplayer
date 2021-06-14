@@ -135,21 +135,22 @@ void Button::changeLabel(string newlabel,string fnt,int r,int g,int b){
 	font=TTF_OpenFont(&fontname[0],20);
 	if (font==nullptr){
 		cout<<"Couldn;t find font\n";
-		exit(1);
+		return;
 	}
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,&newlabel[0],{r,g,b,255});
 	if (textSurface==nullptr){
 		cout<<"Couldn;t find font\n";
+		return;
 	}
 
 	colors[0][0]=SDL_CreateTextureFromSurface(renderer,textSurface);
 	textSurface=TTF_RenderText_Solid(font,&newlabel[0],{251,255,255,255});
 	if (textSurface==nullptr){
 		cout<<"Couldn;t find font\n";
+		return;
 	}
 	colors[0][1]=SDL_CreateTextureFromSurface(renderer,textSurface);
 	texture=colors[0][0];
-	cout<<"cn\n";
 
 
 }

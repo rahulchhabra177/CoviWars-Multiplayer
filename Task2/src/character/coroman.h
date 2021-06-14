@@ -33,15 +33,18 @@ public:
 	bool isInvincible=false;
 	bool isVaccinated=false;
 	bool isForeigner=false;
+	bool isfireball = false; 
 
 	string name="player";
 	SDL_Rect dstr,src;
 	Character(char * path,SDL_Renderer* localRenderer,int init_x,int init_y,bool isForeign,int screen_width,SDL_Texture* texture_p[4][8],SDL_Texture* texture_pv[4][8],SDL_Texture* texture_pa[4][8]);
+	Character(SDL_Renderer* localRenderer,int init_x,int init_y,int speedx,int speedy,SDL_Texture* texture_p[]);
 	void updatePlayer(bool isForeigner);
 	void render(SDL_Renderer* renderer);
 	SDL_Texture* texture[4][8]={NULL};
 	SDL_Texture* texture_v[4][8]={NULL};
 	SDL_Texture* texture_a[4][8]={NULL};
+	SDL_Texture* texture_ball[2]={NULL};
 	bool isEnemy=false;
 	bool collide(Enemy * enemy,SoundClass* m);
 	string getPlayerState();

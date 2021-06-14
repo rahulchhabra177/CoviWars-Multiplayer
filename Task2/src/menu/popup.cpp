@@ -36,15 +36,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	//Pop-up menu in the transition between levels
 	if (type==1){
 		Button* startmulti_button=new Button("Next Level",renderer,width,height);
-		startmulti_button->set_cor(1400,950,540,150);
+		startmulti_button->set_cor(1550,950,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Options",renderer,width,height);
-		options_button->set_cor(1400,1125,500,150);
+		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 		
 		Button* exit_button=new Button("Quit",renderer,width,height);
-		exit_button->set_cor(1400,1300,500,150);
+		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
 		Button* logo=new Button("CONGRATULATIONS",renderer,"",25,25,25);
@@ -55,15 +55,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	//Game over pop-up menu
 	else if (type==2){
 		Button* startmulti_button=new Button("Play Again",renderer,width,height);
-		startmulti_button->set_cor(1450,950,540,150);
+		startmulti_button->set_cor(1550,950,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Options",renderer,width,height);
-		options_button->set_cor(1450,1125,500,150);
+		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 		
 		Button* exit_button=new Button("Quit",renderer,width,height);
-		exit_button->set_cor(1450,1300,500,150);
+		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
 		Button* logo=new Button("YOU LOSE!",renderer,"",25,25,25);
@@ -73,15 +73,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	//Options pop-menu
 	}else if (type==3){
 		Button* start_button=new Button("Music:  ON","Music:  OFF",renderer,width,height);
-		start_button->set_cor(1450,950,540,150);
+		start_button->set_cor(1550,950,540,150);
 		buttons.push_back(start_button);
 		
 		Button* options_button=new Button("Sounds:  ON","Sounds:  OFF",renderer,width,height);
-		options_button->set_cor(1450,1125,500,150);
+		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 		
 		Button* option_button=new Button("Back",renderer,width,height);
-		option_button->set_cor(1450,1300,500,150);
+		option_button->set_cor(1550,1300,500,150);
 		buttons.push_back(option_button);
 
 		Button* logo=new Button("Options",renderer,"",25,25,25);
@@ -91,15 +91,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	//Pause pop-up menu
 	}else if (type==4){
 		Button* startmulti_button=new Button("Resume",renderer,width,height);
-		startmulti_button->set_cor(1400,1000,540,150);
+		startmulti_button->set_cor(1550,1000,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Options",renderer,width,height);
-		options_button->set_cor(1400,1200,500,150);
+		options_button->set_cor(1550,1200,500,150);
 		buttons.push_back(options_button);
 		
 		Button* exit_button=new Button("Quit",renderer,width,height);
-		exit_button->set_cor(1400,1400,500,150);
+		exit_button->set_cor(1550,1400,500,150);
 		buttons.push_back(exit_button);
 
 		Button* logo=new Button("Game Paused!",renderer,"",25,25,25);
@@ -109,15 +109,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	//Lobby pop-up menu
 	}else if (type==-1){
 		Button* startmulti_button=new Button("Back",renderer,width,height);
-		startmulti_button->set_cor(1400,1000,540,150);
+		startmulti_button->set_cor(1550,1000,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Options",renderer,width,height);
-		options_button->set_cor(1400,1200,500,150);
+		options_button->set_cor(1550,1200,500,150);
 		buttons.push_back(options_button);
 		
 		Button* exit_button=new Button("Quit",renderer,width,height);
-		exit_button->set_cor(1400,1400,500,150);
+		exit_button->set_cor(1550,1400,500,150);
 		buttons.push_back(exit_button);
 
 		Button* logo=new Button("Waiting for other player to join",renderer,"",25,25,25);
@@ -128,15 +128,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	//Congratulations pop-up
 	else if (type==5){
 		Button* startmulti_button=new Button("Play Again",renderer,width,height);
-		startmulti_button->set_cor(1450,950,540,150);
+		startmulti_button->set_cor(1550,950,540,150);
 		buttons.push_back(startmulti_button);
 
 		Button* options_button=new Button("Options",renderer,width,height);
-		options_button->set_cor(1450,1125,500,150);
+		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 
 		Button* exit_button=new Button("Quit",renderer,width,height);
-		exit_button->set_cor(1450,1300,500,150);
+		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
 		Button* logo=new Button("YOU WIN!",renderer,"",25,25,25);
@@ -146,15 +146,15 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	else if (type==-2){
 		// timed=true;
 		Button* startmulti_button=new Button("Rahul Chhabra",renderer,"",25,25,52);
-		startmulti_button->set_cor(1450,950,540,150);
+		startmulti_button->set_cor(1550,950,540,150);
 		buttons.push_back(startmulti_button);
 		
 		Button* options_button=new Button("Shrey Patel",renderer,"",25,25,52);
-		options_button->set_cor(1450,1125,500,150);
+		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 		
 		Button* exit_button=new Button("Back",renderer,width,height);
-		exit_button->set_cor(1450,1300,500,150);
+		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
 		Button* logo=new Button("Contributors",renderer,"",25,25,52);

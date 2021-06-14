@@ -19,7 +19,7 @@ class play{
 		SDL_Texture *heading=nullptr;
 		bool play_debug=true;
 		Maze* maze=nullptr;
-		Character* pacman=nullptr,*pacman2=nullptr;
+		Character* pacman=nullptr,*pacman2=nullptr,*fireball=nullptr;
 		ScoreBoard *score=nullptr;
 		vector<Enemy*> enemies;
 		SDL_Rect* dst_hdng;
@@ -41,6 +41,8 @@ class play{
 		SDL_Texture* texture_p[4][8]={NULL};
 		SDL_Texture* texture_pv[4][8]={NULL};
 		SDL_Texture* texture_pa[4][8]={NULL};
+		SDL_Texture* texture_ball[2]={NULL};
+		int numFballs=3;
 		string pl2name="Client";
 		play(char* title,int level,SDL_Texture* poster, SDL_Renderer* localRenderer,Menu* menu,bool multi,string mzData=""){
 			if (play_debug)cout<<"play.cpp:play\n";
@@ -90,7 +92,11 @@ class play{
 					texture_pa[i][j]=Texture::LoadT(a,localRenderer);
 				}
 			}
-
+			for (int i=0;i<2;i++){
+					string path="./../assets/maze_items/fireball"+to_string(i)+".png";
+					char* a=&path[0];
+					texture_ball[i]=Texture::LoadT(a,localRenderer);
+			}
 
 			for(int i=0;i<numEnemies;i++){
 				Enemy* enemy=nullptr;
@@ -99,7 +105,6 @@ class play{
 	
 			maze = new Maze(lvl,renderer,multi,mzData);
 			score = new ScoreBoard(renderer,multi);
-			
 			if(mzData=="" || !multiplayer){
 				
 				//In case of a single player game or server in a multiplayer
@@ -202,11 +207,13 @@ class play{
 			pacman->x = 100;
 			pacman->y = 100;
 			pacman->score = 0;
+			numFballs=3;
 			score->time_string = "00:00";
 			maze->reinitialize();
 			numFruitsPlaced=0;
 			numVaccinesPlaced=0;
 			numMasksPlaced=0;
+			fireball=nullptr;
 			for (int i=0;i<maze->numFruits;i++){
 					fruits[i]=false;
 			}
@@ -276,6 +283,7 @@ class play{
 			//So, we have rendered the maze before the enemies and the pacman, so that
 			//whenever the pacman or the enemies pass through the special cells of 
 			//the maze, they pass over them instead of getting shadowed by them
+			
 			score->render();
 			maze->render(renderer);
 			for(int i=0;i<enemies.size();i++){
@@ -290,12 +298,17 @@ class play{
 			for(int i=0;i<buttons.size();i++){
 				buttons[i]->render(renderer);
 			}
-			while (pacman2->name.size()!=0 && pacman2->name[pacman2->name.size()-1]==' '){
+			while (pacman2!=nullptr && pacman2->name.size()!=0 && pacman2->name[pacman2->name.size()-1]==' '){
 				pacman2->name.pop_back();
 			}
-			if (pacman2->name==""){
+			if (pacman2!=nullptr && pacman2->name==""){
 				pacman2->name="Player 2";
 			}
+			if (fireball!=nullptr){
+				cout<<"fball\n\n\n\n\n\n\n\n\n\n\n\n\n";
+				fireball->render(renderer);
+			}
+			if (play_debug)cout<<"play.cpp:render\n";
 		}
 		
 		//This helper function manages the requests and responses for 
@@ -442,7 +455,7 @@ class play{
 
 			//Scoreboard and timer updates
 			if (!multiplayer){
-				score->update(1,menu_n->cplayer,pacman->score,"",0);
+				score->update(1,pacman->name,pacman->score,"",0);
 			}else{
 				if(pacman2!=nullptr){
 					score->update(1,pacman->name,pacman->score,pacman2->name,pacman2->score);
@@ -450,7 +463,7 @@ class play{
 			}
 
 			//Checking for collision of the local player will the walls
-			if(!collidePlayer(last_key_x(pacman),last_key_y(pacman))){
+			if(!collidePlayer(pacman,last_key_x(pacman),last_key_y(pacman))){
 				pacman->x_speed=last_key_x(pacman);
 				pacman->y_speed=last_key_y(pacman);
 				cout<<pacman->x_speed<<":"<<pacman->y_speed<<":"<<pacman->lastKey<<"\n";
@@ -458,9 +471,18 @@ class play{
 			}
 
 			//Updating the position of all the player characters
-			if(!collidePlayer(pacman->x_speed,pacman->y_speed)){
+			if(!collidePlayer(pacman,pacman->x_speed,pacman->y_speed)){
 				pacman->updatePlayer(false);
 			}
+			if (fireball!=nullptr){
+				if (collideProjectile(fireball,fireball->x_speed/5,fireball->y_speed/5)){
+					fireball=nullptr;
+				}
+				else{
+				fireball->updatePlayer(false);
+				}
+			}
+			
 			if(pacman2!=nullptr){
 				pacman2->updatePlayer(true);
 			}
@@ -538,7 +560,7 @@ class play{
 							// pacman->updatePlayer(false);
 						}
 					}
-
+					
 					//Similar logic for other players
 					if(pacman2!=nullptr){
 						if(enemies[i]->active){
@@ -554,7 +576,10 @@ class play{
 							}
 						}
 					}
-
+					if (fireball!=nullptr && fireball->collide(enemies[i],m)){
+							enemies[i]->active = false;
+							fireball=nullptr;
+					}
 					//Updating the movement of enemies
 					if(enemies[i]->active){	
 						enemyAI(i);
@@ -608,7 +633,7 @@ class play{
 			}else if(e.type==SDL_KEYDOWN){
 				changeSpeed(pacman,e);
 
-				if(e.key.keysym.sym==SDLK_ESCAPE && !multiplayer){
+				if(e.key.keysym.sym==SDLK_ESCAPE){
 					*state=2;
 				}else if(e.key.keysym.sym==SDLK_p){
 					*state=2;
@@ -621,6 +646,10 @@ class play{
 				}
 				else if(e.key.keysym.sym==SDLK_e && !multiplayer){
 					placeEnemy(); 
+				}
+				else if(e.key.keysym.sym==SDLK_SPACE && !multiplayer && numFballs>0){
+					fireball=new Character(renderer,pacman->x,pacman->y,pacman->x_speed*4,pacman->y_speed*4,texture_ball); 
+					numFballs--;
 				}
 			}
 		}
@@ -720,7 +749,7 @@ class play{
 					case SDLK_UP:{
 						cout<<"UP"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=1){pacman->lastKey=1;}
-						if (!collidePlayer(0,(-1)*pacman->speed)){
+						if (!collidePlayer(pacman,0,(-1)*pacman->speed)){
 							pacman->y_speed=(-1)*pacman->speed;
 							pacman->x_speed=0;
 							pacman->cur_dir=1;
@@ -731,7 +760,7 @@ class play{
 					case SDLK_DOWN:{
 						cout<<"Down"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=3){pacman->lastKey=3;}
-						if (!collidePlayer(0,pacman->speed)){
+						if (!collidePlayer(pacman,0,pacman->speed)){
 							pacman->y_speed=pacman->speed;
 							pacman->x_speed=0;
 							pacman->cur_dir=3;
@@ -743,7 +772,7 @@ class play{
 					case SDLK_RIGHT:{
 						cout<<"Right"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=0){pacman->lastKey=0;}
-						if (!collidePlayer(pacman->speed,0)){
+						if (!collidePlayer(pacman,pacman->speed,0)){
 							pacman->y_speed=0;
 							pacman->x_speed=pacman->speed;
 							pacman->cur_dir=0;
@@ -755,7 +784,7 @@ class play{
 					case SDLK_LEFT:{
 						cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=2){pacman->lastKey=2;}
-						if (!collidePlayer((-1)*pacman->speed,0)){
+						if (!collidePlayer(pacman,(-1)*pacman->speed,0)){
 							pacman->y_speed=0;
 							pacman->x_speed=(-1)*pacman->speed;
 							pacman->cur_dir=2;
@@ -769,7 +798,7 @@ class play{
 		}
 
 		//For checking the collision between the player and the walls of the maze
-		bool collidePlayer(int x_speed,int y_speed){
+		bool collidePlayer(Character *pacman,int x_speed,int y_speed){
 			int x = pacman->x;
 			int y = pacman->y;
 			int pw = pacman->width;
@@ -826,6 +855,63 @@ class play{
 			}
 		}
 		
+		//For checking the collision between the player and the walls of the maze
+		bool collideProjectile(Character *pacman,int x_speed,int y_speed){
+			int x = pacman->x;
+			int y = pacman->y;
+			int pw = pacman->width;
+			int ph = pacman->height;
+			int w = maze->mazeCell.w;
+			int h = maze->mazeCell.h;
+
+			//As evident, the collision is checked on the basis of the 
+			//current direction of motion of pacman/enemy
+			if(x_speed!=0){
+				if(x_speed>0){
+					bool check1 = maze->mazeData[(x+pw)/w][y/h]!=1;
+					bool check2 = maze->mazeData[(x+pw)/w][(y+ph-1)/h]!=1;
+					if(check1 && check2){
+						return false;
+					}else{
+						return true;
+					}
+				}
+				else{
+					
+					bool check1 = maze->mazeData[(x-1)/w][y/h]!=1;
+					bool check2 = maze->mazeData[(x-1)/w][(y+ph-1)/h]!=1;
+					if(check1 && check2){
+						return false;
+					}
+					else{
+						return true;
+					}
+					
+				}
+			}else{
+				if(y_speed>0){
+					bool check1 = maze->mazeData[x/w][(y+ph)/h]!=1;
+					bool check2 = maze->mazeData[(x+pw-1)/w][(y+ph)/h]!=1;
+					if(check1 && check2){
+						return false;
+					}else{
+						return true;
+					}
+				}else{
+					
+					bool check1 = maze->mazeData[x/w][(y-1)/h]!=1;
+					bool check2 = maze->mazeData[(x+pw-1)/w][(y-1)/h]!=1;
+					if(check1 && check2){
+						return false;
+					}else{
+						return true;
+					}
+				
+				}
+			}
+		}
+
+
 		//The following function manage the collision between the pacman
 		//and different power-ups
 		bool eatPowerUp(Character* pacman,int powerup){
