@@ -18,7 +18,7 @@ class play{
 		SDL_Renderer* renderer;
 		SDL_Texture *heading=nullptr;
 		bool play_debug=true;
-		Maze* maze=nullptr;
+		Maze* maze=nullptr,*maze_copy=nullptr;
 		Character* pacman=nullptr,*pacman2=nullptr,*fireball=nullptr;
 		ScoreBoard *score=nullptr;
 		vector<Enemy*> enemies;
@@ -37,7 +37,8 @@ class play{
 		vector<bool> masks;
 		int numEnemiesPlaced=0;
 		vector<bool> extra_enemies;
-		vector<SDL_Texture*> texture_e;
+		vector<SDL_Texture*> texture_e;     	
+		vector<SDL_Texture*> texture_e0;				
 		vector<SDL_Texture*> texture_e1;
 		vector<SDL_Texture*> texture_e2;
 		vector<SDL_Texture*> texture_e3;
@@ -45,9 +46,11 @@ class play{
 		SDL_Texture* texture_pv[4][8]={NULL};
 		SDL_Texture* texture_pa[4][8]={NULL};
 		SDL_Texture* texture_ball[2]={NULL};
-		int numFballs=3;
+		int numFballs=10;
 		string pl2name="Client";
 		int nextEnemy=0;
+		int scoreCounter1=0;
+		int scoreCounter2=0;
 
 		play(char* title,int level,SDL_Texture* poster, SDL_Renderer* localRenderer,Menu* menu,bool multi,string mzData=""){
 			if (play_debug)cout<<"play.cpp:play\n";
@@ -72,12 +75,17 @@ class play{
 				texture_e.push_back(Texture::LoadT(a,localRenderer));
 			}
 			for (int i=0;i<8;i++){
-				string path="./../assets/enemy/corona1.png";
+				string path="./../assets/enemy/corona2.png";
+				char* a=&path[0];
+				texture_e0.push_back(Texture::LoadT(a,localRenderer));
+			}
+			for (int i=0;i<8;i++){
+				string path="./../assets/enemy/corona0.png";
 				char* a=&path[0];
 				texture_e1.push_back(Texture::LoadT(a,localRenderer));
 			}
 			for (int i=0;i<8;i++){
-				string path="./../assets/enemy/corona2.png";
+				string path="./../assets/enemy/corona1.png";
 				char* a=&path[0];
 				texture_e2.push_back(Texture::LoadT(a,localRenderer));
 			}
@@ -118,12 +126,20 @@ class play{
 					texture_ball[i]=Texture::LoadT(a,localRenderer);
 			}
 
-			for(int i=0;i<numEnemies*4;i++){
-				Enemy* enemy=nullptr;
-				enemies.push_back(enemy);
+			if(!multiplayer){
+				for(int i=0;i<numEnemies*4;i++){
+					Enemy* enemy=nullptr;
+					enemies.push_back(enemy);
+				}
+			}else{
+				for(int i=0;i<numEnemies*2;i++){
+					Enemy* enemy=nullptr;
+					enemies.push_back(enemy);
+				}
 			}
 	
 			maze = new Maze(lvl,renderer,multi,mzData);
+			maze_copy = maze;
 			score = new ScoreBoard(renderer,multi);
 			if(mzData=="" || !multiplayer){
 				
@@ -147,22 +163,37 @@ class play{
 				//or directly on players to give the player a fair chance to win
 				occupied[1][1]=1;
 				
-				for(int i=0;i<numEnemies*4;i++){
-					while(true){
-						srand(time(0));
-						int x = 2*(rand()%(maze->m_width/2))+1;
-						int y = 2*(rand()%(maze->m_height/2))+1;
-						if(maze->mazeData[x][y]==0 && occupied[x][y]==0 && (!x<menu_n->s_width/3 && !y<menu_n->s_height/3)){
-							vector<SDL_Texture*> newTexture;
-							switch(i){
-								case 0:{newTexture=texture_e;break;}
-								case 1:{newTexture=texture_e1;break;}
-								case 2:{newTexture=texture_e2;break;}
-								case 3:{newTexture=texture_e3;break;}
+				if(!multiplayer){
+					for(int i=0;i<numEnemies*4;i++){
+						while(true){
+							srand(time(0));
+							int x = 2*(rand()%(maze->m_width/2))+1;
+							int y = 2*(rand()%(maze->m_height/2))+1;
+							if(maze->mazeData[x][y]==0 && occupied[x][y]==0 && (!x<menu_n->s_width/3 || !y<menu_n->s_height/3)){
+								vector<SDL_Texture*> newTexture;
+								switch(i){
+									case 0:{newTexture=texture_e0;break;}
+									case 1:{newTexture=texture_e1;break;}
+									case 2:{newTexture=texture_e2;break;}
+									case 3:{newTexture=texture_e3;break;}
+								}
+								enemies[i]=new Enemy(renderer,i,100*x,100*y,menu_n->s_width,newTexture);
+								occupied[x][y]=1;
+								break;
 							}
-							enemies[i]=new Enemy(renderer,i,100*x,100*y,menu_n->s_width,newTexture);
-							occupied[x][y]=1;
-							break;
+						}
+					}
+				}else{
+					for(int i=0;i<numEnemies*2;i++){
+						while(true){
+							srand(time(0));
+							int x = 2*(rand()%(maze->m_width/2))+1;
+							int y = 2*(rand()%(maze->m_height/2))+1;
+							if(maze->mazeData[x][y]==0 && occupied[x][y]==0 && !y<(3*menu_n->s_height)/4){
+								enemies[i]=new Enemy(renderer,100*x,100*y,menu_n->s_width,texture_e);
+								occupied[x][y]=1;
+								break;
+							}
 						}
 					}
 				}
@@ -234,9 +265,9 @@ class play{
 			pacman->x = 100;
 			pacman->y = 100;
 			pacman->score = 0;
-			numFballs=3;
+			numFballs=10;
 			score->time_string = "00:00";
-			maze->reinitialize();
+			maze=maze_copy;
 			numFruitsPlaced=0;
 			numVaccinesPlaced=0;
 			numMasksPlaced=0;
@@ -407,6 +438,7 @@ class play{
 
 			if(eatPowerUp(pacman,0)){
 				pacman->score++;
+				scoreCounter1++;
 			}
 			if(eatPowerUp(pacman,4)){
 				pacman->isInvincible=true;
@@ -446,6 +478,7 @@ class play{
 				pacman2->updateCounter(lvl);
 				if(eatPowerUp(pacman2,0)){
 					pacman2->score++;
+					scoreCounter2++;
 				}
 				if(eatPowerUp(pacman2,4)){
 					pacman2->isInvincible=true;
@@ -454,6 +487,9 @@ class play{
 				if(eatPowerUp(pacman2,5)){
 					pacman2->isVaccinated=true;
 					pacman2->counter=0;
+				}
+				if(eatPowerUp(pacman2,6)){
+					pacman2->isMasked=true;
 				}
 			}
 
@@ -491,7 +527,7 @@ class play{
 			}
 
 			//Checking for collision of the local player will the walls
-			if(!collidePlayer(pacman,last_key_x(pacman),last_key_y(pacman))){
+			if(!collidePlayer(pacman,last_key_x(pacman),last_key_y(pacman)) && !pacman->knockback){
 				pacman->x_speed=last_key_x(pacman);
 				pacman->y_speed=last_key_y(pacman);
 				cout<<pacman->x_speed<<":"<<pacman->y_speed<<":"<<pacman->lastKey<<"\n";
@@ -499,12 +535,13 @@ class play{
 			}
 
 			//Updating the position of all the player characters
-			if(pacman->freeze){
+			if(!collidePlayer(pacman,pacman->x_speed,pacman->y_speed) || pacman->freeze){
 				pacman->updatePlayer(false);
+			}else{
+				pacman->knockback = false;
+				pacman->knockbackCounter = 0;
 			}
-			if(!collidePlayer(pacman,pacman->x_speed,pacman->y_speed)){
-				pacman->updatePlayer(false);
-			}
+
 			if (fireball!=nullptr){
 				if (collideProjectile(fireball,fireball->x_speed/5,fireball->y_speed/5)){
 					fireball=nullptr;
@@ -540,10 +577,10 @@ class play{
 
 				//If more than one players are alive when all the tablets/eggs
 				//are collected, then the player with greater score wins
-				if(pacman->score+pacman2->score==maze->numEggs){
+				if(scoreCounter1+scoreCounter2==maze->numEggs){
 					if(pacman->score>pacman2->score){
 						*state=5;
-					}else{
+					}else if(pacman->score<pacman2->score){
 						*state=4;
 					}
 				}
@@ -584,28 +621,33 @@ class play{
 								enemies[i]->active=false;
 							}
 
-						//Otherwise the player loses
+						//Otherwise the player collides
 						}else{
 							m->PlaySound("collision");
-							if(enemies[i]->type==0){
-								pacman->score-=15;
-							}else if(enemies[i]->type==1){
+							if(enemies[i]->type==0){		//Divides
 								pacman->score-=10;
+								enemies[i]->active=false;
+							}else if(enemies[i]->type==1){	//Freeze
+								pacman->score-=15;
 								pacman->freezeCounter=0;
 								pacman->knockbackCounter=0;
 								pacman->freeze=true;
 								pacman->knockback=false;
-							}else if(enemies[i]->type==2){
+								enemies[i]->active=false;
+							}else if(enemies[i]->type==2){	//Knockback
 								pacman->score-=20;
 								pacman->freezeCounter=0;
 								pacman->knockbackCounter=0;
 								pacman->freeze=false;
 								pacman->knockback=true;
-							}else{
+								enemies[i]->active=false;
+							}else if(enemies[i]->type==3){	//Explode
 								pacman->score-=25;
-								enemies[i]->explodeCounter=60*15;
+								enemies[i]->explodeCounter=60*15;   	
+							}else{
+								pacman->score-=20;
+								enemies[i]->active=false;
 							}
-							enemies[i]->active=false;
 						}
 					}
 					
@@ -625,8 +667,10 @@ class play{
 										pacman2->score-=10;
 									}else if(enemies[i]->type==2){
 										pacman2->score-=20;
-									}else{
+									}else if(enemies[i]->type==3){
 										pacman2->score-=25;
+									}else{
+										pacman2->score-=20;
 									}
 									enemies[i]->active=false;
 								}
@@ -646,7 +690,15 @@ class play{
 		}
 
 		void placeEnemy(){
-			enemies.push_back(new Enemy(renderer,(maze->m_width-2)*100,(maze->m_height-2)*100,menu_n->s_width,texture_e));
+			int n = rand()%4;
+			vector<SDL_Texture*> newTexture;
+			switch(n){
+				case 0:{newTexture=texture_e0;break;}
+				case 1:{newTexture=texture_e1;break;}
+				case 2:{newTexture=texture_e2;break;}
+				case 3:{newTexture=texture_e3;break;}
+			}
+			enemies.push_back(new Enemy(renderer,n,(maze->m_width-2)*100,(maze->m_height-2)*100,menu_n->s_width,newTexture));
 			numEnemiesPlaced++;
 		}
 		
@@ -678,6 +730,10 @@ class play{
 		void handle_event(SDL_Event e,int* state,SoundClass* m,bool music_on,network* nmanager){
 			if (play_debug)cout<<"play.cpp:handle_event\n";
 			
+			if(pacman->knockback){
+				return;
+			}
+
 			if(e.type==SDL_QUIT){
 				*state=6;				
 			}else if(e.type==SDL_MOUSEBUTTONDOWN){
@@ -802,53 +858,51 @@ class play{
 		void changeSpeed(Character* pacman,SDL_Event e){
 			if (play_debug)cout<<"play.cpp::changeSpeed\n";
 			if(e.type==SDL_KEYDOWN){
-				if(pacman->knockback==false){
-					switch(e.key.keysym.sym){
-						case SDLK_UP:{
-							cout<<"UP"<<":"<<pacman->lastKey<<"\n";
-							if (pacman->cur_dir!=1){pacman->lastKey=1;}
-							if (!collidePlayer(pacman,0,(-1)*pacman->speed)){
-								pacman->y_speed=(-1)*pacman->speed;
-								pacman->x_speed=0;
-								pacman->cur_dir=1;
-								cout<<"Up"<<":"<<pacman->lastKey<<"\n";
-							}
-							break;
+				switch(e.key.keysym.sym){
+					case SDLK_UP:{
+						cout<<"UP"<<":"<<pacman->lastKey<<"\n";
+						if (pacman->cur_dir!=1){pacman->lastKey=1;}
+						if (!collidePlayer(pacman,0,(-1)*pacman->speed)){
+							pacman->y_speed=(-1)*pacman->speed;
+							pacman->x_speed=0;
+							pacman->cur_dir=1;
+							cout<<"Up"<<":"<<pacman->lastKey<<"\n";
 						}
-						case SDLK_DOWN:{
+						break;
+					}
+					case SDLK_DOWN:{
+						cout<<"Down"<<":"<<pacman->lastKey<<"\n";
+						if (pacman->cur_dir!=3){pacman->lastKey=3;}
+						if (!collidePlayer(pacman,0,pacman->speed)){
+							pacman->y_speed=pacman->speed;
+							pacman->x_speed=0;
+							pacman->cur_dir=3;
 							cout<<"Down"<<":"<<pacman->lastKey<<"\n";
-							if (pacman->cur_dir!=3){pacman->lastKey=3;}
-							if (!collidePlayer(pacman,0,pacman->speed)){
-								pacman->y_speed=pacman->speed;
-								pacman->x_speed=0;
-								pacman->cur_dir=3;
-								cout<<"Down"<<":"<<pacman->lastKey<<"\n";
-							}
-							break;
 						}
-						case SDLK_RIGHT:{
+						break;
+					}
+					case SDLK_RIGHT:{
+						cout<<"Right"<<":"<<pacman->lastKey<<"\n";
+						if (pacman->cur_dir!=0){pacman->lastKey=0;}
+						if (!collidePlayer(pacman,pacman->speed,0)){
+							pacman->y_speed=0;
+							pacman->x_speed=pacman->speed;
+							pacman->cur_dir=0;
 							cout<<"Right"<<":"<<pacman->lastKey<<"\n";
-							if (pacman->cur_dir!=0){pacman->lastKey=0;}
-							if (!collidePlayer(pacman,pacman->speed,0)){
-								pacman->y_speed=0;
-								pacman->x_speed=pacman->speed;
-								pacman->cur_dir=0;
-								cout<<"Right"<<":"<<pacman->lastKey<<"\n";
-								
-							}
-							break;
+							
 						}
-						case SDLK_LEFT:{
-							cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";
-							if (pacman->cur_dir!=2){pacman->lastKey=2;}
-							if (!collidePlayer(pacman,(-1)*pacman->speed,0)){
-								pacman->y_speed=0;
-								pacman->x_speed=(-1)*pacman->speed;
-								pacman->cur_dir=2;
-								cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";		
-							}
-							break;
+						break;
+					}
+					case SDLK_LEFT:{
+						cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";
+						if (pacman->cur_dir!=2){pacman->lastKey=2;}
+						if (!collidePlayer(pacman,(-1)*pacman->speed,0)){
+							pacman->y_speed=0;
+							pacman->x_speed=(-1)*pacman->speed;
+							pacman->cur_dir=2;
+							cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";		
 						}
+						break;
 					}
 				}
 			}
@@ -1030,13 +1084,22 @@ class play{
 				int nextDirection;
 
 				//Handling special types of enemies
-				if(enemy->explodeCounter==5*60){
+				if(enemy->explodeCounter==15*60){
 					if(enemy->type==0){
-						Enemy* newEnemy = new Enemy(renderer,x,y,menu_n->s_width,texture_e);
+						vector<SDL_Texture*> newTexture;
+						switch(nextEnemy){
+							case 0:{newTexture=texture_e0;break;}
+							case 1:{newTexture=texture_e1;break;}
+							case 2:{newTexture=texture_e2;break;}
+							case 3:{newTexture=texture_e3;break;}
+						}
+						Enemy* newEnemy = new Enemy(renderer,nextEnemy,x,y,menu_n->s_width,newTexture);
 						newEnemy->x_speed = (-1)*enemy->x_speed;
 						newEnemy->y_speed = (-1)*enemy->y_speed;
 						enemies.push_back(newEnemy);
-						numEnemiesPlaced++;		
+						numEnemiesPlaced++;
+						enemy->explodeCounter=0;
+						nextEnemy=(nextEnemy+1)%4;		
 					}else if(enemy->type==3){
 						enemy->active=false;
 						explode(x/100,y/100);
@@ -1151,14 +1214,24 @@ class play{
 					maze->mazeData[a-1][b-1]=2;
 				}
 			}else{
-				maze->mazeData[a][b+1]=2;
-				maze->mazeData[a+1][b+1]=2;
-				maze->mazeData[a][b-1]=2;
-				maze->mazeData[a+1][b-1]=2;
-				maze->mazeData[a][b+1]=2;
-				maze->mazeData[a-1][b+1]=2;
-				maze->mazeData[a][b-1]=2;
-				maze->mazeData[a-1][b-1]=2;
+				maze->mazeData[a+1][b]=2;
+				maze->mazeData[a-1][b]=2;
+				if(b==1){
+					maze->mazeData[a][b+1]=2;
+					maze->mazeData[a+1][b+1]=2;
+					maze->mazeData[a-1][b+1]=2;
+				}else if(b==h-2){
+					maze->mazeData[a+1][b-1]=2;
+					maze->mazeData[a-1][b-1]=2;
+					maze->mazeData[a][b-1]=2;
+				}else{
+					maze->mazeData[a+1][b-1]=2;
+					maze->mazeData[a-1][b-1]=2;
+					maze->mazeData[a][b-1]=2;
+					maze->mazeData[a][b+1]=2;
+					maze->mazeData[a+1][b+1]=2;
+					maze->mazeData[a-1][b+1]=2;
+				}
 			}
 		}
 		

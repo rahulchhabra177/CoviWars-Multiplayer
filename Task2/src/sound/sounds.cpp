@@ -59,6 +59,7 @@ void SoundClass::InitializeAll(){
 	LoadSound("./../sounds/pacman_eatfruit.wav","eatFruit");
 	LoadSound("./../sounds/pacman_extrapac.wav","eatVaccine");
 	LoadSound("./../sounds/pacman_chomp.wav","wallAdded");
+	LoadSound("./../sounds/explode.wav","explode");
 	LoadMusic("./../music/bMusic.mp3","bMusic");
 }
 

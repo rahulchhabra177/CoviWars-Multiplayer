@@ -145,11 +145,11 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	}
 	else if (type==-2){
 		// timed=true;
-		Button* startmulti_button=new Button("Rahul Chhabra",renderer,"",25,25,52);
+		Button* startmulti_button=new Button("Shrey Patel",renderer,"",25,25,52);
 		startmulti_button->set_cor(1550,950,540,150);
 		buttons.push_back(startmulti_button);
 		
-		Button* options_button=new Button("Shrey Patel",renderer,"",25,25,52);
+		Button* options_button=new Button("Rahul Chhabra",renderer,"",25,25,52);
 		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 		

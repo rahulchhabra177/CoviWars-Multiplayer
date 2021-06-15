@@ -103,12 +103,12 @@ void Character::updatePlayer(bool isForeigner){
 					if(knockbackCounter==60*3){
 						knockback=false;
 						knockbackCounter=0;
-						x_speed = (-1)*x_speed;
-						y_speed = (-1)*y_speed;
+						x_speed = (-1)*x_speed/2;
+						y_speed = (-1)*y_speed/2;     
 					}else{
 						if(knockbackCounter==0){
-							x_speed = (-1)*x_speed;
-							y_speed = (-1)*y_speed;
+							x_speed = (-2)*x_speed;
+							y_speed = (-2)*y_speed;
 						}
 						knockbackCounter++;
 					}

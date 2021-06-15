@@ -164,6 +164,8 @@ void Game::handle_event(){
 		}
 	}else if (state==4){
 		playAgain->handle_event(event,&state,MusicManager,&prevstate);
+	}else if(state==5){
+		win->handle_event(event,&state,MusicManager,&prevstate);
 	}else if (state==2){
 		pause->handle_event(event,&state,MusicManager,&prevstate);
 	}
@@ -224,6 +226,9 @@ void Game::process(){
 	}
 	else if (state==2){
 		pause->update(&state);
+		if(playState->multiplayer){
+			playState->update(&state,true,MusicManager,&prevstate,nmanager);
+		}
 	}
 	else if (state==7){
 		credits->update(&state);
@@ -244,7 +249,7 @@ void Game::process(){
 		//This pseudostate manages the transition between the start menu 
 		//and the play state in case of a single player game, so a new 
 		//single play state is created
-		playState = new play("Play",1,gameback,renderer,menuList[0],false);
+		playState = new play("Play",5,gameback,renderer,menuList[0],false);
 		state = 0;
 	}
 	else if(state==101){

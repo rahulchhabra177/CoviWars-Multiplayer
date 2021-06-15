@@ -15,7 +15,7 @@ public:
 	int y_speed = 0;
 	int count = 0,cur_texture=0;
 	int rot_speed=20;
-	int type=0;
+	int type=-1;
 	int explodeCounter=0;
 	bool active=false;
 	string name="player";

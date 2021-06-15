@@ -123,6 +123,27 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 		removeDeadEnds();
 		setQuarantine();
 		
+		if (multiplayer){
+			for (int i=0;i<numFruits;i++){
+				placeFruits();
+			}	
+			for (int i=0;i<numVaccines;i++){
+				placeVaccine();
+			}
+			for (int i=0;i<numMasks;i++){
+				placeMasks();
+			}
+		}
+		
+		numEggs = 0;
+
+		for(int i=0;i<m_width;i++){
+			for(int j=0;j<m_height;j++){
+				if(mazeData[i][j]==0){
+					numEggs++;
+				}
+			}
+		}
 
 	}else{
 
@@ -149,17 +170,6 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 					numEggs++;
 				}
 			}
-		}
-	}
-	if (multiplayer){
-		for (int i=0;i<5;i++){
-			placeFruits();
-		}	
-		for (int i=0;i<3;i++){
-			placeVaccine();
-		}
-		for (int i=0;i<4;i++){
-			placeMasks();
 		}
 	}
 }
@@ -318,18 +328,15 @@ void Maze::removeDeadEnds(){
 								if(j==1){
 									if(counter==0){
 										mazeData[i][j+1]=0;
-										numEggs++;
 									}
 								}else{
 									if(counter==0){
 										mazeData[i][j-1]=0;
-										numEggs++;
 									}
 								}
 							}else{
 								if(counter==0){
 									mazeData[i+1][j]=0;
-									numEggs++;
 								}
 							}
 							if(i!=m_width-2){
@@ -347,18 +354,15 @@ void Maze::removeDeadEnds(){
 								if(i==1){
 									if(counter==0){
 										mazeData[i+1][j]=0;
-										numEggs++;
 									}
 								}else{
 									if(counter==0){
 										mazeData[i-1][j]=0;
-										numEggs++;
 									}
 								}
 							}else{
 								if(counter==0){
 									mazeData[i][j-1]=0;
-									numEggs++;
 								}
 							}
 							if(i!=1){
@@ -376,18 +380,15 @@ void Maze::removeDeadEnds(){
 								if(j==1){
 									if(counter==0){
 										mazeData[i][j+1]=0;
-										numEggs++;
 									}
 								}else{
 									if(counter==0){
 										mazeData[i][j-1]=0;
-										numEggs++;
 									}
 								}
 							}else{
 								if(counter==0){
 									mazeData[i-1][j]=0;
-									numEggs++;
 								}
 							}
 							if(i!=1){
@@ -405,18 +406,15 @@ void Maze::removeDeadEnds(){
 								if(i==1){
 									if(counter==0){
 										mazeData[i+1][j]=0;
-										numEggs++;
 									}
 								}else{
 									if(counter==0){
 										mazeData[i-1][j]=0;
-										numEggs++;
 									}
 								}
 							}else{
 								if(counter==0){
 									mazeData[i][j+1]=0;
-									numEggs++;
 								}
 								hiddenWalls.push_back(make_pair(i,j+1));
 							}
@@ -465,7 +463,6 @@ void Maze::constructMaze(){
 	int x = 2*(rand()%(m_width/2))+1;
 	int y = 2*(rand()%(m_height/2))+1;
 	cells.push(make_pair(x,y));
-	numEggs++;
 	while(!cells.empty()){
 		vector<int> unvisited = neighbours(cells.top());
 		int x = cells.top().first;
@@ -495,7 +492,6 @@ void Maze::constructMaze(){
 			}
 			mazeData[x][y] = 0;
 			cells.push(make_pair(x,y));
-			numEggs+=2;
 		}
 	}
 }
@@ -596,10 +592,9 @@ void Maze::setParams(){
 		case 1:{numFruits=7;numVaccines=3;numMasks=2;qSize=5;extra_enemies=4;break;}
 		case 2:{numFruits=6;numVaccines=2;numMasks=2;qSize=5;extra_enemies=8;break;}
 		case 3:{numFruits=5;numVaccines=2;numMasks=2;qSize=6;extra_enemies=12;break;}
-		case 4:{numFruits=4;numVaccines=1;numMasks=1;qSize=6;extra_enemies=16;break;}
-		case 5:{numFruits=3;numVaccines=1;numMasks=1;qSize=7;extra_enemies=20;break;}
+		case 4:{numFruits=4;numVaccines=1;numMasks=2;qSize=6;extra_enemies=16;break;}
+		case 5:{numFruits=3;numVaccines=1;numMasks=2;qSize=7;extra_enemies=20;break;}
 	}
-	numEggs = numEggs - numFruits - numVaccines - numMasks;
 }
 
 //For setting a quarantine region in the maze
@@ -611,7 +606,6 @@ void Maze::setQuarantine(){
 			int k = mazeData[x+i][y+j];
 			if(k==0){
 				mazeData[x+i][y+j]=7;
-				numEggs--;
 			}
 		}
 	}

@@ -19,7 +19,6 @@ ScoreBoard::ScoreBoard(SDL_Renderer* render,bool multi){
 	pl1->set_cor(2887,596,378,150);
 	pl2->set_cor(2887,796,378,150);
 	
-
 }
 
 //Update function which managers the updation of the score of all the players
@@ -33,7 +32,7 @@ void ScoreBoard::update(int player,string p1,int s1,string p2,int s2){
 		//once all the players have joined, and until then it waits
 		if(p2!=""){
 			counter++;
-			if (counter%30==0){
+			if (counter%10==0){
 				//Player1
 				string player1=p1+" : "+to_string(s1);
 				pl1->changeLabel(player1,"",255,255,25);
