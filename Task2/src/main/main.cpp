@@ -22,7 +22,7 @@ int main(int argc,char* args[]){
 	int player_id=0;
 	bool isServer=false;
 	if (stoi(args[1])==1){isServer=true;}
-	string nm=(isServer?"Coroman-server":"Coroman-client");
+	string nm=(isServer?"CoviWars-server":"CoviWars-client");
 
 	//Actual frame-by-frame processing of the game	
 	Game *game=new Game(&nm[0],SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh,isServer);

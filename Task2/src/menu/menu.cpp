@@ -60,7 +60,7 @@ class Menu{
 				exit_button->set_cor(1700,1800,500,170);
 				buttons.push_back(exit_button);
 				
-				Button* logo=new Button("COROMAN",renderer,"",25,25,52);
+				Button* logo=new Button("COVI-WARS",renderer,"",25,25,52);
 				logo->set_cor(1300,250,1200,400);
 				buttons.push_back(logo);
 				

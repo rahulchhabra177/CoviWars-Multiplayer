@@ -1,4 +1,4 @@
-OBJS = ./main/main.cpp ./main/game.cpp ./texture/Texture.cpp ./character/coroman.cpp ./button/button.cpp ./playstate/play.cpp ./menu/menu.cpp ./maze/maze.cpp ./sound/sounds.cpp ./character/enemy.cpp ./scoreboard/scoreboard.cpp ./network/network.cpp ./menu/popup.cpp
+OBJS = ./main/main.cpp ./main/game.cpp ./texture/Texture.cpp ./character/coviwars.cpp ./button/button.cpp ./playstate/play.cpp ./menu/menu.cpp ./maze/maze.cpp ./sound/sounds.cpp ./character/enemy.cpp ./scoreboard/scoreboard.cpp ./network/network.cpp ./menu/popup.cpp
 CC = g++
 COMPILER_FLAGS = -w
 LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_net

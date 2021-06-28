@@ -1,5 +1,5 @@
 #include "./../texture/Texture.h";
-#include "./../character/coroman.h";
+#include "./../character/coviwars.h";
 
 using namespace std;
 bool character_debug=true;

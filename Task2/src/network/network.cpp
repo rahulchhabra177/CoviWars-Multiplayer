@@ -2,7 +2,7 @@
 using namespace std;
 
 //Constructor for network manager
-network::network(bool isserver){
+network::network(bool isserver,char* ip_addr,int portNo){
 	
 	SDLNet_Init();
 	IPaddress ip;	
@@ -12,14 +12,14 @@ network::network(bool isserver){
 	if (isServer){
 
 		//Assigning a new IP address if this a server
-		SDLNet_ResolveHost(&ip,NULL,1504);
+		SDLNet_ResolveHost(&ip,NULL,portNo);
 		server = SDLNet_TCP_Open(&ip);
 
 	}else{
 
 		//Assigning the IP of the server if the current instance of the game
 		//is a client
-		SDLNet_ResolveHost(&ip,"127.0.0.1",1504);
+		SDLNet_ResolveHost(&ip,ip_addr,portNo);
 		server=SDLNet_TCP_Open(&ip);
 		if(server==NULL){
 			cout<<"Unable to connect to server\n";

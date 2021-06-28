@@ -4,7 +4,7 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<bits/stdc++.h>
-#include "./../character/coroman.h"
+#include "./../character/coviwars.h"
 #include "./../button/button.h"
 
 class ScoreBoard{

@@ -7,7 +7,7 @@ class network{
 public:
 
 	bool isServer=false;
-	network(bool isserver);
+	network(bool isserver,char* ip_addr,int portNo);
 	void send(std::string s,int* state,int* prevstate);
 	std::string receive(int num,int* state,int* prevstate);
 	TCPsocket server,client;

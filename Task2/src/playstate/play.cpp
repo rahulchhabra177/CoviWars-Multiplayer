@@ -101,21 +101,21 @@ class play{
 			//of 32 textures. 
 			for (int i=0;i<4;i++){
 				for (int j=0;j<8;j++){
-					string path="./../assets/coroman/normal/pac"+to_string(i)+to_string(j%2+1)+".png";
+					string path="./../assets/coviwars/normal/pac"+to_string(i)+to_string(j%2+1)+".png";
 					char* a=&path[0];
 					texture_p[i][j]=Texture::LoadT(a,localRenderer);
 				}
 			}
 			for (int i=0;i<4;i++){
 				for (int j=0;j<8;j++){
-					string path="./../assets/coroman/vaccinated/pacvac"+to_string(i)+to_string(j%2+1)+".png";
+					string path="./../assets/coviwars/vaccinated/pacvac"+to_string(i)+to_string(j%2+1)+".png";
 					char* a=&path[0];
 					texture_pv[i][j]=Texture::LoadT(a,localRenderer);
 				}
 			}
 			for (int i=0;i<4;i++){
 				for (int j=0;j<8;j++){
-					string path="./../assets/coroman/invincible/pacapp"+to_string(i)+to_string(j%2+1)+".png";
+					string path="./../assets/coviwars/invincible/pacapp"+to_string(i)+to_string(j%2+1)+".png";
 					char* a=&path[0];
 					texture_pa[i][j]=Texture::LoadT(a,localRenderer);
 				}

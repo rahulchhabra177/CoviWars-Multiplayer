@@ -83,7 +83,14 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				winback=Texture::LoadT("./../assets/backgrounds/start.png",renderer);
 
 				//Initialisations of all the null objects declared before
-				nmanager = new network(isServer);
+
+				char* ip_addr;
+				int portNo;
+
+				cout<<"Enter your IP address: ";cin>>ip_addr;
+				cout<<"Enter your port number: ";cin>>portNo;
+
+				nmanager = new network(isServer,ip_addr,portNo);
 				pmenu = new Popup(renderer,1,false,s_width,s_height);
 				optionPopup = new Popup(renderer,3,false,s_width,s_height);
 				lobby=new Popup(renderer,-1,false,s_width,s_height);
@@ -249,7 +256,7 @@ void Game::process(){
 		//This pseudostate manages the transition between the start menu 
 		//and the play state in case of a single player game, so a new 
 		//single play state is created
-		playState = new play("Play",5,gameback,renderer,menuList[0],false);
+		playState = new play("Play",1,gameback,renderer,menuList[0],false);
 		state = 0;
 	}
 	else if(state==101){
