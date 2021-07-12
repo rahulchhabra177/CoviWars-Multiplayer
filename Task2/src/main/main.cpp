@@ -25,7 +25,7 @@ int main(int argc,char* args[]){
 	string nm=(isServer?"CoviWars-server":"CoviWars-client");
 
 	//Actual frame-by-frame processing of the game	
-	Game *game=new Game(&nm[0],SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh,isServer);
+	Game *game=new Game(nm,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,sw,sh,isServer);
 	while (game->isRunning()){
 		frameStart=SDL_GetTicks();
 		

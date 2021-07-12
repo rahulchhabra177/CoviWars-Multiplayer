@@ -11,7 +11,7 @@ class Menu{
 		vector<Button*> buttons;				//List of buttons in the menu
 		SDL_Texture* background,*playerName;
 		SDL_Renderer* renderer;
-		bool menu_debug=true;
+		bool menu_debug=false;
 		SDL_Rect input_box;						//For taking in the name of the player as input
 		bool changed=false;						//To check if the player inputs any characters
 		string cur_player="";					//The name of the current player

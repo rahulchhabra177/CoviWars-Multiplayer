@@ -30,6 +30,6 @@ class Button{
 		void set_cor(int x,int y,int a ,int b);
 		void set_rect(int a,int b,int q,int w);
 		void set_original();
-
+		TTF_Font* font;
 };
 #endif

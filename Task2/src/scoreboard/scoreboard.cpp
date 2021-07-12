@@ -1,5 +1,5 @@
 #include "scoreboard.h"
-bool score_debug=true;
+bool score_debug=false;
 using namespace std;
 
 //Constructor

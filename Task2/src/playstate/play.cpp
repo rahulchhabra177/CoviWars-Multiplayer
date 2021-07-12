@@ -17,7 +17,7 @@ class play{
 		SDL_Texture* background;
 		SDL_Renderer* renderer;
 		SDL_Texture *heading=nullptr;
-		bool play_debug=true;
+		bool play_debug=false;
 		Maze* maze=nullptr,*maze_copy=nullptr;
 		Character* pacman=nullptr,*pacman2=nullptr,*fireball=nullptr;
 		ScoreBoard *score=nullptr;
@@ -364,7 +364,6 @@ class play{
 				pacman2->name="Player 2";
 			}
 			if (fireball!=nullptr){
-				cout<<"fball\n\n\n\n\n\n\n\n\n\n\n\n\n";
 				fireball->render(renderer);
 			}
 			if (play_debug)cout<<"play.cpp:render\n";
@@ -511,9 +510,7 @@ class play{
 						nmanager->send("$"+pacman->getPlayerState()+to_string(enemies.size())+enemyState,state,prevstate);
 					}
 					string response=nmanager->receive(10,state,prevstate);
-					cout<<"handle\n";
 					handle_request(response,state,prevstate);
-					cout<<"request handled\n";
 				}
 			}
 
@@ -530,7 +527,6 @@ class play{
 			if(!collidePlayer(pacman,last_key_x(pacman),last_key_y(pacman)) && !pacman->knockback){
 				pacman->x_speed=last_key_x(pacman);
 				pacman->y_speed=last_key_y(pacman);
-				cout<<pacman->x_speed<<":"<<pacman->y_speed<<":"<<pacman->lastKey<<"\n";
 				pacman->cur_dir=pacman->lastKey;
 			}
 
@@ -860,47 +856,38 @@ class play{
 			if(e.type==SDL_KEYDOWN){
 				switch(e.key.keysym.sym){
 					case SDLK_UP:{
-						cout<<"UP"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=1){pacman->lastKey=1;}
 						if (!collidePlayer(pacman,0,(-1)*pacman->speed)){
 							pacman->y_speed=(-1)*pacman->speed;
 							pacman->x_speed=0;
 							pacman->cur_dir=1;
-							cout<<"Up"<<":"<<pacman->lastKey<<"\n";
 						}
 						break;
 					}
 					case SDLK_DOWN:{
-						cout<<"Down"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=3){pacman->lastKey=3;}
 						if (!collidePlayer(pacman,0,pacman->speed)){
 							pacman->y_speed=pacman->speed;
 							pacman->x_speed=0;
 							pacman->cur_dir=3;
-							cout<<"Down"<<":"<<pacman->lastKey<<"\n";
 						}
 						break;
 					}
 					case SDLK_RIGHT:{
-						cout<<"Right"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=0){pacman->lastKey=0;}
 						if (!collidePlayer(pacman,pacman->speed,0)){
 							pacman->y_speed=0;
 							pacman->x_speed=pacman->speed;
 							pacman->cur_dir=0;
-							cout<<"Right"<<":"<<pacman->lastKey<<"\n";
-							
 						}
 						break;
 					}
 					case SDLK_LEFT:{
-						cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";
 						if (pacman->cur_dir!=2){pacman->lastKey=2;}
 						if (!collidePlayer(pacman,(-1)*pacman->speed,0)){
 							pacman->y_speed=0;
 							pacman->x_speed=(-1)*pacman->speed;
-							pacman->cur_dir=2;
-							cout<<"LEFT"<<":"<<pacman->lastKey<<"\n";		
+							pacman->cur_dir=2;		
 						}
 						break;
 					}

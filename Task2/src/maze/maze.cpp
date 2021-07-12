@@ -1,7 +1,7 @@
 #include "./../maze/maze.h"
 #include <time.h>
 using namespace std;
-bool maze_debug=true;
+bool maze_debug=false;
 
 //To keep the single player version of this game fresh and interesting, we 
 //have implemented a hidden walls feature, in which after every fixed interval,
@@ -155,12 +155,10 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 			cout<<"Data Insufficient\n";
 			exit(1);
 		}
-		cout<<"mazeData->size:"<<mzData.size()<<"\n";
 
 		for(int i=0;i<m_width;i++){
 			vector<int> v;
 			for(int j=0;j<m_height;j++){
-				// cout<<mzData[k];
 				v.push_back(stoi(mzData.substr(k+1,1)));
 				k++;
 			}
@@ -177,7 +175,6 @@ Maze::Maze(int l,SDL_Renderer* localRenderer,bool multi,string mzData){
 //Converting the structure of the maze into a string to be sent to other
 //clients through the network manager
 string Maze::getMazeState(){
-	cout<<"gettingMazeState\n";
 	string s="";
 	for (int i=0;i<m_width;i++){
 		for(int j=0;j<m_height;j++){
@@ -435,7 +432,6 @@ void Maze::removeDeadEnds(){
 			}
 		}
 	}
-	cout<<"Dead Ends removed\n";
 }
 
 //This update function is useful for the hidden walls feature

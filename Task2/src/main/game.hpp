@@ -11,7 +11,7 @@ using namespace std;
 class Game{
 
 	public:
-		Game(char* title, int x,int y,int h,int w,bool isServer);
+		Game(string title, int x,int y,int h,int w,bool isServer);
 		void handle_event();
 		void process();
 		void render();

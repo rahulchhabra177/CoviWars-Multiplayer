@@ -1,7 +1,7 @@
 #include "sounds.h";
 
 using namespace std;
-bool sound_debug=true;
+bool sound_debug=false;
 
 //Sound vector stores all the sound effects which are heard when certain actions
 //take place in the game, like collisions, button presses, state changes, etc.
@@ -78,7 +78,6 @@ void SoundClass::PlayMusic(string label){
 	if (music_on){
 		if (sound_debug)cout<<"sounds.cpp:PlaySound\n";
 		int loc=LabelToInt1[label];
-		cout<<loc<<" "<<label<<"\n";
 		Mix_PlayMusic(MusicVector.at(loc),-1);
 	}
 }

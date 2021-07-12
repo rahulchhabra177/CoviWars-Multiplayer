@@ -15,7 +15,7 @@ network* nmanager=nullptr;		//Network/Socket manager for multiplayer
 //Pop-ups for different menus
 Popup* pmenu=nullptr,*optionPopup=nullptr,*lobby=nullptr,*playAgain=nullptr,*pause=nullptr,*win=nullptr,*credits=nullptr;
 
-bool game_debug=true;
+bool game_debug=false;
 bool client_started=false;		
 
 //For navigating throughtout the game, we have implemneted the game as a collection
@@ -39,7 +39,7 @@ bool client_started=false;
 //important in transitions between states
 
 //Game constructor
-Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,bool isserver){
+Game::Game(string title, int xcor,int ycor,int width_window,int height_window,bool isserver){
 	if (game_debug)cout<<"game.cpp::Game\n";
 	
 	isServer = isserver;
@@ -47,10 +47,15 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 	running = true;
 	s_width = width_window;
 	s_height = height_window;
+
+	string ip_addr;
+	int portNo;
+	cout<<"Enter your IP address: ";cin>>ip_addr;
+	cout<<"Enter your port number: ";cin>>portNo;
 	
 	if (SDL_Init(SDL_INIT_EVERYTHING)==0){
 		cout<<"SDL Initialised succesfully....\n";
-		window=SDL_CreateWindow(title,xcor,ycor,width_window,height_window,flag);
+		window=SDL_CreateWindow(&title[0],xcor,ycor,width_window,height_window,flag);
 		if (window==NULL){
 			running=false;
 			cout<<"Error:Couldn't initialize window\n";
@@ -84,13 +89,7 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 
 				//Initialisations of all the null objects declared before
 
-				char* ip_addr;
-				int portNo;
-
-				cout<<"Enter your IP address: ";cin>>ip_addr;
-				cout<<"Enter your port number: ";cin>>portNo;
-
-				nmanager = new network(isServer,ip_addr,portNo);
+				nmanager = new network(isServer,&ip_addr[0],portNo);
 				pmenu = new Popup(renderer,1,false,s_width,s_height);
 				optionPopup = new Popup(renderer,3,false,s_width,s_height);
 				lobby=new Popup(renderer,-1,false,s_width,s_height);
@@ -99,7 +98,6 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				credits=new Popup(renderer,-2,false,s_width,s_height);
 				win=new Popup(renderer,5,false,s_width,s_height);
 				
-				cout<<"Initialising Menus\n";
 				Menu* startMenu = new Menu("Start",1,menuback,renderer,width_window,height_window);
 				menuList.push_back(startMenu);
 				
@@ -117,8 +115,6 @@ Game::Game(char* title, int xcor,int ycor,int width_window,int height_window,boo
 				
 				Menu* Rules = new Menu("Rules Screen",6,gameback,renderer,width_window,height_window);
 				menuList.push_back(Rules);
-				
-				cout<<"Menus Initialised\n";
 				
 				MusicManager = new SoundClass();
 				MusicManager->InitializeAll();
@@ -148,7 +144,6 @@ void Game::handle_event(){
 		int a,b;
 		//This function retrieves the current position of the mouse pointer
 		SDL_GetMouseState(&a,&b);
-		cout<<"\n\nMouse Button Pressed:coordinates:"<<a<<" "<<b<<"\n\n";
 	}
 	
 	//Note that most of the event handling is deferred to event handlers of
@@ -198,7 +193,6 @@ void Game::handle_event(){
 			//of all the enemies and the initial position of the
 			//pacman for consistency among all the players.
 			if (nmanager->connected){
-				cout<<"connected\n";
 				nmanager->send("$"+playState->getPlayState(),&state,&prevstate);
 				playState->addPlayer();
 			}

@@ -52,7 +52,6 @@ bool network::check_new_players(){
 //This method is used by the server or the clients to send some request or
 //data, in the form of a string to the server or other clients
 void network::send(string s,int* state,int* prevstate){
-	cout<<"send\n";
 
 	//For disconnecting a client/server if it's connection times out 
 	if (SDL_GetTicks()-timeout>5000){
@@ -69,9 +68,7 @@ void network::send(string s,int* state,int* prevstate){
 				*prevstate=-1;
 		
 			}
-			cout<<"size::\n";
 			size+=SDLNet_TCP_Send(client,tmp+size,len-size);
-			cout<<"size:\n";
 		}
 	}else{
 		if (server==NULL){cout<<"No server\n";exit(1);return;}
@@ -80,9 +77,7 @@ void network::send(string s,int* state,int* prevstate){
 				*prevstate=-1;
 				// *state=101;
 			}
-			cout<<"size::\n";
 			size+=SDLNet_TCP_Send(server,tmp+size,len-size);
-			cout<<"size:\n";
 		}
 	}
 }
@@ -90,7 +85,6 @@ void network::send(string s,int* state,int* prevstate){
 //This method is used to receive data or request from the server or clients
 //essentially the opposite of send function 
 string network::receive(int num,int* state,int* prevstate){
-	cout<<"receive\n";
 
 	//For disconnecting a client/server if it's connection times out 
 	if (SDL_GetTicks()-timeout>5000){
@@ -107,7 +101,6 @@ string network::receive(int num,int* state,int* prevstate){
 			int test=0;
 			while (offset<num && test<100){
 				test++;
-				cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 				offset_prv=offset;
 				offset+=SDLNet_TCP_Recv(client,temp,num-result.size());	
 				if (offset<=0){
@@ -115,7 +108,6 @@ string network::receive(int num,int* state,int* prevstate){
 				}
 				result+=string(temp).substr(0,min(num,(int)strlen(temp)));
 			}
-			cout<<"Packet Recieved:"<<result<<":"<<result.size()<<"\n";
 			return result;
 		}
 	}else if (connected){
@@ -128,7 +120,6 @@ string network::receive(int num,int* state,int* prevstate){
 			int test=0;
 			while (offset<num && test<100){
 				test++;
-				cout<<offset<<":"<<num<<":"<<result.size()<<":"<<result<<": offset\n";
 				offset_prv=offset;
 				offset+=SDLNet_TCP_Recv(server,temp,num-result.size());
 				
@@ -137,7 +128,6 @@ string network::receive(int num,int* state,int* prevstate){
 				}
 				result+=string(temp).substr(0,min(num,(int)strlen(temp)));
 			}
-			cout<<"Packet Recieved:"<<result<<":"<<result.size()<<"\n";
 			return result;
 		}
 	}

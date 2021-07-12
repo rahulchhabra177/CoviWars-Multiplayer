@@ -1,7 +1,7 @@
 #include "button.h";
 
 using namespace std;
-bool button_debug=true;
+bool button_debug=false;
 
 //Button constructor
 Button::Button(char* name, SDL_Renderer* localRenderer,int width,int height){
@@ -14,13 +14,7 @@ Button::Button(char* name, SDL_Renderer* localRenderer,int width,int height){
 	label = name;
 	s_height=height;
 	s_width=width;
-	TTF_Font * font;
-	font=TTF_OpenFont("./../fonts/batmfa1.ttf",20);
-	
-	if (font==NULL){
-		cout<<"Error:Couldn't initialize font"<<TTF_GetError()<<"\n";
-		exit(1);
-	}
+	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
 	
 	//Generating button texture from SDL surface
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{25,25,52,255});
@@ -45,14 +39,7 @@ Button::Button(char* name, SDL_Renderer* localRenderer,string fnt,int r,int g,in
 	renderer=localRenderer;
 	TTF_Init();
 	label = name;
-	TTF_Font * font;
-	string fntname="./../fonts/batmfa"+fnt+".ttf";
-	font=TTF_OpenFont(&fntname[0],20);
-	
-	if (font==NULL){
-		cout<<"Error:Couldn't initialize font"<<TTF_GetError()<<"\n";
-		exit(1);
-	}
+	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
 	
 	//Generating button texture from SDL surface
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{r,g,b,255});
@@ -79,8 +66,7 @@ Button::Button(char* name,char* name2, SDL_Renderer* localRenderer,int width,int
 	label = name;
 	s_height=height;
 	s_width=width;
-	TTF_Font * font;//=new TTFont();
-	font=TTF_OpenFont("./../fonts/batmfa1.ttf",20);
+	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
 	
 	if (font==NULL){
 		cout<<"Error:Couldn't initialize font"<<TTF_GetError()<<"\n";
@@ -129,14 +115,6 @@ bool Button::isInside(int a,int b){
 void Button::changeLabel(string newlabel,string fnt,int r,int g,int b){
 
 	if (button_debug)cout<<"button.cpp:changeLabel:"<<newlabel<<"\n";
-	TTF_Init();
-	TTF_Font * font;//=new TTFont();
-	string fontname="./../fonts/batmfa"+fnt+".ttf";
-	font=TTF_OpenFont(&fontname[0],20);
-	if (font==nullptr){
-		cout<<"Couldn;t find font\n";
-		return;
-	}
 	SDL_Surface *textSurface=TTF_RenderText_Solid(font,&newlabel[0],{r,g,b,255});
 	if (textSurface==nullptr){
 		cout<<"Couldn;t find font\n";
@@ -279,7 +257,6 @@ void Button::render(SDL_Renderer *renderer){
 
 //Reverting a button to its original state when the mouse pointer leaves it
 void Button::set_original(){
-	// cout<<"set_original\n\n";
 	if (cur_color!=0){
 		dest.x+=10;
 		dest.y+=10;
