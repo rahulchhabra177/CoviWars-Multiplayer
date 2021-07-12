@@ -26,7 +26,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 	timed=isTimed;
 
 	//Background textures
-	background=Texture::LoadT("./../assets/backgrounds/pop.png",renderer);
+	background=Texture::LoadT("./../assets/backgrounds/popup.png",renderer);
 	back = Texture::LoadT("./../assets/backgrounds/redblur.png",renderer);
 
 	startTime=SDL_GetTicks();
@@ -47,7 +47,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
-		Button* logo=new Button("CONGRATULATIONS",renderer,"",25,25,25);
+		Button* logo=new Button("CONGRATULATIONS",renderer,"",255,255,255);
 		logo->set_cor(1220,520,1200,400);
 		buttons.push_back(logo);
 	}
@@ -66,7 +66,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
-		Button* logo=new Button("YOU LOSE!",renderer,"",25,25,25);
+		Button* logo=new Button("YOU LOSE!",renderer,"",255,255,255);
 		logo->set_cor(1220,520,1200,400);
 		buttons.push_back(logo);
 
@@ -84,7 +84,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		option_button->set_cor(1550,1300,500,150);
 		buttons.push_back(option_button);
 
-		Button* logo=new Button("Options",renderer,"",25,25,25);
+		Button* logo=new Button("Options",renderer,"",255,255,255);
 		logo->set_cor(1220,520,1200,400);
 		buttons.push_back(logo);
 
@@ -102,7 +102,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		exit_button->set_cor(1550,1400,500,150);
 		buttons.push_back(exit_button);
 
-		Button* logo=new Button("Game Paused!",renderer,"",25,25,25);
+		Button* logo=new Button("Game Paused!",renderer,"",255,255,255);
 		logo->set_cor(1220,520,1200,400);
 		buttons.push_back(logo);
 
@@ -120,7 +120,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		exit_button->set_cor(1550,1400,500,150);
 		buttons.push_back(exit_button);
 
-		Button* logo=new Button("Waiting for other player to join",renderer,"",25,25,25);
+		Button* logo=new Button("Waiting for other player to join",renderer,"",255,255,255);
 		logo->set_cor(1020,520,1600,400);
 		buttons.push_back(logo);
 	}
@@ -139,17 +139,17 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
-		Button* logo=new Button("YOU WIN!",renderer,"",25,25,25);
+		Button* logo=new Button("YOU WIN!",renderer,"",255,255,255);
 		logo->set_cor(1220,520,1200,400);
 		buttons.push_back(logo);
 	}
 	else if (type==-2){
 		// timed=true;
-		Button* startmulti_button=new Button("Shrey Patel",renderer,"",25,25,52);
+		Button* startmulti_button=new Button("Rahul Chhabra",renderer,"",255,255,52);
 		startmulti_button->set_cor(1550,950,540,150);
 		buttons.push_back(startmulti_button);
 		
-		Button* options_button=new Button("Rahul Chhabra",renderer,"",25,25,52);
+		Button* options_button=new Button("Shrey Patel",renderer,"",255,255,52);
 		options_button->set_cor(1550,1125,500,150);
 		buttons.push_back(options_button);
 		
@@ -157,7 +157,7 @@ Popup::Popup(SDL_Renderer* localRenderer,int type,bool isTimed,int width,int hei
 		exit_button->set_cor(1550,1300,500,150);
 		buttons.push_back(exit_button);
 
-		Button* logo=new Button("Contributors",renderer,"",25,25,52);
+		Button* logo=new Button("Contributors",renderer,"",255,255,52);
 		logo->set_cor(1220,520,1200,400);
 		buttons.push_back(logo);
 	}

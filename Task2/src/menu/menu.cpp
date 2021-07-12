@@ -60,7 +60,7 @@ class Menu{
 				exit_button->set_cor(1700,1800,500,170);
 				buttons.push_back(exit_button);
 				
-				Button* logo=new Button("COVI-WARS",renderer,"",25,25,52);
+				Button* logo=new Button("COVI-WARS",renderer,"",255,255,252);
 				logo->set_cor(1300,250,1200,400);
 				buttons.push_back(logo);
 				
@@ -138,7 +138,7 @@ class Menu{
 				rule_rect.w=3200;
 				Button* back_button=new Button("Back",renderer,width,height);
 				back_button->set_cor(1700,1850,300,70);
-				back_button->changeLabel("Back","",255,255,25);
+				back_button->changeLabel("Back","",255,255,255);
 				buttons.push_back(back_button);
 			}
 
