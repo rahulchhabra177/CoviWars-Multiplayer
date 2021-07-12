@@ -17,9 +17,9 @@ Button::Button(char* name, SDL_Renderer* localRenderer,int width,int height){
 	font=TTF_OpenFont("./../fonts/batmfa.ttf",20);
 	
 	//Generating button texture from SDL surface
-	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{25,25,52,255});
+	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{255,255,255,255});
 	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
-	textSurface=TTF_RenderText_Solid(font,label,{251,255,255,255});
+	textSurface=TTF_RenderText_Solid(font,label,{251,252,25,251});
 	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
 	
 	if (textSurface==NULL){
@@ -74,14 +74,14 @@ Button::Button(char* name,char* name2, SDL_Renderer* localRenderer,int width,int
 	}
 	
 	//Generating button textures from SDL surface for both versions of the button
-	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{14,21,24,255});
+	SDL_Surface *textSurface=TTF_RenderText_Solid(font,label,{255,255,255,255});
 	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
-	textSurface=TTF_RenderText_Solid(font,label,{255,255,255,255});
+	textSurface=TTF_RenderText_Solid(font,label,{255,255,25,255});
 	colors[0].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
 	
-	textSurface=TTF_RenderText_Solid(font,name2,{14,25,204,255});
+	textSurface=TTF_RenderText_Solid(font,name2,{255,255,204,255});
 	colors[1].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
-	textSurface=TTF_RenderText_Solid(font,name2,{255,255,255,255});
+	textSurface=TTF_RenderText_Solid(font,name2,{255,255,25,255});
 	colors[1].push_back(SDL_CreateTextureFromSurface(renderer,textSurface));
 	
 	if (textSurface==NULL){
@@ -122,7 +122,7 @@ void Button::changeLabel(string newlabel,string fnt,int r,int g,int b){
 	}
 
 	colors[0][0]=SDL_CreateTextureFromSurface(renderer,textSurface);
-	textSurface=TTF_RenderText_Solid(font,&newlabel[0],{251,255,255,255});
+	textSurface=TTF_RenderText_Solid(font,&newlabel[0],{251,255,25,255});
 	if (textSurface==nullptr){
 		cout<<"Couldn;t find font\n";
 		return;
