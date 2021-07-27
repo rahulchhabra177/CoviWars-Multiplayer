@@ -1,0 +1,4 @@
+The game succesfully compiles and runs, both for the single player and the multiplayer mode.
+The UI navigation works satisfactorily.
+Mouse and Keyboard inputs are executed succesfully.
+We have used TCP sockets and they work fine.
