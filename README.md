@@ -4,7 +4,7 @@ This readme will guide you through the process of installation of dependencies f
 
 # Have a look!
 
-![Game ](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+![Game ](https://github.com/rahulchhabra177/CoviWars-Multiplayer/tree/master/maingame/assets/game.gif)
 
 # **Requirements**
 Our game uses the SDL library (v2) to run and therefore you need to install various SDL modules before playing the game. On Linux distributions, these libraries can be installed by:
@@ -23,7 +23,7 @@ Our game uses the SDL library (v2) to run and therefore you need to install vari
 ## **How to play the game**
 	
  1. First, clone the game repository by using the command:
- `git clone https://github.com/pshrey795/COP290Assignments.git` in terminal
+ `git clone https://github.com/rahulchhabra177/CoviWars-Multiplayer.git` in terminal
  2. Navigate to the [src directory](https://github.com/rahulchhabra177/CoviWars-Multiplayer/tree/master/maingame/src)
  . The game can be built using the `make` command, which will result in an executable called game.
  4. Now, the game can be started depending upon the mode:
