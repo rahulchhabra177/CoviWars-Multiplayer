@@ -1,6 +1,10 @@
+
 # Welcome to CoviWars!
 This readme will guide you through the process of installation of dependencies for the game and for running the game for both single-player and multiplayer modes.
 
+# Have a look!
+
+![Game ](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
 
 # **Requirements**
 Our game uses the SDL library (v2) to run and therefore you need to install various SDL modules before playing the game. On Linux distributions, these libraries can be installed by:
@@ -20,13 +24,13 @@ Our game uses the SDL library (v2) to run and therefore you need to install vari
 	
  1. First, clone the game repository by using the command:
  `git clone https://github.com/pshrey795/COP290Assignments.git` in terminal
- 2. Navigate to the [src directory](https://github.com/pshrey795/COP290Assignments/tree/Shrey_Task2/Task2/src)
- 3. The game can be built using the `make` command, which will result in an executable called game.
+ 2. Navigate to the [src directory](https://github.com/rahulchhabra177/CoviWars-Multiplayer/tree/master/maingame/src)
+ . The game can be built using the `make` command, which will result in an executable called game.
  4. Now, the game can be started depending upon the mode:
 			1. **Singleplayer Mode** : Type `./game 1` for starting the game.
 			2. **Multiplayer Mode**: Type `./game 1` for starting the server and `./game 0` for starting the client.
 5. Before the game window starts, the terminal will ask you certain parameters regarding the desired resolution and your IP address and port number for multiplayer mode.
-![](https://github.com/pshrey795/COP290Assignments/blob/Shrey_Task2/Task2/assets/screen/image.png)
+![](https://github.com/rahulchhabra177/CoviWars-Multiplayer/tree/master/maingame/assets/screen/image.png)
  
 
 ## **References**
@@ -41,4 +45,3 @@ Our game uses the SDL library (v2) to run and therefore you need to install vari
 
  - We used wikipedia for reading up on [Dijkstras' algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and the [travelling salesman(TSP)](https://en.wikipedia.org/wiki/Travelling_salesman_problem) problem.
  - We referred to a [paper by UCDavis](https://web.cs.ucdavis.edu/~amenta/w10/dijkstra.pdf) for arguing thr correctness of Dijkstras' algorithm.
-
