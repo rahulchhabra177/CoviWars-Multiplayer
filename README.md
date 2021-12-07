@@ -4,7 +4,9 @@ This readme will guide you through the process of installation of dependencies f
 
 # Have a look!
 
-![Game ](https://github.com/rahulchhabra177/CoviWars-Multiplayer/tree/master/maingame/assets/game.gif)
+![Game ](https://github.com/rahulchhabra177/CoviWars-Multiplayer/blob/master/maingame/assets/game.gif?raw=true)
+
+***Link to ppt:*** https://docs.google.com/presentation/d/e/2PACX-1vRE61LhV5bYMUz_UOwYw2j1ih-AKNIYuAfXM1Q_FRySepwgsgQsAqKy9dyO6u3cmtHy1CtwcZE4yZr8/pub?start=true&loop=false&delayms=2000
 
 # **Requirements**
 Our game uses the SDL library (v2) to run and therefore you need to install various SDL modules before playing the game. On Linux distributions, these libraries can be installed by:
